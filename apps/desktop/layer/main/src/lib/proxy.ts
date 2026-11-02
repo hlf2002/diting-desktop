@@ -56,15 +56,18 @@ const normalizeProxyUri = (userProxy: string) => {
   }
 }
 
-const BYPASS_RULES = ["<local>"].join(";")
+const BYPASS_RULES = ["<local>", "localhost", "127.0.0.1", "[::1]"].join(";")
 
 export const updateProxy = () => {
-  const proxyUri = getProxyConfig()
+  // 本地自建后端（http://localhost:3000）必须直连，不能走系统/环境代理，
+  // 否则 Chromium 会把 localhost 请求也发给代理，导致 net::ERR_FAILED。
+  // 因此：无显式代理配置时改为 direct（而非 system），并在有代理时始终绕过本机地址。
+  const proxyUri =
+    getProxyConfig() ?? normalizeProxyUri(process.env.HTTPS_PROXY || process.env.HTTP_PROXY || "")
+
   if (!proxyUri) {
     session.defaultSession.setProxy({
-      // Note that the system mode is different from setting no proxy configuration.
-      // In the latter case, Electron falls back to the system settings only if no command-line options influence the proxy configuration.
-      mode: "system",
+      mode: "direct",
     })
     return
   }
