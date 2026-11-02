@@ -1,6 +1,5 @@
 import { fileURLToPath } from "node:url"
 
-import { is } from "@electron-toolkit/utils"
 import { LEGACY_APP_PROTOCOL } from "@follow/shared"
 import { callWindowExpose, WindowState } from "@follow/shared/bridge"
 import { APP_PROTOCOL, DEV } from "@follow/shared/constants"
@@ -213,7 +212,7 @@ class WindowManagerStatic {
 
   /** Where the app's pages load from: the dev server, or the bundle behind the app protocol */
   private getRendererUrl() {
-    if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
+    if (process.env["ELECTRON_RENDERER_URL"]) {
       return new URL(process.env["ELECTRON_RENDERER_URL"])
     }
     return new URL(filePathToAppUrl("/"))
@@ -399,7 +398,7 @@ class WindowManagerStatic {
 
     // HMR for renderer base on electron-vite cli.
     // Load the remote URL for development or the local html file for production.
-    if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
+    if (process.env["ELECTRON_RENDERER_URL"]) {
       window.loadURL(process.env["ELECTRON_RENDERER_URL"] + (options?.extraPath || ""))
       logger.log(process.env["ELECTRON_RENDERER_URL"] + (options?.extraPath || ""))
     } else {
