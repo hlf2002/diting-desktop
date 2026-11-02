@@ -64,11 +64,19 @@ export class AuthService extends IpcService {
   }
 
   private getAuthRequestHeaders(additionalHeaders?: Record<string, string>) {
-    return {
+    const headers: Record<string, string> = {
       ...createDesktopAPIHeaders({ version: PKG.version }),
       ...createAuthRequestOriginHeaders(env.VITE_WEB_URL),
       ...additionalHeaders,
     }
+
+    // Electron 的 net.fetch 不会自动发送 CORS 预检请求。手动设置 Origin 会让 Chromium
+    // 把请求判定为跨域 CORS 请求，此时任何自定义头（Cache-Control / X-App-* 等）都会
+    // 触发"需要预检"检查，而预检不会发生，最终以 net::ERR_FAILED 失败。
+    // net.fetch 本身不校验 CORS，因此去掉 Origin 头即可正常请求本地自建后端。
+    delete headers.Origin
+
+    return headers
   }
 
   private async applySessionToken(token: string): Promise<void> {
