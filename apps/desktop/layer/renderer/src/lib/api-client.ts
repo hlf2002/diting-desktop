@@ -64,6 +64,14 @@ const fetchWithElectronAuth = async (request: Request) => {
   })
 }
 
+/**
+ * Fetch helper that mirrors how ordinary API requests travel: in Electron it goes
+ * through the main process (no CORS / cookie handling), elsewhere plain fetch.
+ * The request URL must share the origin with `env.VITE_API_URL` to be routed
+ * through the main process.
+ */
+export const apiFetch = fetchWithElectronAuth
+
 export const followClient = new FollowClient({
   credentials: "include",
   timeout: 60_000,

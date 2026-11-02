@@ -78,7 +78,8 @@ export function AccountManagement() {
       <p className="text-sm font-semibold">{t("profile.link_social.authentication")}</p>
       <div className="flex flex-wrap items-center gap-2">
         {Object.keys(providers || {})
-          .filter((provider) => provider !== "credential")
+          // credential 已下线；qzhuli 是唯一登录方式，不作为可解绑的「社交账号」展示
+          .filter((provider) => provider !== "credential" && provider !== "qzhuli")
           .map((provider) => (
             <AuthProviderButton
               key={provider}

@@ -9,7 +9,6 @@ import { EmailManagement } from "~/modules/profile/email-management"
 import { useTOTPModalWrapper } from "~/modules/profile/hooks"
 import { ProfileSettingForm } from "~/modules/profile/profile-setting-form"
 import { TwoFactor } from "~/modules/profile/two-factor"
-import { UpdatePasswordForm } from "~/modules/profile/update-password-form"
 import { SettingsTitle } from "~/modules/settings/title"
 import { defineSettingPageData } from "~/modules/settings/utils"
 import { deleteUser } from "~/queries/auth"
@@ -37,7 +36,7 @@ export function Component() {
 
         <div className="space-y-4">
           <AccountManagement />
-          <UpdatePasswordForm />
+          {/* 登录方式仅 Q助理扫码，无本地密码可改：隐藏修改密码表单 */}
           <TwoFactor />
           <div className="flex items-center justify-between">
             <Label>{t("profile.delete_account.label")}</Label>
