@@ -26,6 +26,7 @@ import {
 } from "../../lib/cli-session-sync"
 import { deleteNotificationsToken, updateNotificationsToken } from "../../lib/user"
 import { logger } from "../../logger"
+import { startRSSHubWorker, stopRSSHubWorker } from "../../modules/rsshub-worker"
 
 export class AuthService extends IpcService {
   static override readonly groupName = "auth"
@@ -237,6 +238,11 @@ export class AuthService extends IpcService {
   async sessionChanged(preferredToken?: string): Promise<void> {
     await updateNotificationsToken()
 
+    // Q助理登录成功 → 启动 RSSHub P2P 抓取 worker
+    if (preferredToken) {
+      startRSSHubWorker()
+    }
+
     // Sync the current desktop session to the npm CLI login, once the user connected the CLI.
     if (!isCliSyncEnabled()) return
     const token = await getCliSessionToken({
@@ -249,6 +255,9 @@ export class AuthService extends IpcService {
 
   @IpcMethod()
   async signOut(): Promise<void> {
+    // 登出 → 停止 RSSHub P2P 抓取 worker
+    stopRSSHubWorker()
+
     try {
       await deleteNotificationsToken()
     } finally {
