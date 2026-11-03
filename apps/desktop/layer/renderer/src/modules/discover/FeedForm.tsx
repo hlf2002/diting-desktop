@@ -125,7 +125,7 @@ export const FeedForm: Component<{
 
   const feedQuery = useFeedQuery(queryParams)
 
-  const id = feedQuery.data?.feed.id || _id
+  const id = feedQuery.data?.feed?.id || _id
   const feedFromStore = useFeedByIdOrUrl({
     id,
     url,
@@ -141,11 +141,11 @@ export const FeedForm: Component<{
     if (!feedQuery.isLoading) {
       tracker.subscribeModalOpened({
         feedId: id,
-        feedUrl: feedQuery.data?.feed.url || url,
+        feedUrl: feedQuery.data?.feed?.url || url,
         isError: feedQuery.isError,
       })
     }
-  }, [feedQuery.data?.feed.url, feedQuery.isError, feedQuery.isLoading, id, url])
+  }, [feedQuery.data?.feed?.url, feedQuery.isError, feedQuery.isLoading, id, url])
 
   return (
     <div
