@@ -20,6 +20,7 @@ import { ipcServices } from "~/lib/client"
 import { clearAuthSessionToken, getAuthSessionToken } from "~/lib/client-session"
 import { defineQuery } from "~/lib/defineQuery"
 import { reloadAtAppRoot } from "~/lib/reload-at-app-root"
+import { clearRSSHubToken, fetchRSSHubToken } from "~/lib/rsshub-token"
 import { clearLocalPersistStoreData } from "~/store/utils/clear"
 
 const sessionCookieRefreshInterval = 1000 * 60 * 60 * 12
@@ -121,6 +122,14 @@ export const useSession = (options?: { enabled?: boolean }) => {
       ? ({ user: whoami } as NonNullable<typeof data>)
       : data
 
+  // 登录成功后自动拉取 RSSHub 私有服务 token（fire-and-forget，不阻塞 UI）
+  const userId = session?.user?.id
+  useEffect(() => {
+    if (userId) {
+      void fetchRSSHubToken().catch(() => null)
+    }
+  }, [userId])
+
   const getAuthStatus = ():
     "loading" | "authenticated" | "error" | "unauthenticated" | "unknown" => {
     if (session) {
@@ -203,6 +212,7 @@ export const signOut = async () => {
     }
   } finally {
     clearAuthSessionToken()
+    clearRSSHubToken()
     // Clear query cache
     localStorage.removeItem(QUERY_PERSIST_KEY)
 

@@ -77,6 +77,18 @@ export function qzhuliCompleteLogin(token: string) {
   setAuthSessionToken(token)
 
   if (isElectronRuntime()) {
+    // 同步 token 到主进程的 managed cookies，否则主进程转发请求时带不上 cookie
+    void import("./client").then(({ ipcServices }) => {
+      const authService = ipcServices?.auth as
+        | (NonNullable<typeof ipcServices>["auth"] & {
+            setSessionToken?: (token: string) => Promise<void>
+          })
+        | undefined
+      if (authService?.setSessionToken) {
+        void authService.setSessionToken(token)
+      }
+    })
+
     // handleSessionChanges 会清理查询缓存并 reload
     void import("~/queries/auth").then(({ handleSessionChanges }) => handleSessionChanges())
     return
