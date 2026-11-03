@@ -5,9 +5,9 @@ import {
   dismissFeedForm,
   expectTimelineSwitchAndEntryReadFlow,
   followOnboardingFeed,
-  loginWithCredential,
+  loginTestUser,
   logoutFromProfileMenu,
-  registerWithCredential,
+  registerTestUser,
   unsubscribeFirstFeedFromSettings,
 } from "../../support/app"
 import { closeElectronApp, launchElectronApp } from "../../support/electron"
@@ -82,14 +82,14 @@ test.describe("electron core flows", () => {
       })
 
       await test.step("registers a new account", async () => {
-        await registerWithCredential(electronApp.page, account)
+        await registerTestUser(electronApp.page, account)
       })
 
       await test.step("logs out and logs back in", async () => {
         await logoutFromProfileMenu(electronApp.page)
         await closeElectronApp(electronApp)
         electronApp = await launchElectronApp(env)
-        await loginWithCredential(electronApp.page, account)
+        await loginTestUser(electronApp.page, account)
       })
 
       await test.step("follows onboarding feed", async () => {

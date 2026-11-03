@@ -3,7 +3,7 @@ import { expect } from "@playwright/test"
 
 import type { TestAccount } from "./account"
 import type { DesktopE2EEnv } from "./env"
-import { buildWebAppURL } from "./env"
+import { buildWebAppURL, resolveDesktopE2EEnv } from "./env"
 
 const ONBOARDING_FEED_URL = "folo://onboarding"
 
@@ -68,18 +68,13 @@ const isLoggedOutUiReady = async (page: Page) => {
     .last()
     .isVisible()
     .catch(() => false)
-  const loginInputVisible = await page
-    .locator('[data-testid="login-email-input"]:visible')
-    .last()
-    .isVisible()
-    .catch(() => false)
-  const registerInputVisible = await page
-    .locator('[data-testid="register-email-input"]:visible')
+  const qzhuliProviderVisible = await page
+    .locator('[data-testid="login-provider-qzhuli"]:visible')
     .last()
     .isVisible()
     .catch(() => false)
 
-  return loginButtonVisible || loginModalVisible || loginInputVisible || registerInputVisible
+  return loginButtonVisible || loginModalVisible || qzhuliProviderVisible
 }
 
 export const injectRecaptchaToken = async (page: Page, env?: DesktopE2EEnv) => {
@@ -243,18 +238,8 @@ export const ensureLoginModal = async (page: Page) => {
           .last()
           .isVisible()
           .catch(() => false)
-        const loginInputVisible = await page
-          .locator('[data-testid="login-email-input"]:visible')
-          .last()
-          .isVisible()
-          .catch(() => false)
-        const registerInputVisible = await page
-          .locator('[data-testid="register-email-input"]:visible')
-          .last()
-          .isVisible()
-          .catch(() => false)
-        const credentialProviderVisible = await page
-          .locator('[data-testid="login-provider-credential"]:visible')
+        const qzhuliProviderVisible = await page
+          .locator('[data-testid="login-provider-qzhuli"]:visible')
           .last()
           .isVisible()
           .catch(() => false)
@@ -266,12 +251,7 @@ export const ensureLoginModal = async (page: Page) => {
           .catch(() => false)
 
         return (
-          loginModalVisible ||
-          loginButtonVisible ||
-          loginInputVisible ||
-          registerInputVisible ||
-          credentialProviderVisible ||
-          loginDialogVisible
+          loginModalVisible || loginButtonVisible || qzhuliProviderVisible || loginDialogVisible
         )
       },
       { timeout: 30_000 },
@@ -279,143 +259,92 @@ export const ensureLoginModal = async (page: Page) => {
     .toBe(true)
 }
 
-const ensureCredentialForm = async (page: Page, mode: "register" | "login") => {
-  await ensureLoginModal(page)
+/**
+ * e2e 登录：Q助理扫码在自动化环境里走不通（需要真实 App 扫码，且平台回调
+ * 只登记了生产域名），因此改为调用服务端测试接口直接签发会话。
+ * 前置条件：diting-server 以 E2E_AUTH_BYPASS=1 启动（生产环境该接口恒为 404）。
+ */
+const E2E_AUTH_ENDPOINT = "/api/auth/qzhuli/e2e-login"
+const AUTH_SESSION_TOKEN_STORAGE_KEY = "follow:auth_session_token"
 
-  const targetInput = visibleByTestId(
-    page,
-    mode === "register" ? "register-email-input" : "login-email-input",
-  )
-  const loginButton = visibleByTestId(page, "login-button")
-  const loginModal = visibleByTestId(page, "login-modal")
-  const activeDialog = page.locator('[role="dialog"]:visible').last()
-  const credentialProvider = visibleByTestId(page, "login-provider-credential")
-  const targetForm = visibleByTestId(page, mode === "register" ? "register-form" : "login-form")
-  const oppositeForm = visibleByTestId(page, mode === "register" ? "login-form" : "register-form")
-  const oppositeFormSwitcher = visibleByTestId(
-    page,
-    mode === "register" ? "login-switch-register" : "register-switch-login",
-  )
-
-  if (await isVisible(targetInput)) {
-    return
-  }
-
-  if (
-    (await isVisible(loginButton)) &&
-    !(await isVisible(loginModal)) &&
-    !(await isVisible(activeDialog))
-  ) {
-    await expect(loginButton).toBeVisible({ timeout: 30_000 })
-    await loginButton.click({ noWaitAfter: true })
-  }
-
-  if (await isVisible(targetInput)) {
-    return
-  }
-
-  if (!(await isVisible(targetForm)) && !(await isVisible(oppositeForm))) {
-    await expect(credentialProvider).toBeVisible({ timeout: 30_000 })
-    for (let attempt = 0; attempt < 3; attempt++) {
-      await credentialProvider.click({ force: true, timeout: 30_000, noWaitAfter: true })
-      if (
-        await expect
-          .poll(async () => (await isVisible(targetForm)) || (await isVisible(oppositeForm)), {
-            timeout: 5_000,
-          })
-          .toBe(true)
-          .then(() => true)
-          .catch(() => false)
-      ) {
-        break
-      }
-    }
-  }
-
-  await expect
-    .poll(async () => (await isVisible(targetForm)) || (await isVisible(oppositeForm)), {
-      timeout: 15_000,
+const createTestSession = async (page: Page, account: TestAccount): Promise<string> => {
+  const env = resolveDesktopE2EEnv()
+  const response = await page.request
+    .post(`${env.apiURL}${E2E_AUTH_ENDPOINT}`, {
+      data: { email: account.email },
+      headers: { "content-type": "application/json" },
     })
-    .toBe(true)
+    .catch((error: unknown) => {
+      throw new Error(
+        `无法连接 ${env.apiURL}${E2E_AUTH_ENDPOINT}：${error instanceof Error ? error.message : String(error)}`,
+      )
+    })
 
-  if (await isVisible(oppositeForm)) {
-    await expect(oppositeFormSwitcher).toBeVisible({ timeout: 30_000 })
-    for (let attempt = 0; attempt < 3; attempt++) {
-      await oppositeFormSwitcher.click({ force: true, timeout: 10_000, noWaitAfter: true })
-      if (
-        await targetInput
-          .waitFor({ state: "visible", timeout: 5_000 })
-          .then(() => true)
-          .catch(() => false)
-      ) {
-        return
-      }
-    }
+  if (!response.ok()) {
+    throw new Error(
+      `创建 e2e 会话失败（HTTP ${response.status()}）。` +
+        `请确认 diting-server 以 E2E_AUTH_BYPASS=1 启动，且未处于生产模式。`,
+    )
   }
 
-  await expect(targetInput).toBeVisible({ timeout: 30_000 })
-}
-
-export const registerWithCredential = async (page: Page, account: TestAccount) => {
-  await ensureCredentialForm(page, "register")
-  await visibleByTestId(page, "register-email-input").fill(account.email)
-  await visibleByTestId(page, "register-password-input").fill(account.password)
-  const confirmPasswordInput = visibleByTestId(page, "register-confirm-password-input")
-  await confirmPasswordInput.fill(account.password)
-  const submit = visibleByTestId(page, "register-submit")
-  await expect(submit).toBeEnabled({ timeout: 30_000 })
-
-  const signUpResponse = page
-    .waitForResponse(
-      (response) =>
-        response.request().method() === "POST" &&
-        response.url().includes("/better-auth/sign-up/email"),
-      { timeout: optionalRendererResponseTimeout(page) },
-    )
-    .catch(() => null)
-
-  const [response] = await Promise.all([
-    signUpResponse,
-    submit.click({ force: true, noWaitAfter: true }),
-  ])
-  if (response) {
-    expect(response.ok()).toBe(true)
-    await waitForBetterAuthSessionCookie(page, new URL(response.url()).origin)
+  const body = (await response.json()) as {
+    code: number
+    message?: string
+    data?: { token?: string }
   }
 
-  await waitForAuthenticated(page)
+  const token = body.data?.token
+  if (body.code !== 0 || !token) {
+    throw new Error(`创建 e2e 会话失败：${body.message ?? "响应缺少 token"}`)
+  }
+
+  return token
 }
 
-export const loginWithCredential = async (page: Page, account: TestAccount) => {
-  await ensureCredentialForm(page, "login")
-  await visibleByTestId(page, "login-email-input").fill(account.email)
-  const passwordInput = visibleByTestId(page, "login-password-input")
-  await passwordInput.fill(account.password)
-  const submit = visibleByTestId(page, "login-submit")
-  await expect(submit).toBeEnabled({ timeout: 30_000 })
+/** 写入登录态：Electron 存 localStorage（token 走请求头），Web 写 cookie */
+const applyTestSession = async (page: Page, token: string) => {
+  const env = resolveDesktopE2EEnv()
+  const isElectronRuntime = await page
+    .evaluate(() => typeof (globalThis as { electron?: unknown }).electron !== "undefined")
+    .catch(() => false)
 
-  const signInResponse = page
-    .waitForResponse(
-      (response) =>
-        response.request().method() === "POST" &&
-        response.url().includes("/better-auth/sign-in/email"),
-      { timeout: optionalRendererResponseTimeout(page) },
-    )
-    .catch(() => null)
-
-  const [response] = await Promise.all([
-    signInResponse,
-    submit.click({ force: true, noWaitAfter: true }),
-  ])
-  if (response) {
-    expect(response.ok()).toBe(true)
-    await waitForBetterAuthSessionCookie(page, new URL(response.url()).origin)
+  if (isElectronRuntime) {
+    await page.evaluate(({ key, value }) => localStorage.setItem(key, value), {
+      key: AUTH_SESSION_TOKEN_STORAGE_KEY,
+      value: token,
+    })
+  } else {
+    const apiURL = new URL(env.apiURL)
+    const secure = apiURL.protocol === "https:"
+    await page.context().addCookies([
+      {
+        name: `${secure ? "__Secure-" : ""}better-auth.session_token`,
+        value: token,
+        domain: apiURL.hostname,
+        path: "/",
+        httpOnly: true,
+        sameSite: "Lax",
+        secure,
+      },
+    ])
+    await waitForBetterAuthSessionCookie(page, env.apiURL)
   }
 
   await page.reload({ waitUntil: "domcontentloaded" }).catch(() => {})
   await waitForRenderedAppShell(page, 120_000)
-
   await waitForAuthenticated(page)
+}
+
+/** 注册并登录一个全新的测试账号 */
+export const registerTestUser = async (page: Page, account: TestAccount) => {
+  const token = await createTestSession(page, account)
+  await applyTestSession(page, token)
+}
+
+/** 用已存在的测试账号登录 */
+export const loginTestUser = async (page: Page, account: TestAccount) => {
+  const token = await createTestSession(page, account)
+  await applyTestSession(page, token)
 }
 
 export const logoutFromProfileMenu = async (page: Page) => {

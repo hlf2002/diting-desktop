@@ -4,10 +4,10 @@ import { expect, test } from "@playwright/test"
 import { createTestAccount, tryDeleteCurrentUser } from "../../support/account"
 import {
   getActionLanguageLabel,
-  loginWithCredential,
+  loginTestUser,
   openSettings,
   openWebApp,
-  registerWithCredential,
+  registerTestUser,
   setActionLanguage,
 } from "../../support/app"
 import { resolveDesktopE2EEnv } from "../../support/env"
@@ -68,10 +68,10 @@ test.describe("web multi-session sync", () => {
 
     try {
       await openWebApp(pageA, env)
-      await registerWithCredential(pageA, account)
+      await registerTestUser(pageA, account)
 
       await openWebApp(pageB, env)
-      await loginWithCredential(pageB, account)
+      await loginTestUser(pageB, account)
 
       await openSettings(pageA)
 

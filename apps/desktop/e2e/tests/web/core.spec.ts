@@ -7,10 +7,10 @@ import {
   expectOnboardingFeedUnsubscribed,
   expectTimelineSwitchAndEntryReadFlow,
   followOnboardingFeed,
-  loginWithCredential,
+  loginTestUser,
   logoutFromProfileMenu,
   openWebApp,
-  registerWithCredential,
+  registerTestUser,
   unsubscribeFirstFeedFromSettings,
 } from "../../support/app"
 import { resolveDesktopE2EEnv } from "../../support/env"
@@ -31,7 +31,7 @@ test.describe("web core flows", () => {
       await openWebApp(activePage, env)
 
       await test.step("registers a new account", async () => {
-        await registerWithCredential(activePage, account)
+        await registerTestUser(activePage, account)
       })
 
       await test.step("follows onboarding feed", async () => {
@@ -45,7 +45,7 @@ test.describe("web core flows", () => {
         loginContext = await browser.newContext()
         activePage = await loginContext.newPage()
         await openWebApp(activePage, env)
-        await loginWithCredential(activePage, account)
+        await loginTestUser(activePage, account)
       })
 
       await test.step("switches timeline, opens an entry, and toggles read state", async () => {
