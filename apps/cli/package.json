@@ -1,24 +1,24 @@
 {
-  "name": "folocli",
+  "name": "diting-cli",
   "type": "module",
   "version": "0.0.5",
-  "description": "Folo CLI for terminal workflows and automation",
-  "author": "Folo Team",
+  "description": "谛听 CLI（Diting CLI）for terminal workflows and automation",
+  "author": "谛听团队",
   "license": "AGPL-3.0-only",
-  "homepage": "https://github.com/RSSNext/Folo",
+  "homepage": "https://github.com/hlf2002/diting-desktop",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RSSNext/Folo.git"
+    "url": "git+https://github.com/hlf2002/diting-desktop.git"
   },
   "keywords": [
-    "folo",
+    "diting",
     "rss",
     "reader",
     "cli",
     "automation"
   ],
   "bin": {
-    "folo": "./dist/index.js"
+    "diting-cli": "./dist/index.js"
   },
   "files": [
     "dist",

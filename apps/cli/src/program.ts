@@ -40,8 +40,8 @@ export const createProgram = (): Program => {
     })
 
   program
-    .name("folo")
-    .description("Folo CLI client for structured automation")
+    .name("diting-cli")
+    .description("谛听 CLI（Diting CLI）client for structured automation")
     .version(packageJSON.version)
     .option("-f, --format <format>", "Output format: json | table | plain", parseFormat, "json")
     .option("--api-url <url>", `API base URL (default: ${defaultApiURL})`)
@@ -101,7 +101,7 @@ const getCommandPath = (command: Command) => {
 const toUsageError = (error: CommanderError, helpCommand: Command | undefined): OutputError => {
   // A group run without a subcommand shows its help instead of an error message
   if (error.code === "commander.help") {
-    const path = helpCommand ? getCommandPath(helpCommand) : "folo"
+    const path = helpCommand ? getCommandPath(helpCommand) : "diting-cli"
     return {
       code: "INVALID_ARGUMENT",
       message: `Missing command. Run \`${path} --help\` to see the commands it accepts.`,

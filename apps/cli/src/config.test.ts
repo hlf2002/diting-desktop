@@ -9,7 +9,7 @@ describe("config", () => {
 
   beforeEach(async () => {
     vi.resetModules()
-    home = await mkdtemp(join(tmpdir(), "folo-cli-config-"))
+    home = await mkdtemp(join(tmpdir(), "diting-cli-config-"))
     vi.stubEnv("HOME", home)
     vi.stubEnv("USERPROFILE", home)
   })
@@ -19,20 +19,20 @@ describe("config", () => {
 
     await updateConfig({ token: "secret", apiUrl: "https://diting.7373.com.cn" })
 
-    const configPath = join(home, ".folo", "config.json")
+    const configPath = join(home, ".diting", "config.json")
     expect(JSON.parse(await readFile(configPath, "utf8"))).toEqual({
       token: "secret",
       apiUrl: "https://diting.7373.com.cn",
     })
     if (process.platform !== "win32") {
       expect((await stat(configPath)).mode & 0o777).toBe(0o600)
-      expect((await stat(join(home, ".folo"))).mode & 0o777).toBe(0o700)
+      expect((await stat(join(home, ".diting"))).mode & 0o777).toBe(0o700)
     }
   })
 
   it("treats a damaged config as empty so that login can repair it", async () => {
-    await mkdir(join(home, ".folo"))
-    await writeFile(join(home, ".folo", "config.json"), '{"token": "sec')
+    await mkdir(join(home, ".diting"))
+    await writeFile(join(home, ".diting", "config.json"), '{"token": "sec')
     const { readConfig, updateConfig } = await import("./config")
     vi.spyOn(console, "error").mockImplementation(() => {})
 

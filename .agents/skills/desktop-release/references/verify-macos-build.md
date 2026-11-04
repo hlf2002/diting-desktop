@@ -40,7 +40,7 @@ For a release build, take the dmg and `latest-mac.yml` from the GitHub release i
 What shapes the launch:
 
 - Staging and release builds share bundle ID `is.follow`, the userData name "Folo" and the log file `~/Library/Logs/Folo/main.log` with the user's own Folo, which is usually running. `FOLO_E2E_USER_DATA_DIR` gives the test copy its own profile, cookies and single-instance lock.
-- On startup every packaged build syncs its signed-in session to the Folo CLI by running `npx folocli login --token …`, which rewrites `~/.folo/config.json`. Launch with `PATH=/usr/bin:/bin:/usr/sbin:/sbin` so `npx` is not found ("npx is not available" in the log is expected), and back the file up anyway.
+- On startup every packaged build syncs its signed-in session to the Folo CLI by running `npx diting-cli login --token …`, which rewrites `~/.diting/config.json`. Launch with `PATH=/usr/bin:/bin:/usr/sbin:/sbin` so `npx` is not found ("npx is not available" in the log is expected), and back the file up anyway.
 - The app registers the `folo://` and `follow://` schemes for `is.follow` at startup. Unregister the copy from LaunchServices when done. `/Applications` also holds the Mac App Store build ("Folo 2.app", the highest build number), which normally owns those schemes.
 - The user's own Folo may already listen on a CDP port (often 9333); pick a free one.
 
@@ -59,7 +59,7 @@ PROFILE="$SCRATCH/profile"
 rsync -a --exclude 'Cache' --exclude 'Code Cache' --exclude 'GPUCache' --exclude 'Dawn*Cache' \
   --exclude 'Singleton*' --exclude 'DevToolsActivePort' "$SRC/" "$PROFILE/"
 
-cp ~/.folo/config.json "$SCRATCH/folo-cli-config.backup.json" 2>/dev/null || true
+cp ~/.diting/config.json "$SCRATCH/diting-cli-config.backup.json" 2>/dev/null || true
 LAUNCHED_AT=$(date '+%Y-%m-%d %H:%M:%S')
 EXE="$APP/Contents/MacOS/$(plutil -extract CFBundleExecutable raw "$APP/Contents/Info.plist")"
 (PATH=/usr/bin:/bin:/usr/sbin:/sbin FOLO_E2E_USER_DATA_DIR="$PROFILE" \
@@ -95,8 +95,8 @@ The main window appears on the user's screen; keep the session short.
 ```bash
 pkill -TERM -f "$EXE"
 sleep 3
-if [ -f "$SCRATCH/folo-cli-config.backup.json" ] && ! cmp -s ~/.folo/config.json "$SCRATCH/folo-cli-config.backup.json"; then
-  cp "$SCRATCH/folo-cli-config.backup.json" ~/.folo/config.json
+if [ -f "$SCRATCH/diting-cli-config.backup.json" ] && ! cmp -s ~/.diting/config.json "$SCRATCH/diting-cli-config.backup.json"; then
+  cp "$SCRATCH/diting-cli-config.backup.json" ~/.diting/config.json
 fi
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -u "$APP"
 rm -rf "$DIR/app" "$DIR/mnt" "$PROFILE"

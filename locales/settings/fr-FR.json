@@ -269,7 +269,7 @@
   "appearance.words.customize": "Personnaliser",
   "cli.agent_prompt": "Invite pour l'agent",
   "cli.command_copied": "Commande copiée",
-  "cli.description": "Exécutez Diting CLI depuis n'importe quel terminal avec npx en utilisant folocli@latest, sans installation globale. L'application Desktop peut synchroniser votre connexion actuelle en un clic.",
+  "cli.description": "Exécutez Diting CLI depuis n'importe quel terminal avec npx en utilisant diting-cli@latest, sans installation globale. L'application Desktop peut synchroniser votre connexion actuelle en un clic.",
   "cli.global_install": "Exécuter la dernière version avec npx",
   "cli.install": "Synchroniser la connexion Desktop",
   "cli.install_failed": "Échec de la synchronisation de la connexion Desktop vers le CLI",

@@ -12,7 +12,7 @@ import { describe, expect, it } from "vitest"
 const execFileAsync = promisify(execFile)
 const cliPath = resolve(process.cwd(), "dist/index.js")
 const testToken = process.env.FOLO_TEST_TOKEN
-const isolatedHome = mkdtempSync(resolve(tmpdir(), "folocli-test-"))
+const isolatedHome = mkdtempSync(resolve(tmpdir(), "diting-cli-test-"))
 
 type CLIExecution = {
   code: number
@@ -27,7 +27,7 @@ const runCLI = async (args: string[]): Promise<CLIExecution> => {
         ...process.env,
         HOME: isolatedHome,
         USERPROFILE: isolatedHome,
-        FOLO_TOKEN: "",
+        DITING_TOKEN: "",
       },
     })
 

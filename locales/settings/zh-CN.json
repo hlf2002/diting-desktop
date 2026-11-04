@@ -269,7 +269,7 @@
   "appearance.words.customize": "自定义",
   "cli.agent_prompt": "Agent 提示词",
   "cli.command_copied": "命令已复制",
-  "cli.description": "你可以直接通过 npx 使用 folocli@latest 在任意终端里运行 谛听 CLI，无需全局安装。桌面端可以一键同步当前登录状态。",
+  "cli.description": "你可以直接通过 npx 使用 diting-cli@latest 在任意终端里运行 谛听 CLI，无需全局安装。桌面端可以一键同步当前登录状态。",
   "cli.global_install": "通过 npx 运行最新版本",
   "cli.install": "同步桌面端登录",
   "cli.install_failed": "同步桌面端登录到 CLI 失败",

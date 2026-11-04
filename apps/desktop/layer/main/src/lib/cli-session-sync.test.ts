@@ -55,20 +55,20 @@ describe("syncSessionToCliConfig", () => {
 
     await syncSessionToCliConfig("abc%3Ddef")
 
-    const configPath = join(home, ".folo", "config.json")
+    const configPath = join(home, ".diting", "config.json")
     expect(JSON.parse(await readFile(configPath, "utf8"))).toEqual({
       token: "abc=def",
       apiUrl: "https://diting.7373.com.cn",
     })
     if (process.platform !== "win32") {
       expect((await stat(configPath)).mode & 0o777).toBe(0o600)
-      expect((await stat(join(home, ".folo"))).mode & 0o777).toBe(0o700)
+      expect((await stat(join(home, ".diting"))).mode & 0o777).toBe(0o700)
     }
   })
 
   it("leaves the config alone for the same token and clears it on sign-out", async () => {
     const { syncSessionToCliConfig } = await import("./cli-session-sync")
-    const configPath = join(home, ".folo", "config.json")
+    const configPath = join(home, ".diting", "config.json")
 
     await syncSessionToCliConfig("abc=def")
     const { mtimeMs } = await stat(configPath)

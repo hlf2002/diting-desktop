@@ -269,7 +269,7 @@
   "appearance.words.customize": "Customize",
   "cli.agent_prompt": "Agent prompt",
   "cli.command_copied": "Command copied",
-  "cli.description": "Run Diting CLI from any terminal with npx using folocli@latest, without a global install. Desktop can sync your current login with one click.",
+  "cli.description": "Run Diting CLI from any terminal with npx using diting-cli@latest, without a global install. Desktop can sync your current login with one click.",
   "cli.global_install": "Run latest with npx",
   "cli.install": "Sync Desktop Login",
   "cli.install_failed": "Failed to sync desktop login to CLI",

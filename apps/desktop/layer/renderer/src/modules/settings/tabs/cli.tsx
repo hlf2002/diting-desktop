@@ -33,7 +33,7 @@ const getOneTimeTokenFromResult = (result: unknown) => {
   return null
 }
 
-const LATEST_WITH_NPX_COMMAND = "npx --yes folocli@latest --help"
+const LATEST_WITH_NPX_COMMAND = "npx --yes diting-cli@latest --help"
 const AGENT_PROMPT =
   "Read https://diting.7373.com.cn/skill.md and follow the instructions to use Diting."
 

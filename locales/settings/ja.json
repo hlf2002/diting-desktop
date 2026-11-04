@@ -269,7 +269,7 @@
   "appearance.words.customize": "カスタマイズ",
   "cli.agent_prompt": "エージェント用プロンプト",
   "cli.command_copied": "コマンドをコピーしました",
-  "cli.description": "グローバルインストールなしで、folocli@latest を指定した npx からどのターミナルでも Diting CLI を実行できます。デスクトップアプリから現在のログイン状態をワンクリックで同期できます。",
+  "cli.description": "グローバルインストールなしで、diting-cli@latest を指定した npx からどのターミナルでも Diting CLI を実行できます。デスクトップアプリから現在のログイン状態をワンクリックで同期できます。",
   "cli.global_install": "npx で最新版を実行",
   "cli.install": "デスクトップのログインを同期",
   "cli.install_failed": "デスクトップのログインを CLI に同期できませんでした",

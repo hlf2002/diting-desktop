@@ -172,13 +172,13 @@ export const createCommandContext = async (
 ): Promise<CommandContext> => {
   const globalOptions = getGlobalOptions(command)
   const config = await readConfig()
-  const token = normalizeToken(globalOptions.token ?? process.env.FOLO_TOKEN ?? config.token)
+  const token = normalizeToken(globalOptions.token ?? process.env.DITING_TOKEN ?? config.token)
   const apiUrl = resolveApiUrl(globalOptions.apiUrl ?? config.apiUrl ?? defaultApiURL)
 
   if (requireAuth && !token) {
     throw new CLIError(
       "UNAUTHORIZED",
-      "Missing token. Run `folo login` (browser sign-in) or set FOLO_TOKEN.",
+      "Missing token. Run `diting-cli login` (browser sign-in) or set DITING_TOKEN.",
     )
   }
 

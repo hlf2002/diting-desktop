@@ -31,7 +31,7 @@ const run = async (...args: string[]) => {
     }),
   )
 
-  await runCLI(["node", "folo", ...args])
+  await runCLI(["node", "diting-cli", ...args])
 
   return { stdout: stdout.join(""), stderr: stderr.join(""), exitCode: process.exitCode }
 }
@@ -86,9 +86,9 @@ describe("usage errors", () => {
     ],
     [
       ["subscription"],
-      "Missing command. Run `folo subscription --help` to see the commands it accepts.",
+      "Missing command. Run `diting-cli subscription --help` to see the commands it accepts.",
     ],
-    [[], "Missing command. Run `folo --help` to see the commands it accepts."],
+    [[], "Missing command. Run `diting-cli --help` to see the commands it accepts."],
   ])("prints `folo %s` as an INVALID_ARGUMENT envelope", async (args, message) => {
     const { stdout, stderr, exitCode } = await run(...args)
 
@@ -127,7 +127,7 @@ describe("help and version", () => {
     async (args) => {
       const { stdout, stderr, exitCode } = await run(...args)
 
-      expect(stdout).toContain("Usage: folo")
+      expect(stdout).toContain("Usage: diting-cli")
       expect(stderr).toBe("")
       expect(exitCode).toBeUndefined()
     },

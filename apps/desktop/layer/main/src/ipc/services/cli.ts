@@ -52,7 +52,7 @@ export class CliService extends IpcService {
         preferredToken,
       })
       if (!token) {
-        return { success: false, error: "Sign in to Folo Desktop first." }
+        return { success: false, error: "Sign in to 谛听 Desktop first." }
       }
 
       await syncSessionToCliConfig(token)

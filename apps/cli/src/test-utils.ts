@@ -40,7 +40,7 @@ export const runCLIWithAPI = async (args: string[], handler: APIHandler) => {
   const stdout = vi.spyOn(console, "info").mockImplementation(() => {})
   const stderr = vi.spyOn(console, "error").mockImplementation(() => {})
 
-  await runCLI(["node", "folo", "--api-url", "http://api.test", "--token", "token", ...args])
+  await runCLI(["node", "diting-cli", "--api-url", "http://api.test", "--token", "token", ...args])
 
   const result = {
     requests,

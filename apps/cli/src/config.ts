@@ -8,7 +8,7 @@ export interface FoloCLIConfig {
   apiUrl?: string
 }
 
-const configDir = join(homedir(), ".folo")
+const configDir = join(homedir(), ".diting")
 const configPath = join(configDir, "config.json")
 
 const normalizeConfig = (config: unknown): FoloCLIConfig => {

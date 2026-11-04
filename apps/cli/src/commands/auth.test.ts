@@ -8,7 +8,7 @@ vi.mock("../config", () => ({
   readConfig: async () => ({}),
   updateConfig: vi.fn(async (patch: Record<string, unknown>) => patch),
   clearToken: vi.fn(async () => {}),
-  getConfigPath: () => "/home/user/.folo/config.json",
+  getConfigPath: () => "/home/user/.diting/config.json",
 }))
 
 const session = { user: { id: "user1", name: "User" }, session: { id: "session1" } }
@@ -41,7 +41,7 @@ const runWith = async (answer: Answer, ...args: string[]) => {
   const stdout = vi.spyOn(console, "info").mockImplementation(() => {})
   const stderr = vi.spyOn(console, "error").mockImplementation(() => {})
 
-  await runCLI(["node", "folo", ...args])
+  await runCLI(["node", "diting-cli", ...args])
 
   return {
     requests,
@@ -96,7 +96,7 @@ describe("a token the API does not know", () => {
     [["--token", "expired", "whoami"]],
     [["--token", "expired", "auth", "whoami"]],
     [["login", "--token", "expired"]],
-  ])("fails `folo %s` as unauthorized", async (args) => {
+  ])("fails `diting-cli %s` as unauthorized", async (args) => {
     const { stdout, stderr, exitCode } = await run(...args)
 
     expect(stdout).toBe("")
@@ -145,7 +145,7 @@ describe("an API URL that names something else", () => {
       "HTTP_404",
     ],
   ] as const)(
-    "fails `folo %s` at %s without blaming the token",
+    "fails `diting-cli %s` at %s without blaming the token",
     async (_command, _server, answer, args, code) => {
       const { stdout, stderr, exitCode } = await runWith(
         answer,

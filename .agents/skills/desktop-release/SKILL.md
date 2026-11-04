@@ -299,7 +299,7 @@ gh pr list --base dev --head main --state all --limit 1 \
 
 Tell the user: version, mode and `runtimeVersion`; PR and merge commit; tag; GitHub release URL and signing status; OTA checks; Mac App Store version state; Microsoft Store submission number and state; the sync PR; the verification summary with `verification.md` and the key screenshots; anything not verified and why. Store reviews finish later; say how to check them (`asc versions list`, the Partner Center overview).
 
-Clean up: quit the test app, restore `~/.folo/config.json` if it changed, unregister and delete app copies, profile copies and mounts, delete the downloads (keep the report and screenshots), close the browser tabs you opened, and release any granted credentials.
+Clean up: quit the test app, restore `~/.diting/config.json` if it changed, unregister and delete app copies, profile copies and mounts, delete the downloads (keep the report and screenshots), close the browser tabs you opened, and release any granted credentials.
 
 ### C10. Announcement kit
 

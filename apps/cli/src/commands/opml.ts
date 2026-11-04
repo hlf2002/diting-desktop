@@ -11,7 +11,7 @@ interface OpmlExportOptions {
 }
 
 /** The file name of an export when the CLI picks it */
-export const OPML_FILENAME = "folo.opml"
+export const OPML_FILENAME = "diting.opml"
 
 /**
  * GET /subscriptions/export answers with the OPML document itself (application/xml), not the
@@ -25,7 +25,7 @@ export const fetchOPMLExport = async (client: FollowClient) => {
   }
 }
 
-/** A directory, or a path that ends like one, gets the export as folo.opml inside it */
+/** A directory, or a path that ends like one, gets the export as diting.opml inside it */
 export const resolveOPMLOutputPath = async (output: string) => {
   if (/[/\\]$/.test(output)) {
     return join(output, OPML_FILENAME)

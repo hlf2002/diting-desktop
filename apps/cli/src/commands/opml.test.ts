@@ -30,15 +30,15 @@ describe("fetchOPMLExport", () => {
 })
 
 describe("resolveOPMLOutputPath", () => {
-  it("saves the export as folo.opml in a directory", async () => {
-    const directory = await mkdtemp(join(tmpdir(), "folocli-opml-"))
+  it("saves the export as diting.opml in a directory", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "diting-cli-opml-"))
 
     await expect(resolveOPMLOutputPath(directory)).resolves.toBe(join(directory, OPML_FILENAME))
     await expect(resolveOPMLOutputPath("backups/")).resolves.toBe(join("backups", OPML_FILENAME))
   })
 
   it("keeps a file name the user gave", async () => {
-    const directory = await mkdtemp(join(tmpdir(), "folocli-opml-"))
+    const directory = await mkdtemp(join(tmpdir(), "diting-cli-opml-"))
 
     await expect(resolveOPMLOutputPath(join(directory, "backup.opml"))).resolves.toBe(
       join(directory, "backup.opml"),

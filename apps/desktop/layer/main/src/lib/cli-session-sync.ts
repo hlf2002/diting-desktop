@@ -21,9 +21,9 @@ import { resolveCliSessionToken } from "./cli-login-token"
 import { store } from "./store"
 
 const execFileAsync = promisify(execFile)
-export const CLI_NPM_PACKAGE_NAME = "folocli"
+export const CLI_NPM_PACKAGE_NAME = "diting-cli"
 const CLI_NPX_PACKAGE_SPEC = `${CLI_NPM_PACKAGE_NAME}@latest`
-const CLI_CONFIG_DIR = join(homedir(), ".folo")
+const CLI_CONFIG_DIR = join(homedir(), ".diting")
 const CLI_CONFIG_PATH = join(CLI_CONFIG_DIR, "config.json")
 
 const getCliSyncRequestHeaders = (additionalHeaders?: Record<string, string>) => ({
@@ -235,7 +235,7 @@ export const syncSessionToCliConfig = async (token?: string): Promise<void> => {
       return
     }
 
-    // Written as `folocli login` writes it, without running the CLI: a spawned npx would need
+    // Written as `diting-cli login` writes it, without running the CLI: a spawned npx would need
     // to be found on the PATH and would expose the token in its arguments
     await writeCliConfig({
       ...config,
