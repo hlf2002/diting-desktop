@@ -43,6 +43,7 @@ export const ByokProviderModalContent = ({
     provider: provider?.provider ?? defaultProvider,
     baseURL: provider?.baseURL ?? null,
     apiKey: provider?.apiKey ?? null,
+    model: provider?.model ?? null,
     headers: provider?.headers ?? {},
   })
   const [isApiKeyMissing, setIsApiKeyMissing] = useState(false)
@@ -100,6 +101,22 @@ export const ByokProviderModalContent = ({
           }
         />
         <p className="text-xs text-text-secondary">{t("byok.providers.form.base_url_help")}</p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="model">{t("byok.providers.form.model")}</Label>
+        <Input
+          id="model"
+          placeholder={t("byok.providers.form.model_placeholder")}
+          value={formData.model ?? ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              model: e.target.value.trim() || null,
+            })
+          }
+        />
+        <p className="text-xs text-text-secondary">{t("byok.providers.form.model_help")}</p>
       </div>
 
       <div className="space-y-2">

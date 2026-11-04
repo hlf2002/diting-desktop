@@ -228,6 +228,8 @@ export type UserByokProviderConfig = {
   provider: ByokProviderName
   baseURL?: string | null
   apiKey?: string | null
+  /** 模型名（如 gpt-4o-mini / deepseek-chat / gemini-2.0-flash）。留空时服务端按 provider 用默认模型。 */
+  model?: string | null
   headers?: Record<string, string>
 }
 
