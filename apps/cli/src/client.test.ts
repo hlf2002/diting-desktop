@@ -22,10 +22,8 @@ const stubFetch = (response: Response) => {
 describe("resolveApiUrl", () => {
   it("drops trailing slashes", () => {
     expect(resolveApiUrl("http://localhost:3000/")).toBe("http://localhost:3000")
-    expect(resolveApiUrl(" https://api.diting.7373.com.cn// ")).toBe(
-      "https://api.diting.7373.com.cn",
-    )
-    expect(resolveApiUrl("https://api.diting.7373.com.cn")).toBe("https://api.diting.7373.com.cn")
+    expect(resolveApiUrl(" https://diting.7373.com.cn// ")).toBe("https://diting.7373.com.cn")
+    expect(resolveApiUrl("https://diting.7373.com.cn")).toBe("https://diting.7373.com.cn")
   })
 
   it("rejects values that are not http URLs", () => {

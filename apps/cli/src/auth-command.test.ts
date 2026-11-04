@@ -15,14 +15,14 @@ describe("resolveLoginToken", () => {
     await expect(
       resolveLoginToken({
         inputToken: "one-time-token",
-        apiUrl: "https://api.diting.7373.com.cn",
+        apiUrl: "https://diting.7373.com.cn",
         timeoutMs: 180_000,
         onStatus: vi.fn(),
       }),
     ).resolves.toBe("session-token")
 
     expect(resolveBrowserLoginToken).toHaveBeenCalledWith(
-      "https://api.diting.7373.com.cn",
+      "https://diting.7373.com.cn",
       "one-time-token",
     )
   })
@@ -36,7 +36,7 @@ describe("resolveLoginToken", () => {
 
     await expect(
       resolveLoginToken({
-        apiUrl: "https://api.diting.7373.com.cn",
+        apiUrl: "https://diting.7373.com.cn",
         timeoutMs: 180_000,
         onStatus: vi.fn(),
       }),

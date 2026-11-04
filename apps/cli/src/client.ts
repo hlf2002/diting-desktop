@@ -6,7 +6,7 @@ import { readConfig } from "./config"
 import type { OutputFormat } from "./output"
 import { CLIError, readJSONBody } from "./output"
 
-export const defaultApiURL = "https://api.diting.7373.com.cn"
+export const defaultApiURL = "https://diting.7373.com.cn"
 
 const readString = (value: unknown): string | undefined => {
   return typeof value === "string" && value.length > 0 ? value : undefined
