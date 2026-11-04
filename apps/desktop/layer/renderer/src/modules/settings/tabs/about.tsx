@@ -1,4 +1,3 @@
-import { Folo } from "@follow/components/icons/folo.js"
 import { Logo } from "@follow/components/icons/logo.jsx"
 import { Divider } from "@follow/components/ui/divider/Divider.js"
 import { SocialMediaLinks } from "@follow/constants"
@@ -163,9 +162,7 @@ export const SettingAbout = () => {
         <div className="mb-6 flex justify-center">
           <Logo className="size-20" />
         </div>
-        <h1 className="-mt-6 flex justify-center">
-          <Folo className="size-16" />
-        </h1>
+        <h1 className="-mt-6 flex justify-center text-4xl font-bold tracking-wide">谛听</h1>
         {MODE !== ModeEnum.production && (
           <span className="block -translate-y-2 text-sm font-normal text-text-tertiary">
             {MODE}

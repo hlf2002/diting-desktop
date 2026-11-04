@@ -1,4 +1,3 @@
-import { Folo } from "@follow/components/icons/folo.js"
 import { Logo } from "@follow/components/icons/logo.jsx"
 import { cn } from "@follow/utils/utils"
 import pkg from "@pkg"
@@ -13,7 +12,7 @@ export const PoweredByFooter: Component = ({ className }) => (
       target="_blank"
       rel="noreferrer"
     >
-      <Folo className="size-6" />
+      <span className="text-base font-semibold">谛听</span>
     </a>
   </footer>
 )

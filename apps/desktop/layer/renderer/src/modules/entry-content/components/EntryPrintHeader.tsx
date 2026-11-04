@@ -1,4 +1,3 @@
-import { Folo } from "@follow/components/icons/folo.js"
 import { Logo } from "@follow/components/icons/logo.jsx"
 import { useEntry } from "@follow/store/entry/hooks"
 import { useFeedById } from "@follow/store/feed/hooks"
@@ -28,7 +27,7 @@ export const EntryPrintHeader = ({ entryId }: { entryId: string }) => {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-1.5">
             <Logo className="size-4 shrink-0" />
-            <Folo className="h-4 w-auto shrink-0 text-text" />
+            <span className="shrink-0 text-sm font-semibold text-text">谛听</span>
           </div>
 
           <a

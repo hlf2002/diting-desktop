@@ -1,4 +1,3 @@
-import { Folo } from "@follow/components/icons/folo.js"
 import { ScrollArea } from "@follow/components/ui/scroll-area/ScrollArea.js"
 import { clsx } from "@follow/utils"
 import { AnimatePresence, m } from "motion/react"
@@ -69,7 +68,7 @@ const DefaultWelcomeHeader = ({ title, description }: { title: string; descripti
       </div>
       <div className="flex flex-col gap-2">
         <h1 className="flex items-center justify-center gap-2 text-2xl font-semibold text-text">
-          <Folo className="size-11" /> {title}
+          <span className="text-2xl font-bold">谛听</span> {title}
         </h1>
 
         <p className="text-balance text-sm text-text-secondary">{description}</p>

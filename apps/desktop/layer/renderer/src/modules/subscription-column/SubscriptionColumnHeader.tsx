@@ -49,7 +49,7 @@ export const SubscriptionColumnHeader = memo(() => {
             }}
           >
             <Logo className="mr-1 size-6" />
-            <Folo className="size-8" />
+            <span className="text-lg font-bold">谛听</span>
           </div>
         </LogoContextMenu>
       )}

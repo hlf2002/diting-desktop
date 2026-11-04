@@ -2,8 +2,6 @@
 import { useTranslations } from 'next-intl'
 import type * as React from 'react'
 
-import { Folo } from '~/components/brand/Folo'
-
 export function WindowChrome({
   children,
   showTryOnWeb = true,
@@ -21,7 +19,7 @@ export function WindowChrome({
         <span className="inline-block size-2.5 rounded-full bg-green" />
         <div className="ml-3 h-5 flex items-center gap-2">
           {/* <Logo className="size-4" /> */}
-          <Folo className="size-5" />
+          <span className="text-sm font-semibold">谛听</span>
         </div>
 
         {showTryOnWeb ? (

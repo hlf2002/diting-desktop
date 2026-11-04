@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl'
 import { LinearBlur } from 'progressive-blur'
 
 import { useIsMobile } from '~/atoms'
-import { Folo } from '~/components/brand/Folo'
 import { Logo } from '~/components/brand/Logo'
 import { Button } from '~/components/ui/button/Button'
 import { GlassSurface } from '~/components/ui/glass'
@@ -64,7 +63,7 @@ export const LandingHeader: Component = () => {
             <LocalizedLink href="/" className="flex items-center gap-2 ml-4">
               <Logo width={26} height={26} aria-hidden accentColor="#FF5C00" />
 
-              <Folo className="size-8" />
+              <span className="text-base font-bold">谛听</span>
             </LocalizedLink>
 
             <ul className="hidden items-center gap-5 md:flex">

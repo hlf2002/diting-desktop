@@ -1,5 +1,4 @@
 import { Spring } from "@follow/components/constants/spring.js"
-import { Folo } from "@follow/components/icons/folo.js"
 import { getEditorStateJSONString } from "@follow/components/ui/lexical-rich-editor/utils.js"
 import { ScrollArea } from "@follow/components/ui/scroll-area/ScrollArea.js"
 import { cn } from "@follow/utils"
@@ -157,7 +156,7 @@ const Header: React.FC = () => {
             className="flex flex-col"
           >
             <div className="flex items-center gap-2">
-              <Folo className="size-7" />
+              <span className="text-lg font-bold">谛听</span>
               <span className="text-sm font-semibold text-text">{t("user_button.ai")}</span>
             </div>
             <span className="text-xs text-text-secondary">

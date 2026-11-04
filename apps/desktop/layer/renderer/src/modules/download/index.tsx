@@ -1,4 +1,3 @@
-import { Folo } from "@follow/components/icons/folo.jsx"
 import { Logo } from "@follow/components/icons/logo.jsx"
 import { Button } from "@follow/components/ui/button/index.js"
 import { APP_STORE_URLS } from "@follow/constants"
@@ -35,7 +34,7 @@ export function DownloadPage() {
       <div className="mb-8 flex flex-col items-center text-center">
         <div className="mb-4 flex items-center space-x-4">
           <Logo className="size-12" />
-          <Folo className="w-12 text-text" />
+          <span className="text-2xl font-bold text-text">谛听</span>
         </div>
         <p className="text-base text-text-secondary">{t("download.tagline")}</p>
       </div>
