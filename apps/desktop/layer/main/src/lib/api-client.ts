@@ -45,7 +45,11 @@ followClient.addRequestInterceptor(async (ctx) => {
   })
   const sessionCookie = cookies ? getPreferredSessionTokenCookie(cookies) : null
   const headerCookie = sessionCookie ? `${sessionCookie.name}=${sessionCookie.value}` : ""
-  const userAgent = window?.webContents.getUserAgent() || `Folo/${PKG.version}`
+  const userAgent = (window?.webContents.getUserAgent() || `Diting/${PKG.version}`)
+    // Electron appends the localized product name (e.g. "谛听/1.16.0") into the default UA
+    // on macOS, which is non-ASCII and breaks undici's ByteString requirement for headers.
+    // Strip the entire non-ASCII product segment (multiple CJK chars + /version).
+    .replace(/\s?[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af]+[\w.-]*\/[\d.a-z-]+/gi, "")
 
   options.headers = {
     ...header,

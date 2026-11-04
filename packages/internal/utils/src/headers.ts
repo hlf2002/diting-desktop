@@ -110,7 +110,7 @@ export const createDesktopAPIHeaders = ({ version }: { version: string }) => {
   return {
     ...commonHeaders,
     ...(platform ? { "X-App-Platform": platform } : {}),
-    "X-App-Name": "Folo Web",
+    "X-App-Name": "Diting Web",
     "X-App-Version": version,
     ...(DEV ? { "X-App-Dev": "1" } : {}),
   }
@@ -124,10 +124,10 @@ export const createSSRAPIHeaders = ({ version }: { version: string }) => {
   return {
     ...commonHeaders,
     "X-App-Platform": SSRPlatform.SSR,
-    "X-App-Name": "Folo SSR",
+    "X-App-Name": "Diting SSR",
     "X-App-Version": version,
     "User-Agent":
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Folo",
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Diting",
     ...(DEV ? { "X-App-Dev": "1" } : {}),
   }
 }
@@ -170,7 +170,7 @@ export const createMobileAPIHeaders = ({
   return {
     ...commonHeaders,
     ...(platform ? { "X-App-Platform": platform } : {}),
-    "X-App-Name": "Folo Mobile",
+    "X-App-Name": "Diting Mobile",
     "X-App-Version": version,
   }
 }
