@@ -46,7 +46,8 @@ export const useAITaskListQuery = () => {
 export const useAITaskPlanLimit = () => {
   const role = useUserRole()
   const serverConfigs = useServerConfigs()
-  return serverConfigs?.PAYMENT_PLAN_LIST.find((plan) => plan.role === role)?.limit.MAX_AI_TASKS
+  return (serverConfigs?.PAYMENT_PLAN_LIST ?? []).find((plan) => plan.role === role)?.limit
+    .MAX_AI_TASKS
 }
 
 export const useCanCreateNewAITask = () => {

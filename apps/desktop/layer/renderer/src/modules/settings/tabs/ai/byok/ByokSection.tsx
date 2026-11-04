@@ -20,7 +20,7 @@ import { PROVIDER_OPTIONS } from "./constants"
 const usePlanIncludesByok = () => {
   const role = useUserRole()
   const serverConfigs = useServerConfigs()
-  return serverConfigs?.PAYMENT_PLAN_LIST.find((plan) => plan.role === role)?.limit
+  return (serverConfigs?.PAYMENT_PLAN_LIST ?? []).find((plan) => plan.role === role)?.limit
     .AI_BRING_YOUR_OWN_KEY
 }
 
