@@ -1,5 +1,6 @@
 import { Button } from "@follow/components/ui/button/index.js"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@follow/components/ui/tooltip/index.jsx"
+import { getByokProviderMeta } from "@follow/shared/settings/byok-providers"
 import type { UserByokProviderConfig } from "@follow/shared/settings/interface"
 import { useTranslation } from "react-i18next"
 
@@ -10,17 +11,12 @@ interface ByokProviderItemProps {
   onEdit?: () => void
 }
 
-const PROVIDER_LABELS: Record<string, string> = {
-  openai: "OpenAI",
-  google: "Google",
-  "vercel-ai-gateway": "Vercel AI Gateway",
-  openrouter: "OpenRouter",
-}
-
 export const ByokProviderItem = ({ provider, onEdit, onDelete }: ByokProviderItemProps) => {
   const { t } = useTranslation("ai")
 
-  const providerLabel = PROVIDER_LABELS[provider.provider] || provider.provider
+  const meta = getByokProviderMeta(provider.provider)
+  const providerLabel = meta?.label || provider.provider
+  const modelLabel = provider.model || meta?.defaultModel
 
   return (
     <div className="group -ml-3 rounded-lg border border-border p-3 transition-colors hover:bg-material-medium">
@@ -28,6 +24,7 @@ export const ByokProviderItem = ({ provider, onEdit, onDelete }: ByokProviderIte
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h4 className="text-sm font-medium text-text">{providerLabel}</h4>
+            {modelLabel && <span className="text-xs text-text-tertiary">{modelLabel}</span>}
             {/* A provider without a key is skipped by the server, so it is not configured */}
             {provider.apiKey ? (
               <span className="inline-flex rounded-full bg-accent/10 px-2 py-1 text-xs text-accent">

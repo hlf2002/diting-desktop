@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@follow/components/ui/select/index.js"
+import { getByokProviderMeta } from "@follow/shared/settings/byok-providers"
 import type { ByokProviderName, UserByokProviderConfig } from "@follow/shared/settings/interface"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -48,6 +49,19 @@ export const ByokProviderModalContent = ({
   })
   const [isApiKeyMissing, setIsApiKeyMissing] = useState(false)
 
+  const selectedMeta = getByokProviderMeta(formData.provider)
+
+  const handleProviderChange = (value: ByokProviderName) => {
+    const meta = getByokProviderMeta(value)
+    setFormData((prev) => ({
+      ...prev,
+      provider: value,
+      // 切厂商时带出该厂商的默认端点与模型；custom 没有默认值，必须自己填
+      baseURL: meta?.defaultBaseURL ?? null,
+      model: meta?.defaultModel ?? null,
+    }))
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.provider) {
@@ -69,9 +83,7 @@ export const ByokProviderModalContent = ({
         <Select
           value={formData.provider}
           disabled={availableProviders.length === 0}
-          onValueChange={(value) =>
-            setFormData({ ...formData, provider: value as ByokProviderName })
-          }
+          onValueChange={(value) => handleProviderChange(value as ByokProviderName)}
         >
           <SelectTrigger id="provider">
             <SelectValue />
@@ -101,6 +113,7 @@ export const ByokProviderModalContent = ({
           }
         />
         <p className="text-xs text-text-secondary">{t("byok.providers.form.base_url_help")}</p>
+        {selectedMeta?.hint && <p className="text-xs text-orange">{selectedMeta.hint}</p>}
       </div>
 
       <div className="space-y-2">

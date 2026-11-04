@@ -222,7 +222,25 @@ export interface AISettings {
   byok: UserByokSettings
 }
 
-export type ByokProviderName = "openai" | "google" | "vercel-ai-gateway" | "openrouter"
+/**
+ * BYOK 提供商。按 OpenAI 兼容协议接入：服务端只做转发，不持有任何平台 key。
+ * 国内厂商在前（默认使用者是国内网络），custom = 任意自建/未收录的 OpenAI 兼容端点。
+ */
+export type ByokProviderName =
+  | "deepseek"
+  | "alibaba"
+  | "zai"
+  | "kimi-cn"
+  | "minimax-cn"
+  | "stepfun"
+  | "siliconflow"
+  | "volces"
+  | "baidu-qianfan"
+  | "openai"
+  | "google"
+  | "openrouter"
+  | "vercel-ai-gateway"
+  | "custom"
 
 export type UserByokProviderConfig = {
   provider: ByokProviderName
