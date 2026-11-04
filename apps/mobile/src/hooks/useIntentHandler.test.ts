@@ -55,7 +55,7 @@ describe("handleIncomingUrl", () => {
   })
 
   it("opens the follow form for a link", async () => {
-    handleIncomingUrl("folo://add?id=1337497420971380736", navigation)
+    handleIncomingUrl("diting://add?id=1337497420971380736", navigation)
     await settle()
 
     const routes = routesOf(navigation)
@@ -70,7 +70,7 @@ describe("handleIncomingUrl", () => {
       () => new Promise<void>((resolve) => (closeBrowser = resolve)),
     )
 
-    handleIncomingUrl("folo://add?id=1337585485484134400", navigation)
+    handleIncomingUrl("diting://add?id=1337585485484134400", navigation)
     await settle()
     expect(mocks.dismissInAppBrowser).toHaveBeenCalledTimes(1)
     expect(screensOf(navigation)).toEqual([])
@@ -81,10 +81,10 @@ describe("handleIncomingUrl", () => {
   })
 
   it("replaces an open follow form with the one for the next link", async () => {
-    handleIncomingUrl("folo://add?id=1337497420971380736", navigation)
+    handleIncomingUrl("diting://add?id=1337497420971380736", navigation)
     await settle()
     now += 60_000
-    handleIncomingUrl("folo://add?id=1337585485484134400", navigation)
+    handleIncomingUrl("diting://add?id=1337585485484134400", navigation)
     await settle()
 
     const routes = routesOf(navigation)
@@ -94,8 +94,8 @@ describe("handleIncomingUrl", () => {
   })
 
   it("skips the echo of a link reported twice", async () => {
-    handleIncomingUrl("folo://add?id=1337497420971380736", navigation)
-    handleIncomingUrl("folo://add?id=1337497420971380736", navigation)
+    handleIncomingUrl("diting://add?id=1337497420971380736", navigation)
+    handleIncomingUrl("diting://add?id=1337497420971380736", navigation)
     await settle()
 
     expect(routesOf(navigation)).toHaveLength(1)
@@ -106,7 +106,7 @@ describe("handleIncomingUrl", () => {
     // Signed in already: the sign-in screen closes itself, and what is over it, a moment later
     navigation.presentControllerView(LoginScreen)
 
-    handleIncomingUrl("folo://add?id=1337585485484134400", navigation)
+    handleIncomingUrl("diting://add?id=1337585485484134400", navigation)
     await settle()
     expect(screensOf(navigation)).toEqual([LoginScreen])
 
@@ -120,7 +120,7 @@ describe("handleIncomingUrl", () => {
       const stopWatching = watchPendingFollowScreen(navigation)
       navigation.presentControllerView(LoginScreen)
 
-      handleIncomingUrl("folo://add?id=1337585485484134400", navigation)
+      handleIncomingUrl("diting://add?id=1337585485484134400", navigation)
       await settle()
       // The form would cover the sign-in screen
       expect(screensOf(navigation)).toEqual([LoginScreen])
@@ -135,7 +135,7 @@ describe("handleIncomingUrl", () => {
     it("still opens the form when the sign-in screen closes without signing in", async () => {
       const stopWatching = watchPendingFollowScreen(navigation)
       navigation.presentControllerView(LoginScreen)
-      handleIncomingUrl("folo://add?id=1337585485484134400", navigation)
+      handleIncomingUrl("diting://add?id=1337585485484134400", navigation)
 
       navigation.dismiss()
 
@@ -144,7 +144,7 @@ describe("handleIncomingUrl", () => {
     })
 
     it("opens the form at once without a sign-in screen, which the form asks for", async () => {
-      handleIncomingUrl("folo://add?id=1337585485484134400", navigation)
+      handleIncomingUrl("diting://add?id=1337585485484134400", navigation)
       await settle()
 
       expect(screensOf(navigation)).toEqual([FollowScreen])
@@ -157,7 +157,7 @@ describe("handleIncomingUrl", () => {
         () => new Promise<void>((resolve) => (closeBrowser = resolve)),
       )
 
-      handleIncomingUrl("folo://add?id=1337585485484134400", navigation)
+      handleIncomingUrl("diting://add?id=1337585485484134400", navigation)
       await settle()
       // The launch found no session meanwhile
       navigation.presentControllerView(LoginScreen)

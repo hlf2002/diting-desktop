@@ -32,11 +32,11 @@ const devPrint = (): PluginOption => ({
     server.printUrls = () => {
       _printUrls()
       console.info(
-        `  ${green("➜")}  ${dim("Production debug")}: ${cyan("https://app.folo.is/__debug_proxy.html")}`,
+        `  ${green("➜")}  ${dim("Production debug")}: ${cyan("https://diting.7373.com.cn/__debug_proxy.html")}`,
       )
       console.info(
         `  ${green("➜")}  ${dim("Development debug")}: ${cyan(
-          "https://dev.folo.is/__debug_proxy.html",
+          "https://diting.7373.com.cn/__debug_proxy.html",
         )}`,
       )
     }
@@ -183,7 +183,7 @@ export default ({ mode }) => {
 
           manifest: {
             theme_color: "#000000",
-            name: "Folo",
+            name: "谛听",
             display: "standalone",
             background_color: "#ffffff",
             icons: [
@@ -313,7 +313,7 @@ function checkBrowserSupport() {
       "Folo is not compatible with your browser because your browser version is too old. You can download and use the Folo app or continue using it with the latest browser.",
     )
 
-    window.location.href = "https://folo.is/download"
+    window.location.href = "https://diting.7373.com.cn/download"
   }
 }
 

@@ -5,7 +5,7 @@ import type { TestAccount } from "./account"
 import type { DesktopE2EEnv } from "./env"
 import { buildWebAppURL, resolveDesktopE2EEnv } from "./env"
 
-const ONBOARDING_FEED_URL = "folo://onboarding"
+const ONBOARDING_FEED_URL = "diting://onboarding"
 
 const isVisible = async (locator: Locator) => locator.isVisible().catch(() => false)
 const visibleByTestId = (page: Page, testId: string) =>
@@ -80,7 +80,7 @@ const isLoggedOutUiReady = async (page: Page) => {
 export const injectRecaptchaToken = async (page: Page, env?: DesktopE2EEnv) => {
   await page.addInitScript(
     (nextEnv) => {
-      window.__FOLO_E2E_RECAPTCHA_TOKEN__ = "e2e-token"
+      window.__DITING_E2E_RECAPTCHA_TOKEN__ = "e2e-token"
 
       const originalFetch = globalThis.fetch.bind(globalThis)
       const authEndpoints = [

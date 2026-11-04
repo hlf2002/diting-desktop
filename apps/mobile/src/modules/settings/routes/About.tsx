@@ -136,7 +136,7 @@ export const AboutScreen = () => {
         <GroupedInsetListBaseCell className="flex-col py-6">
           <View className="flex-1 items-center justify-center">
             <Logo height={80} width={80} />
-            <Text className="mt-4 text-2xl font-semibold text-label">Folo</Text>
+            <Text className="mt-4 text-2xl font-semibold text-label">谛听</Text>
             <Text className="font-mono text-sm text-tertiary-label">{appVersionLabel}</Text>
           </View>
           <View className="mt-6 flex-1">
@@ -147,7 +147,7 @@ export const AboutScreen = () => {
                 <Text className="text-[15px] text-label">{children}</Text>
               )}
               values={{
-                appName: "Folo",
+                appName: "谛听",
                 commitSha: `${appVersion}-${buildId}`,
               }}
               components={{
@@ -182,7 +182,7 @@ export const AboutScreen = () => {
               )}
               values={{
                 currentYear: new Date().getFullYear(),
-                appName: "Folo",
+                appName: "谛听",
               }}
             />
           </View>

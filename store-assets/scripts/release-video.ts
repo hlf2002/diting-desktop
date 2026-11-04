@@ -407,7 +407,7 @@ const outro = (slot: Slot) => {
 <div class="center">
   <div style="animation:${enter("pop", start + 100, 900)}">${foloLogo(140)}</div>
   <h1 class="headline" style="font-size:112px;margin-top:40px"><span class="line" style="animation:${enter("in-up", start + 350, 900)}"><span class="t">Update <em>today.</em></span></span></h1>
-  <p class="sub" style="font-size:40px;margin-top:22px;animation:${enter("in-up", start + 650, 900)}"><span class="t">folo.is</span></p>
+  <p class="sub" style="font-size:40px;margin-top:22px;animation:${enter("in-up", start + 650, 900)}"><span class="t">diting.7373.com.cn</span></p>
   <p class="small" style="animation:${enter("in-up", start + 850, 900)}"><span class="t">${line}</span></p>
 </div>`,
   )

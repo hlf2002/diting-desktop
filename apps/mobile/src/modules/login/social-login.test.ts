@@ -37,7 +37,7 @@ describe("loginWithSocialProvider", () => {
     })
 
     expect(result).toBe(true)
-    expect(signInWithProvider).toHaveBeenCalledWith("google", { callbackURL: "folo://" })
+    expect(signInWithProvider).toHaveBeenCalledWith("google", { callbackURL: "diting://" })
     expect(trackLogin).toHaveBeenCalledTimes(1)
     expect(sequence).toEqual(["pending:google", "sign-in:google", "sync", "track", "pending:none"])
   })
@@ -120,7 +120,7 @@ describe("loginWithSocialProvider", () => {
       trackLogin: vi.fn(),
     })
 
-    expect(signInWithProvider).toHaveBeenCalledWith("github", { callbackURL: "folo://" })
+    expect(signInWithProvider).toHaveBeenCalledWith("github", { callbackURL: "diting://" })
   })
 
   it("uses the Apple token flow for Apple sign in", async () => {

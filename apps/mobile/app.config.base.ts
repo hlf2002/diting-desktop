@@ -86,7 +86,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     owner: "follow",
     updates: {
-      url: "https://ota.folo.is/manifest",
+      url: "https://ota.diting.7373.com.cn/manifest",
       requestHeaders: {
         "expo-channel-name": channelName,
       },
@@ -99,16 +99,16 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     runtimeVersion,
 
-    name: "Folo",
-    slug: "follow",
+    name: "谛听",
+    slug: "diting",
     version: PKG.version,
     orientation: "portrait" as const,
     icon: iconPath,
-    scheme: ["follow", "folo"],
+    scheme: ["diting", "cn.com.diting"],
     userInterfaceStyle: "automatic" as const,
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "is.follow",
+      bundleIdentifier: "cn.com.diting",
       usesAppleSignIn: true,
       infoPlist: {
         LSApplicationCategoryType: "public.app-category.news",
@@ -123,7 +123,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       googleServicesFile: "./build/GoogleService-Info.plist",
     },
     android: {
-      package: "is.follow",
+      package: "cn.com.diting",
       // Media selection uses system pickers; saving only needs write access on older Android versions.
       blockedPermissions: [
         "android.permission.ACCESS_MEDIA_LOCATION",

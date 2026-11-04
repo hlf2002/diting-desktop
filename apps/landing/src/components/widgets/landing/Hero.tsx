@@ -117,7 +117,7 @@ export const LandingHero: Component<LandingHeroProps> = ({ items }) => {
             {audience === 'human' ? (
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <NextLink
-                  href="https://app.folo.is"
+                  href="https://diting.7373.com.cn"
                   target="_blank"
                   rel="noreferrer noopener"
                 >
@@ -157,7 +157,7 @@ export const LandingHero: Component<LandingHeroProps> = ({ items }) => {
                   {heroT.rich('agentBody', {
                     skill: (chunks) => (
                       <a
-                        href="https://api.folo.is/skill.md"
+                        href="https://diting.7373.com.cn/skill.md"
                         target="_blank"
                         rel="noreferrer noopener"
                         className="text-accent underline decoration-accent/40 underline-offset-4 transition-colors hover:text-accent/80"

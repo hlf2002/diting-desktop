@@ -31,7 +31,7 @@ vi.mock("@/src/lib/dialog-state", async () => ({
 vi.mock("@/src/lib/payment", () => ({ isAndroidApkInstall: () => false }))
 vi.mock("@follow/constants", () => ({
   APP_STORE_URLS: { iOS: "https://apps.apple.com/app", Android: "https://play.google.com/app" },
-  GOOGLE_PLAY_PACKAGE_ID: "is.follow",
+  GOOGLE_PLAY_PACKAGE_ID: "cn.com.diting",
 }))
 
 const { showStoreUpdatePrompt } = await import("../use-store-update-prompt")

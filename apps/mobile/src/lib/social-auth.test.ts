@@ -11,7 +11,7 @@ describe("parseSocialAuthCallbackURL", () => {
   it("returns the session cookie of a successful callback", () => {
     const cookie = "__Secure-better-auth.session_token=token; Max-Age=2592000; Path=/"
 
-    expect(parseSocialAuthCallbackURL(`folo://?cookie=${encodeURIComponent(cookie)}#`)).toEqual({
+    expect(parseSocialAuthCallbackURL(`diting://?cookie=${encodeURIComponent(cookie)}#`)).toEqual({
       result: { type: "success" },
       cookie,
     })
@@ -20,19 +20,19 @@ describe("parseSocialAuthCallbackURL", () => {
   it("reports a rejected callback and ignores its cookies", () => {
     expect(
       parseSocialAuthCallbackURL(
-        "folo://?error=state_mismatch&cookie=__Secure-better-auth.state%3D%3B%20Max-Age%3D0",
+        "diting://?error=state_mismatch&cookie=__Secure-better-auth.state%3D%3B%20Max-Age%3D0",
       ),
     ).toEqual({ result: { type: "error", error: "state_mismatch" }, cookie: null })
   })
 
   it("treats a denied consent screen as a cancellation", () => {
-    expect(parseSocialAuthCallbackURL("folo://?error=access_denied").result).toEqual({
+    expect(parseSocialAuthCallbackURL("diting://?error=access_denied").result).toEqual({
       type: "cancel",
     })
   })
 
   it("reports a callback without a session cookie", () => {
-    expect(parseSocialAuthCallbackURL("folo://").result).toEqual({
+    expect(parseSocialAuthCallbackURL("diting://").result).toEqual({
       type: "error",
       error: "missing_session_cookie",
     })
@@ -40,7 +40,7 @@ describe("parseSocialAuthCallbackURL", () => {
 })
 
 describe("buildAuthorizationProxyURL", () => {
-  const authBaseURL = "https://api.folo.is/better-auth"
+  const authBaseURL = "https://api.diting.7373.com.cn/better-auth"
   const authorizationURL = "https://accounts.google.com/o/oauth2/v2/auth?state=abc&scope=email"
 
   it("points the Expo authorization proxy at the provider URL", () => {

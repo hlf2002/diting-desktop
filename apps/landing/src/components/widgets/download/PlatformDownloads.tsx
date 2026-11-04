@@ -155,7 +155,7 @@ export const PlatformDownloads: Component<PlatformDownloadsProps> = ({
           transition={{ ...Spring.presets.smooth, delay: 0.25 }}
         >
           <Link
-            href="https://app.folo.is"
+            href="https://diting.7373.com.cn"
             target="_blank"
             rel="noreferrer noopener"
             className={cx(

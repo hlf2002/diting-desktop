@@ -3,7 +3,7 @@ export const APPLE_APP_SITE_ASSOCIATION = {
     apps: [],
     details: [
       {
-        appID: '492J8Q67PF.is.follow',
+        appID: '492J8Q67PF.cn.com.diting',
         paths: ['*'],
       },
     ],

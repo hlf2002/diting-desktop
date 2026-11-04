@@ -1,7 +1,7 @@
 import type { DesktopDistribution } from "./schema"
 
 const APPLE_APP_STORE_ID = "6739802604"
-const GOOGLE_PLAY_PACKAGE_ID = "is.follow"
+const GOOGLE_PLAY_PACKAGE_ID = "cn.com.diting"
 const MICROSOFT_STORE_PRODUCT_ID = "9nvfzpv0v0ht"
 const MICROSOFT_STORE_MARKET = "US"
 const MICROSOFT_STORE_LOCALE = "en-US"

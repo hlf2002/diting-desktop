@@ -357,7 +357,7 @@ export function UnifiedDiscoverForm() {
                           className="inline-flex items-center gap-1 rounded-full border border-accent px-2 py-px text-accent hover:bg-accent/10"
                         >
                           <i className="i-mgc-book-6-cute-re" />
-                          <span>Folo Flavored Feed Spec</span>
+                          <span>Diting Flavored Feed Spec</span>
                         </a>
                       </>
                     )}

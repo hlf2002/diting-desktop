@@ -1,10 +1,10 @@
 import { defineConfig, triggers } from "cf/config"
 
-// folo.is
+// diting.7373.com.cn
 const zone = "115ea8e6a7865dbfc1cf4530d5f87f63"
 
-// `cf deploy --mode dev` deploys folo-web-dev to dev.folo.is. Any other mode deploys folo-web to
-// app.folo.is. The Worker only serves the files that `pnpm run build:web` writes to out/web
+// `cf deploy --mode dev` deploys diting-web-dev to dev.diting.7373.com.cn. Any other mode deploys diting-web to
+// diting.7373.com.cn. The Worker only serves the files that `pnpm run build:web` writes to out/web
 // (see wrangler.config.ts).
 export default defineConfig(({ mode }) => {
   const isDev = mode === "dev"
@@ -27,7 +27,12 @@ export default defineConfig(({ mode }) => {
       assets: {
         notFoundHandling: "single-page-application",
       },
-      triggers: [triggers.fetch({ pattern: isDev ? "dev.folo.is/*" : "app.folo.is/*", zone })],
+      triggers: [
+        triggers.fetch({
+          pattern: isDev ? "dev.diting.7373.com.cn/*" : "diting.7373.com.cn/*",
+          zone,
+        }),
+      ],
     },
   }
 })

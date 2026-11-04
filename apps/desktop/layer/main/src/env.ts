@@ -13,7 +13,7 @@ export const isWindows = platform === "win32"
 export const isLinux = platform === "linux"
 
 /** The temporary profile the end-to-end tests run the app on */
-export const e2eUserDataDir = process.env.FOLO_E2E_USER_DATA_DIR
+export const e2eUserDataDir = process.env.DITING_E2E_USER_DATA_DIR
 
 /**
  * A test run of the unpackaged app. It uses the release URL schemes, see `DEV`, and must leave

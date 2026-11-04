@@ -12,8 +12,8 @@ const DESKTOP_E2E_PROFILES = {
     webUsesHashRouter: false,
   },
   prod: {
-    apiURL: "https://api.folo.is",
-    webURL: "https://app.folo.is",
+    apiURL: "https://api.diting.7373.com.cn",
+    webURL: "https://diting.7373.com.cn",
     webBaseURL: null,
     webUsesHashRouter: true,
   },
@@ -42,11 +42,11 @@ const normalizeRoute = (route: string) => {
 }
 
 export const resolveDesktopE2EEnv = (): DesktopE2EEnv => {
-  const profile = (process.env.FOLO_E2E_PROFILE ?? "local") as DesktopE2EProfile
+  const profile = (process.env.DITING_E2E_PROFILE ?? "local") as DesktopE2EProfile
   const resolvedProfile = profile in DESKTOP_E2E_PROFILES ? profile : "local"
   const profileConfig = DESKTOP_E2E_PROFILES[resolvedProfile]
-  const webDevServerURL = process.env.FOLO_E2E_WEB_DEV_SERVER_URL ?? "http://localhost:2233"
-  const debugProxyPath = process.env.FOLO_E2E_WEB_DEBUG_PROXY_PATH ?? "/__debug_proxy.html"
+  const webDevServerURL = process.env.DITING_E2E_WEB_DEV_SERVER_URL ?? "http://localhost:2233"
+  const debugProxyPath = process.env.DITING_E2E_WEB_DEBUG_PROXY_PATH ?? "/__debug_proxy.html"
 
   const webBaseURL =
     resolvedProfile === "prod"
@@ -58,8 +58,8 @@ export const resolveDesktopE2EEnv = (): DesktopE2EEnv => {
 
   return {
     profile: resolvedProfile,
-    apiURL: process.env.FOLO_E2E_API_URL ?? profileConfig.apiURL,
-    webURL: process.env.FOLO_E2E_WEB_URL ?? profileConfig.webURL,
+    apiURL: process.env.DITING_E2E_API_URL ?? profileConfig.apiURL,
+    webURL: process.env.DITING_E2E_WEB_URL ?? profileConfig.webURL,
     webBaseURL,
     webUsesHashRouter: profileConfig.webUsesHashRouter,
     webDevServerURL,

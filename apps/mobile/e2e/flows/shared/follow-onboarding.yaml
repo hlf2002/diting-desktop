@@ -1,10 +1,10 @@
-appId: is.follow
+appId: cn.com.diting
 ---
 - tapOn:
     id: tab-DiscoverTabScreen
 - tapOn:
     id: discover-search-input
-- inputText: folo://onboarding
+- inputText: diting://onboarding
 - pressKey: Enter
 - extendedWaitUntil:
     visible:

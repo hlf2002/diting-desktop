@@ -110,7 +110,7 @@ export const SettingAbout = () => {
 
   const handleOpenLegal = (type: "privacy" | "tos") => {
     const path = type === "privacy" ? "privacy-policy" : "terms-of-service"
-    window.open(`https://folo.is/${path}`, "_blank")
+    window.open(`https://diting.7373.com.cn/${path}`, "_blank")
   }
 
   const handleOpenAiOnboarding = () => {

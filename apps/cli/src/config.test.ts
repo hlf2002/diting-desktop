@@ -17,12 +17,12 @@ describe("config", () => {
   it("writes the token so that only the user can read it", async () => {
     const { updateConfig } = await import("./config")
 
-    await updateConfig({ token: "secret", apiUrl: "https://api.folo.is" })
+    await updateConfig({ token: "secret", apiUrl: "https://api.diting.7373.com.cn" })
 
     const configPath = join(home, ".folo", "config.json")
     expect(JSON.parse(await readFile(configPath, "utf8"))).toEqual({
       token: "secret",
-      apiUrl: "https://api.folo.is",
+      apiUrl: "https://api.diting.7373.com.cn",
     })
     if (process.platform !== "win32") {
       expect((await stat(configPath)).mode & 0o777).toBe(0o600)

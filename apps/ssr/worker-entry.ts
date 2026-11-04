@@ -282,12 +282,12 @@ async function injectMetaToTemplate(document: Document, c: any) {
         if (meta.title) {
           const $title = document.querySelector("title")
           if ($title) {
-            $title.textContent = `${xss(meta.title)} | Folo`
+            $title.textContent = `${xss(meta.title)} | Diting`
           } else {
             const $head = document.querySelector("head")
             if ($head) {
               const $title = document.createElement("title")
-              $title.textContent = `${xss(meta.title)} | Folo`
+              $title.textContent = `${xss(meta.title)} | Diting`
               $head.append($title)
             }
           }

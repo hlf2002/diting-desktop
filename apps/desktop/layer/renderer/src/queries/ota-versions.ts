@@ -4,7 +4,7 @@ import { ofetch } from "ofetch"
 import type { OTAVersionsResponse } from "~/lib/mas-review"
 import { getMASStoreVersionFromOTAVersions } from "~/lib/mas-review"
 
-const OTA_VERSIONS_URL = "https://ota.folo.is/versions"
+const OTA_VERSIONS_URL = "https://ota.diting.7373.com.cn/versions"
 
 const isMASBuild = () => typeof process !== "undefined" && !!process.mas
 

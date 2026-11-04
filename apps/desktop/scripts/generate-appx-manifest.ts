@@ -67,7 +67,7 @@ async function main() {
     const appxVersion = versionParts.slice(0, 4).join(".")
 
     const config: AppXManifestConfig = {
-      packageName: "Folo",
+      packageName: "diting",
       packageDisplayName: isStaging
         ? "Folo Staging - Follow everything in one place"
         : "Folo - Follow everything in one place",
@@ -76,9 +76,9 @@ async function main() {
       version: appxVersion,
       publisher: "CN=7CBBEB6A-9B0E-4387-BAE3-576D0ACA279E",
       packageBackgroundColor: "#FF5C00",
-      protocols: ["folo", "follow"],
+      protocols: ["diting", "cn.com.diting"],
       description: "Follow everything in one place.",
-      appBundleId: "is.follow",
+      appBundleId: "cn.com.diting",
     }
 
     // Template file path

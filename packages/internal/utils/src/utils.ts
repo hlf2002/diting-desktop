@@ -237,7 +237,7 @@ export const getUrlIcon = (url: string, _fallback?: boolean | undefined) => {
     fallbackUrl = `https://avatar.vercel.sh/${pureDomain}.svg?text=${pureDomain
       ?.slice(0, 2)
       .toUpperCase()}`
-    src = `https://icons.folo.is/${host}`
+    src = `https://icons.diting.7373.com.cn/${host}`
   } catch {
     const pureDomain = parse(url).domainWithoutSuffix
     src = `https://avatar.vercel.sh/${pureDomain}.svg?text=${pureDomain?.slice(0, 2).toUpperCase()}`

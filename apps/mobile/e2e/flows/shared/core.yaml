@@ -1,4 +1,4 @@
-appId: is.follow
+appId: cn.com.diting
 ---
 - runFlow: register.yaml
 - runFlow: sign-out.yaml

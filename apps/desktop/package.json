@@ -4,7 +4,7 @@
   "version": "1.16.0",
   "private": true,
   "description": "Follow everything in one place",
-  "author": "Folo Team",
+  "author": "谛听 Team",
   "homepage": "https://github.com/RSSNext",
   "repository": {
     "url": "https://github.com/RSSNext/Folo",
@@ -32,10 +32,10 @@
     "dev:web": "cross-env WEB_BUILD=1 vite",
     "e2e": "playwright test -c e2e/playwright.config.ts",
     "e2e:electron": "playwright test -c e2e/playwright.config.ts --project=electron",
-    "e2e:electron:prod": "cross-env FOLO_E2E_PROFILE=prod playwright test -c e2e/playwright.config.ts --project=electron",
+    "e2e:electron:prod": "cross-env DITING_E2E_PROFILE=prod playwright test -c e2e/playwright.config.ts --project=electron",
     "e2e:install": "playwright install chromium",
     "e2e:web": "playwright test -c e2e/playwright.config.ts --project=web",
-    "e2e:web:prod": "cross-env FOLO_E2E_PROFILE=prod playwright test -c e2e/playwright.config.ts --project=web",
+    "e2e:web:prod": "cross-env DITING_E2E_PROFILE=prod playwright test -c e2e/playwright.config.ts --project=web",
     "hotfix": "vv -c bump.hotfix.config.js --patch",
     "publish": "electron-vite build && electron-forge publish",
     "start": "electron-vite preview",
@@ -103,6 +103,6 @@
     "wrangler": "4.136.1"
   },
   "runtimeVersion": "1.16.0",
-  "productName": "Folo",
+  "productName": "谛听",
   "mainHash": "89f2f99fd88e5dae5f2b7e9be68192ca48f0afc186b86d56ac3c1e1c9e8f048c"
 }

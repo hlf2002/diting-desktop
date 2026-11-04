@@ -28,7 +28,7 @@ vi.mock("electron", () => ({
 }))
 vi.mock("~/env", () => ({ isMacOS: true, isWindows: false }))
 vi.mock("~/helper", () => ({
-  filePathToAppUrl: (filePath: string) => `app://folo.is${filePath}`,
+  filePathToAppUrl: (filePath: string) => `app://diting.7373.com.cn${filePath}`,
   getIconPath: vi.fn(),
 }))
 vi.mock("~/lib/deep-link", () => ({ setRendererReady: vi.fn() }))
@@ -92,7 +92,9 @@ describe("main window navigation", () => {
   })
 
   it("keeps the app's own pages, e.g. on a reload", () => {
-    const event = navigate("app://folo.is/Applications/Folo.app/renderer/index.html#/timeline")
+    const event = navigate(
+      "app://diting.7373.com.cn/Applications/Folo.app/renderer/index.html#/timeline",
+    )
 
     expect(event.preventDefault).not.toHaveBeenCalled()
     expect(mocks.openExternal).not.toHaveBeenCalled()
@@ -114,7 +116,7 @@ describe("main window navigation", () => {
   })
 
   it("leaves the app's deep links to the system", () => {
-    const event = navigate("folo://feed?id=1")
+    const event = navigate("diting://feed?id=1")
 
     expect(event.preventDefault).not.toHaveBeenCalled()
   })

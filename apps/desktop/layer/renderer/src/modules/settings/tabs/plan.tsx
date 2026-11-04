@@ -20,7 +20,7 @@ import { subscription } from "~/lib/auth"
 
 const APPLE_SUBSCRIPTION_MANAGEMENT_URL = "https://apps.apple.com/account/subscriptions"
 const GOOGLE_PLAY_SUBSCRIPTION_MANAGEMENT_URL =
-  "https://play.google.com/store/account/subscriptions?package=is.follow"
+  "https://play.google.com/store/account/subscriptions?package=cn.com.diting"
 const ACTIVE_STRIPE_SUBSCRIPTION_EXISTS_ERROR_CODE = "ACTIVE_STRIPE_SUBSCRIPTION_EXISTS"
 
 type BillingPortalResponse = {

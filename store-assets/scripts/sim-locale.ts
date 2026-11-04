@@ -55,7 +55,7 @@ for (const udid of udids) {
     "--batteryLevel",
     "100",
   )
-  await simctl("launch", udid, "is.follow")
+  await simctl("launch", udid, "cn.com.diting")
   console.log(`${udid}: ${language} (${region})`)
 }
 await sleep(12_000)

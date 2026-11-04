@@ -12,7 +12,7 @@ describe("isWebUrl", () => {
   it("leaves other links to the apps that handle them", () => {
     expect(isWebUrl("mailto:editor@example.test")).toBe(false)
     expect(isWebUrl("tel:+15555555")).toBe(false)
-    expect(isWebUrl("folo://onboarding/entry/1")).toBe(false)
+    expect(isWebUrl("diting://onboarding/entry/1")).toBe(false)
     expect(isWebUrl("javascript:alert(1)")).toBe(false)
   })
 

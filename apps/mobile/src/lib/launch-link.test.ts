@@ -26,13 +26,13 @@ describe("launch link across reloads in place", () => {
   })
 
   it("opens the link that launched the app", async () => {
-    mocks.initialUrl = "folo://add?id=1337591707432128512"
+    mocks.initialUrl = "diting://add?id=1337591707432128512"
 
-    await expect(getUnhandledLaunchLink()).resolves.toBe("folo://add?id=1337591707432128512")
+    await expect(getUnhandledLaunchLink()).resolves.toBe("diting://add?id=1337591707432128512")
   })
 
   it("skips it after the app reloaded its JS, as signing out does", async () => {
-    mocks.initialUrl = "folo://add?id=1337591707432128512"
+    mocks.initialUrl = "diting://add?id=1337591707432128512"
     await rememberHandledLaunchLink()
 
     // The process, and so its launch link, stays the same across the reload
@@ -40,7 +40,7 @@ describe("launch link across reloads in place", () => {
   })
 
   it("skips it after every reload of the same process", async () => {
-    mocks.initialUrl = "folo://list?id=1337626451536515072"
+    mocks.initialUrl = "diting://list?id=1337626451536515072"
     await rememberHandledLaunchLink()
     await expect(getUnhandledLaunchLink()).resolves.toBeNull()
 
@@ -49,19 +49,19 @@ describe("launch link across reloads in place", () => {
   })
 
   it("opens the same link when it launches the app again later", async () => {
-    mocks.initialUrl = "folo://add?id=1337591707432128512"
+    mocks.initialUrl = "diting://add?id=1337591707432128512"
     await rememberHandledLaunchLink()
     await getUnhandledLaunchLink()
 
     // A new process launched by the link once more, without a reload in between
-    await expect(getUnhandledLaunchLink()).resolves.toBe("folo://add?id=1337591707432128512")
+    await expect(getUnhandledLaunchLink()).resolves.toBe("diting://add?id=1337591707432128512")
   })
 
   it("opens another link that launched the app", async () => {
-    mocks.initialUrl = "folo://add?id=1"
+    mocks.initialUrl = "diting://add?id=1"
     await rememberHandledLaunchLink()
 
-    mocks.initialUrl = "folo://add?id=2"
-    await expect(getUnhandledLaunchLink()).resolves.toBe("folo://add?id=2")
+    mocks.initialUrl = "diting://add?id=2"
+    await expect(getUnhandledLaunchLink()).resolves.toBe("diting://add?id=2")
   })
 })

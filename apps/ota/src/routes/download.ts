@@ -74,7 +74,7 @@ downloadRoute.get("/download/mobile/android/apk", async (c) => {
   }
 
   return redirectToDownload(
-    `https://github.com/RSSNext/Folo/releases/download/mobile/v${versionRecord.version}/build.apk`,
+    `https://github.com/hlf2002/diting-desktop/releases/download/mobile/v${versionRecord.version}/build.apk`,
   )
 })
 

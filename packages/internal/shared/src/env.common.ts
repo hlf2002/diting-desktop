@@ -10,9 +10,9 @@ const FIREBASE_CONFIG_DEFAULT = JSON.stringify({
 
 export const DEFAULT_VALUES = {
   PROD: {
-    API_URL: "https://api.folo.is",
-    OTA_URL: "https://ota.folo.is",
-    WEB_URL: "https://app.folo.is",
+    API_URL: "https://diting.7373.com.cn",
+    OTA_URL: "https://ota.diting.7373.com.cn",
+    WEB_URL: "https://diting.7373.com.cn",
     INBOXES_EMAIL: "@follow.re",
     FIREBASE_CONFIG: FIREBASE_CONFIG_DEFAULT,
     RECAPTCHA_V3_SITE_KEY: "6LeGa3csAAAAALi_WqhlWoaGaqd_kke4HRGvNE0C",
@@ -21,14 +21,14 @@ export const DEFAULT_VALUES = {
     POSTHOG_HOST: "https://us.posthog.com",
   },
   DEV: {
-    API_URL: "https://api.dev.folo.is",
-    OTA_URL: "https://ota.folo.is",
-    WEB_URL: "https://dev.folo.is",
+    API_URL: "https://api.dev.diting.7373.com.cn",
+    OTA_URL: "https://ota.diting.7373.com.cn",
+    WEB_URL: "https://diting.7373.com.cn",
     INBOXES_EMAIL: "__dev@follow.re",
   },
   STAGING: {
-    API_URL: "https://api.folo.is",
-    OTA_URL: "https://ota.folo.is",
+    API_URL: "https://diting.7373.com.cn",
+    OTA_URL: "https://ota.diting.7373.com.cn",
     WEB_URL: "https://staging.follow.is",
     INBOXES_EMAIL: "@follow.re",
     POSTHOG_KEY: "phc_EZGEvBt830JgBHTiwpHqJAEbWnbv63m5UpreojwEWNL",

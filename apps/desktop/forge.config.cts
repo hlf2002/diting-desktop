@@ -138,17 +138,17 @@ const config: ForgeConfig = {
     name: isStaging ? "Folo Staging" : "Folo",
     appCategoryType: "public.app-category.news",
     buildVersion: process.env.BUILD_VERSION || undefined,
-    appBundleId: "is.follow",
+    appBundleId: "cn.com.diting",
     icon: isStaging ? "resources/icon-staging" : "resources/icon",
     extraResource: ["./resources/app-update.yml"],
     protocols: [
       {
         name: "Folo",
-        schemes: ["follow"],
+        schemes: ["diting", "cn.com.diting"],
       },
       {
         name: "Folo",
-        schemes: ["folo"],
+        schemes: ["diting", "cn.com.diting"],
       },
     ],
 
@@ -239,8 +239,8 @@ const config: ForgeConfig = {
     new MakerDeb(
       {
         options: {
-          name: isStaging ? "folo-staging" : "folo",
-          productName: isStaging ? "Folo Staging" : "Folo",
+          name: isStaging ? "diting-staging" : "diting",
+          productName: isStaging ? "谛听 Staging" : "谛听",
           // must match the executable emitted by electron-packager (packagerConfig.name)
           bin: isStaging ? "Folo Staging" : "Folo",
           genericName: "RSS Reader",
@@ -250,7 +250,7 @@ const config: ForgeConfig = {
           categories: ["Network", "News"],
           section: "web",
           icon: isStaging ? "resources/icon-staging.png" : "resources/icon.png",
-          mimeType: ["x-scheme-handler/folo", "x-scheme-handler/follow"],
+          mimeType: ["x-scheme-handler/diting", "x-scheme-handler/cn.com.diting"],
         },
       },
       ["linux"],
@@ -277,7 +277,7 @@ const config: ForgeConfig = {
               publisherDisplayName: "Natural Selection Labs",
               identityName: "NaturalSelectionLabs.Follow-Yourfavoritesinoneinbo",
               packageBackgroundColor: "#FF5C00",
-              protocol: "folo",
+              protocol: "diting",
             },
           },
         ]
@@ -285,7 +285,7 @@ const config: ForgeConfig = {
           new MakerSquirrel({
             name: "Folo",
             setupIcon: isStaging ? "resources/icon-staging.ico" : "resources/icon.ico",
-            iconUrl: "https://app.folo.is/favicon.ico",
+            iconUrl: "https://diting.7373.com.cn/favicon.ico",
           }),
         ]),
   ],
@@ -307,7 +307,7 @@ const config: ForgeConfig = {
       config: {
         repository: {
           owner: "RSSNext",
-          name: "follow",
+          name: "diting",
         },
         draft: true,
       },

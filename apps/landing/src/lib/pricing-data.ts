@@ -1,4 +1,4 @@
-const PRICING_API_URL = 'https://api.follow.is/status/configs'
+const PRICING_API_URL = 'https://diting.7373.com.cn/status/configs'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 export type PricingPlanLimit = {

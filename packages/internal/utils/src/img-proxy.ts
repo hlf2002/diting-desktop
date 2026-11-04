@@ -1,4 +1,4 @@
-export const IMAGE_PROXY_URL = "https://img.folo.is"
+export const IMAGE_PROXY_URL = "https://img.diting.7373.com.cn"
 
 export const imageRefererMatches = [
   {

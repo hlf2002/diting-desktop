@@ -14,7 +14,7 @@ export type PlatformDownloadGroup = {
   channels: PlatformDownloadChannel[]
 }
 
-const OTA_DOWNLOAD_URL = 'https://ota.folo.is/download'
+const OTA_DOWNLOAD_URL = 'https://diting.7373.com.cn/download'
 
 export const DEFAULT_RELEASE_DOWNLOAD_LINKS = {
   androidApk: `${OTA_DOWNLOAD_URL}/mobile/android/apk`,
@@ -45,7 +45,7 @@ export const PlatformDownloadGroups: PlatformDownloadGroup[] = [
     channels: [
       {
         id: 'android-google-play',
-        href: 'https://play.google.com/store/apps/details?id=is.follow',
+        href: 'https://play.google.com/store/apps/details?id=cn.com.diting',
         name: 'Google Play',
         description: 'Automatic updates',
       },

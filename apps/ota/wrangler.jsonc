@@ -2,7 +2,7 @@
 // run yet, such as `wrangler tail`, until the Workers have been deployed to production with cf.
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
-  "name": "folo-ota",
+  "name": "diting-ota",
   "main": "src/index.ts",
   "compatibility_date": "2026-04-10",
   "compatibility_flags": ["nodejs_compat"],
@@ -19,7 +19,7 @@
   "workers_dev": true,
   "routes": [
     {
-      "pattern": "ota.folo.is",
+      "pattern": "diting.7373.com.cn",
       "custom_domain": true,
     },
   ],
@@ -37,8 +37,8 @@
     },
   ],
   "vars": {
-    "GITHUB_OWNER": "RSSNext",
-    "GITHUB_REPO": "Folo",
+    "GITHUB_OWNER": "hlf2002",
+    "GITHUB_REPO": "diting-desktop",
     "OTA_SYNC_TOKEN_HEADER": "x-ota-sync-token",
   },
   "triggers": {
@@ -46,7 +46,7 @@
   },
   "env": {
     "dev": {
-      "name": "folo-ota-dev",
+      "name": "diting-ota-dev",
       "workers_dev": true,
       "kv_namespaces": [
         {
@@ -62,13 +62,13 @@
         },
       ],
       "vars": {
-        "GITHUB_OWNER": "RSSNext",
-        "GITHUB_REPO": "Folo",
+        "GITHUB_OWNER": "hlf2002",
+        "GITHUB_REPO": "diting-desktop",
         "OTA_SYNC_TOKEN_HEADER": "x-ota-sync-token",
       },
       "routes": [
         {
-          "pattern": "ota.dev.folo.is/*",
+          "pattern": "ota.dev.diting.7373.com.cn/*",
           "zone_id": "115ea8e6a7865dbfc1cf4530d5f87f63",
         },
       ],

@@ -2,7 +2,7 @@
 
 **Last Updated: 2025-09-03**
 
-This is the privacy policy of NATURAL SELECTION LABS PTE. LTD. (“Company,” “we,” or “Folo”). This Privacy Policy explains how we collect, use, share, store, and protect your personal data when you use our website <https://folo.is> and the Folo application (collectively, the “Service”). By accessing or using the Service, you agree to this Privacy Policy and the Terms of Service. If you do not agree, please discontinue use immediately.
+This is the privacy policy of NATURAL SELECTION LABS PTE. LTD. (“Company,” “we,” or “Folo”). This Privacy Policy explains how we collect, use, share, store, and protect your personal data when you use our website <https://diting.7373.com.cn> and the Folo application (collectively, the “Service”). By accessing or using the Service, you agree to this Privacy Policy and the Terms of Service. If you do not agree, please discontinue use immediately.
 
 We may update this Privacy Policy from time to time. Any changes will be reflected on our Site with a new Last Updated date. Continued use of the Service after updates constitutes acceptance of the revised Privacy Policy.
 
@@ -14,7 +14,7 @@ We collect personal data to provide, improve, and personalize the Service.
 
 - **Account Information**: When you create a Folo account, we collect your email address, username, and password. You may optionally provide additional details, such as your name or profile preferences.
 - **User Content**: Data you submit, such as RSS feed subscriptions, comments, or content you upload or share via the Service.
-- **Communications**: Information you provide when contacting us via <support@folo.is> or in-app support.
+- **Communications**: Information you provide when contacting us via <support@diting.7373.com.cn> or in-app support.
 
 ## Information We Collect Automatically
 
@@ -110,6 +110,6 @@ Any dispute, claim, or controversy arising out of or relating to this Privacy Po
 
 If you have any questions regarding this Privacy Policy, to submit a complaint, or to access or correct your information, or to withdraw your consent to this Privacy Policy, please contact our Privacy Officer via the contact information below:
 
-General Support: <support@folo.is>
+General Support: <support@diting.7373.com.cn>
 
-Legal and Copyright Matters: <legal@folo.is>
+Legal and Copyright Matters: <legal@diting.7373.com.cn>

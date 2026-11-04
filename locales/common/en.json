@@ -2,7 +2,7 @@
   "app.api_unreachable": "Unable to connect to the server. Please check your network connection.",
   "app.copied_to_clipboard": "Copied to clipboard",
   "app.request_timeout": "The server took too long to respond. Please try again.",
-  "auth.error.account_not_linked": "This email belongs to a Folo account that isn't verified yet. Sign in to it once with a magic link on app.folo.is (leave the password empty), then try this sign-in method again.",
+  "auth.error.account_not_linked": "This email belongs to a Diting account that isn't verified yet. Sign in to it once with a magic link on diting.7373.com.cn (leave the password empty), then try this sign-in method again.",
   "auth.error.invalid_email_or_password": "Incorrect email or password.",
   "auth.error.invalid_token": "This link is invalid or has expired. Please request a new one.",
   "auth.error.sign_in_failed": "Couldn't sign in. Please try again.",

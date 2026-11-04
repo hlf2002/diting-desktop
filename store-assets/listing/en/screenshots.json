@@ -50,7 +50,7 @@
     "badge": "Open source · 39K stars on GitHub"
   },
   "desktop.chat": {
-    "eyebrow": "Folo AI",
+    "eyebrow": "Diting AI",
     "headline": "Ask your feeds\n*anything.*",
     "sub": "Chat about an article, a feed, or everything you follow."
   },
@@ -96,7 +96,7 @@
     ]
   },
   "play.featureGraphic": {
-    "eyebrow": "Folo",
+    "eyebrow": "Diting",
     "headline": "The AI *RSS reader*",
     "sub": "All your feeds. None of the noise."
   }

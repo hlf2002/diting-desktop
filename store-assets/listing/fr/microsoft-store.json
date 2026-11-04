@@ -1,5 +1,5 @@
 {
-  "shortDescription": "Folo est le lecteur RSS avec IA pour Windows. Suivez blogs, actualités, newsletters, vidéos et podcasts dans une seule chronologie apaisée, puis laissez l’IA résumer, traduire et répondre à vos questions sur tout ce que vous suivez.",
+  "shortDescription": "Diting est le lecteur RSS avec IA pour Windows. Suivez blogs, actualités, newsletters, vidéos et podcasts dans une seule chronologie apaisée, puis laissez l’IA résumer, traduire et répondre à vos questions sur tout ce que vous suivez.",
   "features": [
     "Flux RSS, Atom et JSON, plus des milliers de routes RSSHub pour les sites sans flux",
     "Une seule chronologie pour les articles, publications sociales, images, vidéos, podcasts et notifications",
@@ -8,7 +8,7 @@
     "Discutez avec l’IA d’un article, d’un flux, d’un dossier ou de toute votre chronologie",
     "Résumez votre chronologie en un condensé rapide",
     "Tâches IA qui envoient des synthèses quotidiennes ou hebdomadaires dans la discussion ou par e-mail",
-    "Connectez des services MCP pour relier vos autres outils à Folo AI",
+    "Connectez des services MCP pour relier vos autres outils à Diting AI",
     "Choisissez votre modèle d’IA ou utilisez votre propre clé API",
     "Synthèse vocale avec des voix naturelles",
     "Actions : des règles pour filtrer, mettre en favori, réécrire ou résumer les nouvelles entrées, ou vous notifier",
@@ -22,13 +22,13 @@
     "Open source sous licence AGPL-3.0, sans publicité"
   ],
   "screenshotCaptions": [
-    "Tous vos flux dans une chronologie apaisée, avec Folo AI à portée de clic.",
-    "Interrogez Folo AI sur un article, un flux ou tout ce que vous suivez.",
+    "Tous vos flux dans une chronologie apaisée, avec Diting AI à portée de clic.",
+    "Interrogez Diting AI sur un article, un flux ou tout ce que vous suivez.",
     "Transformez des centaines de nouvelles entrées en un condensé rapide.",
     "Lisez vos articles en comparaison bilingue, avec une traduction IA en français, anglais, chinois ou japonais.",
     "Images, vidéos et podcasts ont chacun une mise en page sur mesure.",
     "Programmez des tâches IA pour recevoir des synthèses quotidiennes ou hebdomadaires.",
     "Envoyez vos articles vers vos outils de notes et de lecture différée, ou connectez des services MCP.",
-    "Personnalisez Folo avec des thèmes, des polices de lecture et des raccourcis clavier."
+    "Personnalisez Diting avec des thèmes, des polices de lecture et des raccourcis clavier."
   ]
 }

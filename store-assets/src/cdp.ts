@@ -22,7 +22,7 @@ export const cdpPort = Number(process.env.FOLO_CDP_PORT ?? 9555)
 
 export const connectCdp = async (port = cdpPort): Promise<CdpSession> => {
   const targets = (await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()) as Target[]
-  // The app renderer is served from app://folo.is; ignore iframes and workers.
+  // The app renderer is served from app://diting.7373.com.cn; ignore iframes and workers.
   const target = targets.find((t) => t.type === "page" && t.url.startsWith("app://"))
   if (!target) throw new Error(`No Folo page target on port ${port}`)
 
@@ -80,7 +80,7 @@ export const apiRequest = async <T>(
   body?: unknown,
 ): Promise<T> =>
   session.evaluate<T>(`(async () => {
-    const response = await fetch(${JSON.stringify(`https://api.folo.is${path}`)}, {
+    const response = await fetch(${JSON.stringify(`https://api.diting.7373.com.cn${path}`)}, {
       method: ${JSON.stringify(method)},
       credentials: "include",
       headers: { "content-type": "application/json" },

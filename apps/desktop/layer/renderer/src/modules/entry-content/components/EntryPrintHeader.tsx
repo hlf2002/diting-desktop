@@ -8,8 +8,8 @@ import { useTranslation } from "react-i18next"
 
 import { readableContentMaxWidthClassName } from "~/constants/ui"
 
-const PRINT_HOMEPAGE = "https://folo.is"
-const PRINT_HOMEPAGE_LABEL = "folo.is"
+const PRINT_HOMEPAGE = "https://diting.7373.com.cn"
+const PRINT_HOMEPAGE_LABEL = "diting.7373.com.cn"
 
 export const EntryPrintHeader = ({ entryId }: { entryId: string }) => {
   const { t } = useTranslation()

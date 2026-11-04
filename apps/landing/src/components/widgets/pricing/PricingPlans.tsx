@@ -283,7 +283,7 @@ const PlanCard = ({
 
       <div className="mt-8">
         <Link
-          href="https://app.folo.is"
+          href="https://diting.7373.com.cn"
           target="_blank"
           rel="noreferrer noopener"
         >

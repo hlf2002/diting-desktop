@@ -50,7 +50,7 @@
     "badge": "오픈 소스 · GitHub 스타 39K"
   },
   "desktop.chat": {
-    "eyebrow": "Folo AI",
+    "eyebrow": "Diting AI",
     "headline": "피드에\n*뭐든 물어보세요.*",
     "sub": "글 하나, 피드 하나, 또는 팔로우하는 모든 것에 대해 대화하세요."
   },
@@ -96,7 +96,7 @@
     ]
   },
   "play.featureGraphic": {
-    "eyebrow": "Folo",
+    "eyebrow": "Diting",
     "headline": "AI *RSS 리더*",
     "sub": "모든 피드를 한곳에, 잡음은 빼고."
   }

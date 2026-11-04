@@ -15,7 +15,7 @@ export const ListDemo = ({
         >
           <div className="flex min-w-0 items-center gap-3">
             <img
-              src={`https://icons.folo.is/${item.host}`}
+              src={`https://diting.7373.com.cn/${item.host}`}
               alt={item.title}
               className="size-8 rounded-lg border border-border/60 bg-white/85 p-1"
             />

@@ -1,4 +1,4 @@
-appId: is.follow
+appId: cn.com.diting
 name: Android auth journey
 ---
 - runFlow:

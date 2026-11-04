@@ -1,4 +1,4 @@
-Folo is the AI RSS reader that brings everything you follow into one calm timeline, then helps you read it.
+Diting is the AI RSS reader that brings everything you follow into one calm timeline, then helps you read it.
 
 Follow blogs, news sites, newsletters, podcasts, video channels and social feeds in one place. Let AI summarize the long reads, translate the ones in other languages and read the rest aloud, so you stay informed without drowning in tabs.
 
@@ -26,12 +26,12 @@ YOUR READER, YOUR WAY
 • Subscriptions, read status and stars sync across iPhone, iPad, Mac, Windows, Android and the web
 
 OPEN SOURCE, NO ADS
-Folo is open source and ad-free, built in the open with a community of readers and developers.
+Diting is open source and ad-free, built in the open with a community of readers and developers.
 
 FREE TO START
 Create a free account to follow feeds and sync them across your devices. Basic, Plus and Pro plans add more subscriptions, higher AI limits and automations.
 
 Subscriptions are billed monthly or yearly and renew automatically unless canceled at least 24 hours before the end of the current period. Payment is charged to your Apple Account at confirmation of purchase. Manage or cancel your subscription anytime in your App Store account settings.
 
-Privacy Policy: https://folo.is/privacy-policy
+Privacy Policy: https://diting.7373.com.cn/privacy-policy
 Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

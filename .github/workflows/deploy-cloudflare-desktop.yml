@@ -47,8 +47,8 @@ jobs:
       - name: Build desktop web (SPA)
         working-directory: apps/desktop
         env:
-          VITE_WEB_URL: ${{ github.ref == 'refs/heads/dev' && 'https://dev.folo.is' || 'https://app.folo.is' }}
-          VITE_API_URL: ${{ github.ref == 'refs/heads/dev' && 'https://api.dev.folo.is' || 'https://api.folo.is' }}
+          VITE_WEB_URL: ${{ github.ref == 'refs/heads/dev' && 'https://dev.diting.7373.com.cn' || 'https://diting.7373.com.cn' }}
+          VITE_API_URL: ${{ github.ref == 'refs/heads/dev' && 'https://api.dev.diting.7373.com.cn' || 'https://api.diting.7373.com.cn' }}
         run: pnpm run build:web
 
       - name: Build desktop web Worker

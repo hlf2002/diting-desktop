@@ -106,7 +106,7 @@ Hard freeze and disable flags are not implemented in the verified v1 Worker yet.
 Set these before running the manual checks:
 
 ```bash
-export OTA_BASE_URL="https://ota.folo.is"
+export OTA_BASE_URL="https://ota.diting.7373.com.cn"
 export OTA_PRODUCT="mobile"
 export OTA_PLATFORM="ios"
 export OTA_CHANNEL="production"

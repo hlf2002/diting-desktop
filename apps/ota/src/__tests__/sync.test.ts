@@ -135,7 +135,7 @@ describe("listPublishedOtaReleases", () => {
 
     expect(result).toEqual({ kind: "not-modified" })
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://api.github.com/repos/RSSNext/Folo/releases",
+      "https://api.github.com/repos/hlf2002/diting-desktop/releases",
       expect.objectContaining({
         headers: expect.objectContaining({
           "If-None-Match": '"etag-value"',
@@ -241,7 +241,7 @@ describe("listPublishedOtaReleases", () => {
     })
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://api.github.com/repos/RSSNext/Folo/releases",
+      "https://api.github.com/repos/hlf2002/diting-desktop/releases",
       expect.objectContaining({
         headers: expect.objectContaining({
           "User-Agent": expect.any(String),
@@ -475,7 +475,7 @@ describe("syncGitHubReleases archive mirroring", () => {
       [KV_KEYS.release("mobile", "0.4.2"), JSON.stringify(otaRelease)],
     ])
     const fetchMock = stubReleaseFetch({
-      "https://api.github.com/repos/RSSNext/Folo/releases": () =>
+      "https://api.github.com/repos/hlf2002/diting-desktop/releases": () =>
         new Response(
           JSON.stringify([
             createGitHubReleaseAssetSet(
@@ -516,7 +516,7 @@ describe("syncGitHubReleases archive mirroring", () => {
       ],
     ])
     const fetchMock = stubReleaseFetch({
-      "https://api.github.com/repos/RSSNext/Folo/releases": () =>
+      "https://api.github.com/repos/hlf2002/diting-desktop/releases": () =>
         new Response(
           JSON.stringify([
             createGitHubReleaseAssetSet(
@@ -549,7 +549,7 @@ describe("syncGitHubReleases archive mirroring", () => {
     const kvEntries = new Map<string, unknown>()
     const bucketEntries = new Map<string, { body: Uint8Array; headers?: Record<string, string> }>()
     stubReleaseFetch({
-      "https://api.github.com/repos/RSSNext/Folo/releases": () =>
+      "https://api.github.com/repos/hlf2002/diting-desktop/releases": () =>
         new Response(
           JSON.stringify([
             createGitHubReleaseAssetSet(
@@ -709,7 +709,7 @@ describe("syncGitHubReleases", () => {
       vi.fn(async (input: string | URL | Request) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           githubRequestCount += 1
 
           if (githubRequestCount === 1) {
@@ -732,7 +732,7 @@ describe("syncGitHubReleases", () => {
                 {
                   publishedAt: "2026-04-10T16:00:00Z",
                   apkUrl:
-                    "https://github.com/RSSNext/Folo/releases/download/mobile/v0.4.3/build.apk",
+                    "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.4.3/build.apk",
                 },
               ),
             ]),
@@ -772,7 +772,8 @@ describe("syncGitHubReleases", () => {
       version: "0.4.3",
       publishedAt: "2026-04-10T16:00:00Z",
       tag: "mobile/v0.4.3",
-      downloadUrl: "https://github.com/RSSNext/Folo/releases/download/mobile/v0.4.3/build.apk",
+      downloadUrl:
+        "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.4.3/build.apk",
     })
     expect(kvEntries.get(KV_KEYS.githubEtag)).toBe('"etag-current"')
   })
@@ -805,7 +806,7 @@ describe("syncGitHubReleases", () => {
       vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           githubRequestCount += 1
 
           if (new Headers(init?.headers).get("If-None-Match") === '"etag-current"') {
@@ -858,7 +859,8 @@ describe("syncGitHubReleases", () => {
       version: "0.5.10",
       publishedAt: "2026-09-18T12:32:03Z",
       tag: "mobile/v0.5.10",
-      downloadUrl: "https://github.com/RSSNext/Folo/releases/download/mobile/v0.5.10/build.apk",
+      downloadUrl:
+        "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.5.10/build.apk",
     })
     expect(kvEntries.get(KV_KEYS.latestReleaseVersion("desktop"))).toBe(staleDesktopRecord)
     expect(kvEntries.get(KV_KEYS.syncLastSuccessAt)).toEqual(expect.any(String))
@@ -895,7 +897,7 @@ describe("syncGitHubReleases", () => {
       vi.fn(async (input: string | URL | Request, _init?: RequestInit) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               createGitHubReleaseAssetSet(
@@ -972,7 +974,7 @@ describe("syncGitHubReleases", () => {
     const fetchMock = vi.fn(async (input: string | URL | Request) => {
       const url = String(input)
 
-      if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+      if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
         return releasesResponse.promise
       }
 
@@ -1036,7 +1038,7 @@ describe("syncGitHubReleases", () => {
       vi.fn(async (input: string | URL | Request, _init?: RequestInit) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               createGitHubReleaseAssetSet("mobile/v0.4.3", "https://example.com/store.json", null),
@@ -1123,7 +1125,7 @@ describe("syncGitHubReleases", () => {
       vi.fn(async (input: string | URL | Request, _init?: RequestInit) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               createGitHubReleaseAssetSet(
@@ -1191,7 +1193,7 @@ describe("syncGitHubReleases", () => {
         message: "Install the latest desktop app.",
         distributions: {
           direct: {
-            downloadUrl: "https://ota.folo.is/Folo-1.5.1.dmg",
+            downloadUrl: "https://diting.7373.com.cn/Folo-1.5.1.dmg",
           },
           mas: {
             storeUrl: "https://apps.apple.com/app/id123456789",
@@ -1208,7 +1210,7 @@ describe("syncGitHubReleases", () => {
       vi.fn(async (input: string | URL | Request, _init?: RequestInit) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               createGitHubReleaseAssetSet(
@@ -1255,7 +1257,7 @@ describe("syncGitHubReleases", () => {
     ).toEqual(
       expect.objectContaining({
         distribution: "direct",
-        downloadUrl: "https://ota.folo.is/Folo-1.5.1.dmg",
+        downloadUrl: "https://diting.7373.com.cn/Folo-1.5.1.dmg",
         storeUrl: null,
       }),
     )
@@ -1298,7 +1300,7 @@ describe("syncGitHubReleases", () => {
         message: "Use the latest direct installer.",
         distributions: {
           direct: {
-            downloadUrl: "https://ota.folo.is/Folo-1.5.1.dmg",
+            downloadUrl: "https://diting.7373.com.cn/Folo-1.5.1.dmg",
           },
         },
       },
@@ -1309,7 +1311,7 @@ describe("syncGitHubReleases", () => {
       vi.fn(async (input: string | URL | Request, _init?: RequestInit) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               createGitHubReleaseAssetSet(
@@ -1380,7 +1382,7 @@ describe("syncGitHubReleases", () => {
         message: "Older direct installer policy.",
         distributions: {
           direct: {
-            downloadUrl: "https://ota.folo.is/Folo-1.5.1.dmg",
+            downloadUrl: "https://diting.7373.com.cn/Folo-1.5.1.dmg",
           },
         },
       },
@@ -1391,7 +1393,7 @@ describe("syncGitHubReleases", () => {
       vi.fn(async (input: string | URL | Request, _init?: RequestInit) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               createGitHubReleaseAssetSet(
@@ -1449,7 +1451,7 @@ describe("syncGitHubReleases", () => {
           manifest: {
             name: "manifest.yml",
             downloadUrl:
-              "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/manifest.yml",
+              "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/manifest.yml",
           },
           launchAsset: {
             path: "renderer/custom-renderer.tar.gz",
@@ -1467,7 +1469,7 @@ describe("syncGitHubReleases", () => {
                 name: "latest.yml",
                 path: "latest.yml",
                 downloadUrl:
-                  "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/latest.yml",
+                  "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/latest.yml",
               },
               files: [
                 {
@@ -1475,7 +1477,7 @@ describe("syncGitHubReleases", () => {
                   sha512: "d".repeat(88),
                   size: 654321,
                   downloadUrl:
-                    "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/Folo-1.5.1-windows-x64.exe",
+                    "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/Folo-1.5.1-windows-x64.exe",
                 },
               ],
             },
@@ -1495,7 +1497,7 @@ describe("syncGitHubReleases", () => {
       vi.fn(async (input: string | URL | Request) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               createGitHubReleaseAssetSet(
@@ -1588,16 +1590,18 @@ describe("syncGitHubReleases", () => {
     const fetchMock = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
       const url = String(input)
 
-      if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+      if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
         return new Response(
           JSON.stringify([
             createGitHubReleaseAssetSet(
               "mobile/v0.4.2",
-              "https://github.com/RSSNext/Folo/releases/download/mobile/v0.4.2/ota-release.json",
-              "https://github.com/RSSNext/Folo/releases/download/mobile/v0.4.2/dist.tar.zst",
+              "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.4.2/ota-release.json",
+              "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.4.2/dist.tar.zst",
               {
-                metadataApiUrl: "https://api.github.com/repos/RSSNext/Folo/releases/assets/1",
-                archiveApiUrl: "https://api.github.com/repos/RSSNext/Folo/releases/assets/2",
+                metadataApiUrl:
+                  "https://api.github.com/repos/hlf2002/diting-desktop/releases/assets/1",
+                archiveApiUrl:
+                  "https://api.github.com/repos/hlf2002/diting-desktop/releases/assets/2",
               },
             ),
           ]),
@@ -1605,7 +1609,7 @@ describe("syncGitHubReleases", () => {
         )
       }
 
-      if (url === "https://api.github.com/repos/RSSNext/Folo/releases/assets/1") {
+      if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases/assets/1") {
         expect(init).toMatchObject({
           headers: expect.objectContaining({
             Authorization: "Bearer token",
@@ -1622,7 +1626,7 @@ describe("syncGitHubReleases", () => {
         })
       }
 
-      if (url === "https://api.github.com/repos/RSSNext/Folo/releases/assets/2") {
+      if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases/assets/2") {
         expect(init).toMatchObject({
           headers: expect.objectContaining({
             Authorization: "Bearer token",
@@ -1642,7 +1646,7 @@ describe("syncGitHubReleases", () => {
         })
       }
 
-      if (url.startsWith("https://github.com/RSSNext/Folo/releases/download/")) {
+      if (url.startsWith("https://github.com/hlf2002/diting-desktop/releases/download/")) {
         return new Response("Not Found", {
           status: 404,
           statusText: "Not Found",
@@ -1760,7 +1764,7 @@ describe("syncGitHubReleases", () => {
       vi.fn(async (input: string | URL | Request) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               createGitHubReleaseAssetSet(
@@ -1873,7 +1877,7 @@ describe("syncStoreVersions", () => {
           )
         }
 
-        if (url === "https://play.google.com/store/apps/details?id=is.follow&hl=en_US&gl=US") {
+        if (url === "https://play.google.com/store/apps/details?id=cn.com.diting&hl=en_US&gl=US") {
           return new Response('[[["0.4.1"]],[[[36]]]', {
             status: 200,
             headers: { "Content-Type": "text/html" },
@@ -1991,7 +1995,7 @@ describe("syncStoreVersions", () => {
           )
         }
 
-        if (url === "https://play.google.com/store/apps/details?id=is.follow&hl=en_US&gl=US") {
+        if (url === "https://play.google.com/store/apps/details?id=cn.com.diting&hl=en_US&gl=US") {
           return new Response('[[["0.4.1"]],[[[36]]]', {
             status: 200,
             headers: { "Content-Type": "text/html" },
@@ -2086,7 +2090,7 @@ describe("syncStoreVersions", () => {
           })
         }
 
-        if (url === "https://play.google.com/store/apps/details?id=is.follow&hl=en_US&gl=US") {
+        if (url === "https://play.google.com/store/apps/details?id=cn.com.diting&hl=en_US&gl=US") {
           return new Response('[[["0.4.1"]],[[[36]]]', {
             status: 200,
             headers: { "Content-Type": "text/html" },
@@ -2261,7 +2265,7 @@ describe("internal routes", () => {
       vi.fn(async (input: string | URL | Request, _init?: RequestInit) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               createGitHubReleaseAssetSet(
@@ -2290,7 +2294,7 @@ describe("internal routes", () => {
           })
         }
 
-        if (url === "https://play.google.com/store/apps/details?id=is.follow&hl=en_US&gl=US") {
+        if (url === "https://play.google.com/store/apps/details?id=cn.com.diting&hl=en_US&gl=US") {
           return new Response('[[["0.4.1"]],[[[36]]]', {
             headers: {
               "Content-Type": "text/html",
@@ -2465,7 +2469,7 @@ describe("/versions", () => {
             version: "0.4.1",
             fetchedAt: "2026-04-12T14:25:27.016Z",
             source: "google-play",
-            url: "https://play.google.com/store/apps/details?id=is.follow",
+            url: "https://play.google.com/store/apps/details?id=cn.com.diting",
           },
         },
         desktop: {
@@ -2488,13 +2492,13 @@ describe("/versions", () => {
           version: "0.4.1",
           publishedAt: "2026-04-10T12:00:00Z",
           tag: "mobile/v0.4.1",
-          url: "https://github.com/RSSNext/Folo/releases/tag/mobile/v0.4.1",
+          url: "https://github.com/hlf2002/diting-desktop/releases/tag/mobile/v0.4.1",
         },
         desktop: {
           version: "1.5.0",
           publishedAt: "2026-04-11T10:00:00Z",
           tag: "desktop/v1.5.0",
-          url: "https://github.com/RSSNext/Folo/releases/tag/desktop/v1.5.0",
+          url: "https://github.com/hlf2002/diting-desktop/releases/tag/desktop/v1.5.0",
         },
       },
     })
@@ -2517,7 +2521,7 @@ describe("/versions", () => {
       vi.fn(async (input: string | URL | Request) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               {
@@ -2558,13 +2562,13 @@ describe("/versions", () => {
             version: "0.4.3",
             publishedAt: "2026-04-10T16:00:00Z",
             tag: "mobile/v0.4.3",
-            url: "https://github.com/RSSNext/Folo/releases/tag/mobile/v0.4.3",
+            url: "https://github.com/hlf2002/diting-desktop/releases/tag/mobile/v0.4.3",
           },
           desktop: {
             version: "1.5.2",
             publishedAt: "2026-04-11T12:00:00Z",
             tag: "desktop/v1.5.2",
-            url: "https://github.com/RSSNext/Folo/releases/tag/desktop/v1.5.2",
+            url: "https://github.com/hlf2002/diting-desktop/releases/tag/desktop/v1.5.2",
           },
         },
       }),
@@ -2619,7 +2623,7 @@ describe("latest release summary", () => {
       vi.fn(async (input: string | URL | Request) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               createGitHubReleaseAssetSet(
@@ -2635,7 +2639,7 @@ describe("latest release summary", () => {
                 {
                   publishedAt: "2026-04-10T16:00:05Z",
                   apkUrl:
-                    "https://github.com/RSSNext/Folo/releases/download/mobile/v0.4.3/build.apk",
+                    "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.4.3/build.apk",
                 },
               ),
             ]),
@@ -2686,7 +2690,8 @@ describe("latest release summary", () => {
       version: "0.4.3",
       publishedAt: "2026-04-10T16:00:05Z",
       tag: "mobile/v0.4.3",
-      downloadUrl: "https://github.com/RSSNext/Folo/releases/download/mobile/v0.4.3/build.apk",
+      downloadUrl:
+        "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.4.3/build.apk",
     })
     // OTA metadata is still processed for store policy records.
     expect(kvEntries.get(KV_KEYS.policy("mobile", "production"))).toBe(
@@ -2747,7 +2752,7 @@ describe("latest release summary", () => {
       vi.fn(async (input: string | URL | Request) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               createGitHubRelease("mobile/v0.5.10", {
@@ -2770,7 +2775,7 @@ describe("latest release summary", () => {
                   publishedAt: "2026-06-22T07:10:22Z",
                   prerelease: true,
                   apkUrl:
-                    "https://github.com/RSSNext/Folo/releases/download/mobile/v0.5.5/build.apk",
+                    "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.5.5/build.apk",
                 },
               ),
             ]),
@@ -2824,7 +2829,8 @@ describe("latest release summary", () => {
       version: "0.5.10",
       publishedAt: "2026-09-18T12:32:03Z",
       tag: "mobile/v0.5.10",
-      downloadUrl: "https://github.com/RSSNext/Folo/releases/download/mobile/v0.5.10/build.apk",
+      downloadUrl:
+        "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.5.10/build.apk",
     })
     // The desktop record already points at the newest release, so it is left untouched.
     expect(kvEntries.get(KV_KEYS.latestReleaseVersion("desktop"))).toBe(desktopRecord)
@@ -2846,7 +2852,7 @@ describe("latest release summary", () => {
       vi.fn(async (input: string | URL | Request) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               createGitHubRelease("mobile/v0.6.0", {
@@ -2908,7 +2914,8 @@ describe("latest release summary", () => {
       version: "0.5.10",
       publishedAt: "2026-09-18T12:32:03Z",
       tag: "mobile/v0.5.10",
-      downloadUrl: "https://github.com/RSSNext/Folo/releases/download/mobile/v0.5.10/build.apk",
+      downloadUrl:
+        "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.5.10/build.apk",
     })
   })
 
@@ -2920,7 +2927,7 @@ describe("latest release summary", () => {
       vi.fn(async (input: string | URL | Request) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               createGitHubRelease("mobile/v0.5.11", {
@@ -2961,7 +2968,8 @@ describe("latest release summary", () => {
       version: "0.5.10",
       publishedAt: "2026-09-18T12:32:03Z",
       tag: "mobile/v0.5.10",
-      downloadUrl: "https://github.com/RSSNext/Folo/releases/download/mobile/v0.5.10/build.apk",
+      downloadUrl:
+        "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.5.10/build.apk",
     })
   })
 
@@ -2982,7 +2990,8 @@ describe("latest release summary", () => {
       version: "0.5.12",
       publishedAt: "2026-10-01T00:00:00Z",
       tag: "mobile/v0.5.12",
-      downloadUrl: "https://github.com/RSSNext/Folo/releases/download/mobile/v0.5.12/build.apk",
+      downloadUrl:
+        "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.5.12/build.apk",
     }
     const kvEntries = new Map<string, unknown>([
       [KV_KEYS.latestReleaseVersion("mobile"), mobileRecord],
@@ -2995,7 +3004,7 @@ describe("latest release summary", () => {
       vi.fn(async (input: string | URL | Request) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(
             JSON.stringify([
               createGitHubRelease("mobile/v0.5.10", {
@@ -3041,7 +3050,7 @@ describe("scheduled handler", () => {
       vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
         const url = String(input)
 
-        if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+        if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
           return new Response(null, { status: 304 })
         }
 
@@ -3052,7 +3061,7 @@ describe("scheduled handler", () => {
           })
         }
 
-        if (url === "https://play.google.com/store/apps/details?id=is.follow&hl=en_US&gl=US") {
+        if (url === "https://play.google.com/store/apps/details?id=cn.com.diting&hl=en_US&gl=US") {
           return new Response('[[["0.4.1"]],[[[36]]]', {
             status: 200,
             headers: { "Content-Type": "text/html" },
@@ -3225,7 +3234,7 @@ async function fetchWorker(
   },
 ) {
   return otaWorker.fetch(
-    new Request(`https://ota.folo.is${path}`, init),
+    new Request(`https://diting.7373.com.cn${path}`, init),
     createEnv(options),
     createExecutionContext(),
   )
@@ -3420,7 +3429,7 @@ function createDesktopReleaseMetadata(
       message: null,
       distributions: {
         direct: {
-          downloadUrl: "https://ota.folo.is/Folo-1.5.1.dmg",
+          downloadUrl: "https://diting.7373.com.cn/Folo-1.5.1.dmg",
         },
       },
     },
@@ -3431,7 +3440,7 @@ function createDesktopReleaseMetadata(
         manifest: {
           name: "manifest.yml",
           downloadUrl:
-            "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/manifest.yml",
+            "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/manifest.yml",
         },
         launchAsset: {
           path: "renderer/custom-renderer.tar.gz",
@@ -3449,7 +3458,7 @@ function createDesktopReleaseMetadata(
               name: "latest.yml",
               path: "latest.yml",
               downloadUrl:
-                "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/latest.yml",
+                "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/latest.yml",
             },
             files: [
               {
@@ -3457,7 +3466,7 @@ function createDesktopReleaseMetadata(
                 sha512: "d".repeat(88),
                 size: 654321,
                 downloadUrl:
-                  "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/Folo-1.5.1-windows-x64.exe",
+                  "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/Folo-1.5.1-windows-x64.exe",
               },
             ],
           },
@@ -3529,8 +3538,8 @@ function createGitHubRelease(
     published_at: options.publishedAt,
     assets: (options.assetNames ?? []).map((name, index) => ({
       name,
-      url: `https://api.github.com/repos/RSSNext/Folo/releases/assets/${tag}/${index}`,
-      browser_download_url: `https://github.com/RSSNext/Folo/releases/download/${tag}/${name}`,
+      url: `https://api.github.com/repos/hlf2002/diting-desktop/releases/assets/${tag}/${index}`,
+      browser_download_url: `https://github.com/hlf2002/diting-desktop/releases/download/${tag}/${name}`,
     })),
   }
 }

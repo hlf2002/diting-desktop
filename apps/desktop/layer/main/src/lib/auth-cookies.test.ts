@@ -32,7 +32,7 @@ describe("auth cookies", () => {
       {
         name: "better-auth.session_token",
         value: "legacy-token",
-        domain: ".api.folo.is",
+        domain: ".diting.7373.com.cn",
         hostOnly: false,
         path: "/",
         secure: true,
@@ -40,7 +40,7 @@ describe("auth cookies", () => {
       {
         name: "__Secure-better-auth.session_token",
         value: "domain-token",
-        domain: ".api.folo.is",
+        domain: ".diting.7373.com.cn",
         hostOnly: false,
         path: "/",
         secure: true,
@@ -48,7 +48,7 @@ describe("auth cookies", () => {
       {
         name: "__Secure-better-auth.session_token",
         value: "host-token.signature",
-        domain: "api.folo.is",
+        domain: "diting.7373.com.cn",
         hostOnly: true,
         path: "/",
         secure: true,
@@ -84,7 +84,7 @@ describe("auth cookies", () => {
     const get = vi.fn().mockResolvedValue([])
 
     await persistManagedAuthCookiesFromSetCookieHeader({
-      apiURL: "https://api.folo.is",
+      apiURL: "https://diting.7373.com.cn",
       session: {
         cookies: { get, set, remove },
       } as unknown as Session,
@@ -96,7 +96,7 @@ describe("auth cookies", () => {
 
     expect(set).toHaveBeenCalledWith(
       expect.objectContaining({
-        url: "https://api.folo.is",
+        url: "https://diting.7373.com.cn",
         name: "two_factor",
         value: "two-factor-token",
         path: "/",
@@ -117,7 +117,7 @@ describe("auth cookies", () => {
     const get = vi.fn().mockResolvedValue([])
 
     await persistManagedAuthCookiesFromSetCookieHeader({
-      apiURL: "https://api.folo.is",
+      apiURL: "https://diting.7373.com.cn",
       session: {
         cookies: { get, set, remove },
       } as unknown as Session,
@@ -140,7 +140,7 @@ describe("auth cookies", () => {
     const get = vi.fn().mockResolvedValue([])
 
     await persistManagedAuthCookiesFromSetCookieHeader({
-      apiURL: "https://api.folo.is",
+      apiURL: "https://diting.7373.com.cn",
       session: {
         cookies: { get, set, remove },
       } as unknown as Session,
@@ -161,7 +161,7 @@ describe("auth cookies", () => {
       {
         name: "better-auth.session_token",
         value: "legacy-token",
-        domain: ".api.folo.is",
+        domain: ".diting.7373.com.cn",
         hostOnly: false,
         path: "/",
         secure: true,
@@ -170,7 +170,7 @@ describe("auth cookies", () => {
       {
         name: "__Secure-better-auth.session_token",
         value: "domain-token",
-        domain: ".api.folo.is",
+        domain: ".diting.7373.com.cn",
         hostOnly: false,
         path: "/",
         secure: true,
@@ -179,7 +179,7 @@ describe("auth cookies", () => {
       {
         name: "__Secure-better-auth.session_token",
         value: "host-token.signature",
-        domain: "api.folo.is",
+        domain: "diting.7373.com.cn",
         hostOnly: true,
         path: "/",
         secure: true,
@@ -188,18 +188,18 @@ describe("auth cookies", () => {
     ])
 
     await dedupeManagedAuthCookies({
-      apiURL: "https://api.folo.is",
+      apiURL: "https://diting.7373.com.cn",
       session: {
         cookies: { get, remove },
       } as unknown as Session,
     })
 
     expect(remove).toHaveBeenCalledWith(
-      "https://__folo_cookie_cleanup__.api.folo.is/",
+      "https://__diting_cookie_cleanup__.diting.7373.com.cn/",
       "better-auth.session_token",
     )
     expect(remove).toHaveBeenCalledWith(
-      "https://__folo_cookie_cleanup__.api.folo.is/",
+      "https://__diting_cookie_cleanup__.diting.7373.com.cn/",
       "__Secure-better-auth.session_token",
     )
     expect(remove).toHaveBeenCalledTimes(2)

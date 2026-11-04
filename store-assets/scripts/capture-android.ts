@@ -1,6 +1,6 @@
 // Captures the Android app on an emulator for one UI locale:
 //   tsx store-assets/scripts/capture-android.ts <locale> [serial] [scene,...]
-// Set FOLO_ANDROID_PACKAGE to capture a side-by-side build (default is.follow).
+// Set FOLO_ANDROID_PACKAGE to capture a side-by-side build (default cn.com.diting).
 // Assumes the demo account is signed in and its subscriptions were switched
 // with demo-account.ts. Files land in captures/<locale>/android/<scene>.png.
 import { mkdir, readFile } from "node:fs/promises"
@@ -35,9 +35,9 @@ if (!appUiLocales.includes(locale)) {
   throw new Error("Usage: capture-android.ts <locale> [serial] [scenes]")
 }
 const serial = serialArg || "emulator-5554"
-// A side-by-side build (an `applicationIdSuffix` such as is.follow.playerfix)
+// A side-by-side build (an `applicationIdSuffix` such as cn.com.diting.playerfix)
 // can be captured instead of the store app.
-const appPackage = process.env.FOLO_ANDROID_PACKAGE || "is.follow"
+const appPackage = process.env.FOLO_ANDROID_PACKAGE || "cn.com.diting"
 const onlyScenes = sceneArg?.split(",")
 
 const root = join(import.meta.dirname, "..")
@@ -446,7 +446,7 @@ const homeLabels = (await Promise.all(appUiLocales.map((l) => loadLabels(l)))).m
 // been shown, dumps keep returning its hierarchy, so Discover runs last.
 const relaunch = async () => {
   await adb(serial, "shell", "am", "force-stop", appPackage)
-  await adb(serial, "shell", "am", "start", "-n", `${appPackage}/is.follow.MainActivity`)
+  await adb(serial, "shell", "am", "start", "-n", `${appPackage}/cn.com.diting.MainActivity`)
   // Cold starts can take half a minute; wait until the Home tab has rendered.
   for (let i = 0; i < 40; i++) {
     await sleep(3000)

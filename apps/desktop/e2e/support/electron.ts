@@ -42,7 +42,7 @@ export const launchElectronApp = async (env: DesktopE2EEnv) => {
       NODE_ENV: "test",
       VITE_API_URL: env.apiURL,
       VITE_WEB_URL: env.webURL,
-      FOLO_E2E_USER_DATA_DIR: userDataDir,
+      DITING_E2E_USER_DATA_DIR: userDataDir,
     },
     timeout: 120_000,
   })
@@ -51,7 +51,7 @@ export const launchElectronApp = async (env: DesktopE2EEnv) => {
   // Electron exposes its initial about:blank window before loading the renderer.
   await page.waitForURL((url) => url.protocol !== "about:", { waitUntil: "domcontentloaded" })
   await page.evaluate(() => {
-    window.__FOLO_E2E_RECAPTCHA_TOKEN__ = "e2e-token"
+    window.__DITING_E2E_RECAPTCHA_TOKEN__ = "e2e-token"
 
     const originalFetch = globalThis.fetch.bind(globalThis)
     const authEndpoints = [

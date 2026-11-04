@@ -1,4 +1,4 @@
-appId: is.follow
+appId: cn.com.diting
 ---
 - runFlow:
     file: ./dismiss-overlays.yaml
@@ -7,7 +7,7 @@ appId: is.follow
 - tapOn:
     id: discover-search-input
 - eraseText
-- inputText: folo://onboarding
+- inputText: diting://onboarding
 - pressKey: Enter
 - extendedWaitUntil:
     visible:

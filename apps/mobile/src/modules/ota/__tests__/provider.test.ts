@@ -17,7 +17,7 @@ vi.mock("expo-updates", () => ({
 }))
 
 vi.mock("@/src/lib/proxy-env", () => ({
-  proxyEnv: { OTA_URL: "https://ota.folo.is" },
+  proxyEnv: { OTA_URL: "https://ota.diting.7373.com.cn" },
 }))
 
 vi.mock("@/src/lib/launch-link", () => ({

@@ -31,7 +31,7 @@ export const App = () => {
   // Onboarding entries contain Markdown, as in the desktop reader. Pass the
   // converted HTML through the usual sanitizer and native media/link renderers.
   const content = useMemo(() => {
-    if (!entry?.content || !entry.url?.startsWith("folo://onboarding")) return entry?.content
+    if (!entry?.content || !entry.url?.startsWith("diting://onboarding")) return entry?.content
     return renderToStaticMarkup(parseMarkdown(entry.content).content)
   }, [entry?.content, entry?.url])
 

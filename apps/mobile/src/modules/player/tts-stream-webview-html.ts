@@ -12,7 +12,7 @@ export const TTS_STREAM_WEBVIEW_HTML = String.raw`
   <body>
     <script>
       (() => {
-        const TTS_SERVICE_URL = "https://tts.folo.is";
+        const TTS_SERVICE_URL = "https://tts.diting.7373.com.cn";
         const TTS_MIME_FALLBACK = "audio/mpeg";
         const MIN_INITIAL_DECODE_BYTES = 24 * 1024;
         const MIN_INCREMENTAL_DECODE_BYTES = 16 * 1024;

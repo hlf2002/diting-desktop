@@ -1,10 +1,10 @@
 import { bindings, defineConfig, triggers } from "cf/config"
 
-// folo.is
+// diting.7373.com.cn
 const zone = "115ea8e6a7865dbfc1cf4530d5f87f63"
 
-// `cf deploy --mode dev` deploys folo-ota-dev. Its KV namespace and R2 bucket are still
-// placeholders, so that Worker has never been deployed. Any other mode deploys folo-ota.
+// `cf deploy --mode dev` deploys diting-ota-dev. Its KV namespace and R2 bucket are still
+// placeholders, so that Worker has never been deployed. Any other mode deploys diting-ota.
 // `cf dev` uses local KV and R2 data.
 export default defineConfig(({ mode }) => {
   const isDev = mode === "dev"
@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
   return {
     accountId: "1f1d1678a2413a54c944b3081bab5c84",
     worker: {
-      name: isDev ? "folo-ota-dev" : "folo-ota",
+      name: isDev ? "diting-ota-dev" : "diting-ota",
       compatibilityDate: "2026-04-10",
       compatibilityFlags: ["nodejs_compat"],
       entrypoint: "src/index.ts",
@@ -26,14 +26,14 @@ export default defineConfig(({ mode }) => {
           enabled: true,
         },
       },
-      domains: isDev ? undefined : ["ota.folo.is"],
+      domains: isDev ? undefined : ["diting.7373.com.cn"],
       triggers: [
-        ...(isDev ? [triggers.fetch({ pattern: "ota.dev.folo.is/*", zone })] : []),
+        ...(isDev ? [triggers.fetch({ pattern: "ota.dev.diting.7373.com.cn/*", zone })] : []),
         triggers.scheduled({ schedule: "*/5 * * * *" }),
       ],
       env: {
-        GITHUB_OWNER: bindings.text("RSSNext"),
-        GITHUB_REPO: bindings.text("Folo"),
+        GITHUB_OWNER: bindings.text("hlf2002"),
+        GITHUB_REPO: bindings.text("diting-desktop"),
         OTA_SYNC_TOKEN_HEADER: bindings.text("x-ota-sync-token"),
         OTA_KV: bindings.kv({
           id: isDev ? "REPLACE_WITH_DEV_KV_ID" : "bcb477ad28284a74a7b4a6bfe231c228",

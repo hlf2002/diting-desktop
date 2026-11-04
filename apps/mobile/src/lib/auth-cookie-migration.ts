@@ -9,7 +9,7 @@ import { getUserAgent } from "./native/user-agent"
 import { proxyEnv } from "./proxy-env"
 
 const LEGACY_PROD_API_URL = "https://api.follow.is"
-const NEW_PROD_API_URL = "https://api.folo.is"
+const NEW_PROD_API_URL = "https://api.diting.7373.com.cn"
 
 const authSessionEndpoint = "/better-auth/get-session"
 const migrationRequestTimeout = 6000
@@ -46,7 +46,7 @@ const createMigrationHeaders = async () => {
     "X-Client-Id": getClientId(),
     "X-Session-Id": getSessionId(),
     "User-Agent": await getUserAgent(),
-    "expo-origin": "folo://",
+    "expo-origin": "diting://",
     "x-skip-oauth-proxy": "true",
   }
 }

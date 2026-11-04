@@ -64,7 +64,7 @@ describe("imageProxyFallback", () => {
 
     expect(fail(createElement("IMG", url))).toBe(getImageProxyUrl({ url }))
     expect(fail(createElement("IMG", "https://wx1.sinaimg.cn/large/a.jpg"))).toBe(
-      `https://img.folo.is?url=${encodeURIComponent("https://wx1.sinaimg.cn/large/a.jpg")}&width=&height=`,
+      `https://img.diting.7373.com.cn?url=${encodeURIComponent("https://wx1.sinaimg.cn/large/a.jpg")}&width=&height=`,
     )
   })
 

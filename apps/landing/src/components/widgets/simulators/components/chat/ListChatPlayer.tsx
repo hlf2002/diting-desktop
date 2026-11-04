@@ -35,7 +35,7 @@ const DownloadAppTip: React.FC = () => {
             </Link>{' '}
             or{' '}
             <Link
-              href="https://app.folo.is"
+              href="https://diting.7373.com.cn"
               target="_blank"
               rel="noreferrer noopener"
               className="text-accent"
@@ -409,7 +409,7 @@ export const ListChatPlayer: React.FC<ListChatPlayerProps> = ({
         <Input
           className="rounded-lg"
           inputClassName="rounded-lg"
-          placeholder={'Ask Folo anything…'}
+          placeholder={'Ask Diting anything…'}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           ref={inputRef}

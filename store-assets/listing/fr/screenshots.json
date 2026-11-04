@@ -50,7 +50,7 @@
     "badge": "Open source · 39K étoiles sur GitHub"
   },
   "desktop.chat": {
-    "eyebrow": "Folo AI",
+    "eyebrow": "Diting AI",
     "headline": "Interrogez\n*vos flux.*",
     "sub": "Discutez d’un article, d’un flux ou de tout ce que vous suivez."
   },
@@ -96,7 +96,7 @@
     ]
   },
   "play.featureGraphic": {
-    "eyebrow": "Folo",
+    "eyebrow": "Diting",
     "headline": "Le *lecteur RSS* avec IA",
     "sub": "Tous vos flux. Sans le bruit."
   }

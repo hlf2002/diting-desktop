@@ -15,25 +15,28 @@ describe("resolveLoginToken", () => {
     await expect(
       resolveLoginToken({
         inputToken: "one-time-token",
-        apiUrl: "https://api.folo.is",
+        apiUrl: "https://api.diting.7373.com.cn",
         timeoutMs: 180_000,
         onStatus: vi.fn(),
       }),
     ).resolves.toBe("session-token")
 
-    expect(resolveBrowserLoginToken).toHaveBeenCalledWith("https://api.folo.is", "one-time-token")
+    expect(resolveBrowserLoginToken).toHaveBeenCalledWith(
+      "https://api.diting.7373.com.cn",
+      "one-time-token",
+    )
   })
 
   it("falls back to browser login when no token is provided", async () => {
     vi.mocked(loginWithBrowser).mockResolvedValueOnce({
       token: "browser-session-token",
       callbackUrl: "http://127.0.0.1/callback",
-      loginUrl: "https://app.folo.is/login",
+      loginUrl: "https://diting.7373.com.cn/login",
     })
 
     await expect(
       resolveLoginToken({
-        apiUrl: "https://api.folo.is",
+        apiUrl: "https://api.diting.7373.com.cn",
         timeoutMs: 180_000,
         onStatus: vi.fn(),
       }),

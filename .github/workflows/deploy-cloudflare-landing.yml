@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm_production_deploy:
-        description: Deploy the selected branch to production (folo.is)
+        description: Deploy the selected branch to production (diting.7373.com.cn)
         required: true
         default: false
         type: boolean

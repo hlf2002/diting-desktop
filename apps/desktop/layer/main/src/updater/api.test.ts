@@ -16,7 +16,7 @@ vi.mock("electron", () => ({
 
 vi.mock("@follow/shared/env.desktop", () => ({
   env: {
-    VITE_OTA_URL: "https://ota.folo.is",
+    VITE_OTA_URL: "https://ota.diting.7373.com.cn",
   },
 }))
 
@@ -75,7 +75,7 @@ describe("desktop updater api", () => {
 
     expect(result).toBeNull()
     expect(netFetchMock).toHaveBeenCalledWith(
-      "https://ota.folo.is/manifest",
+      "https://ota.diting.7373.com.cn/manifest",
       expect.objectContaining({
         headers: expect.objectContaining({
           "X-App-Platform": "desktop/windows/exe",
@@ -105,7 +105,7 @@ describe("desktop updater api", () => {
               key: "custom-renderer",
               hash: "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqo",
               contentType: "application/gzip",
-              url: "https://ota.folo.is/assets/desktop/stable/1.5.0/1.5.1/windows/renderer/custom-renderer.tar.gz",
+              url: "https://ota.diting.7373.com.cn/assets/desktop/stable/1.5.0/1.5.1/windows/renderer/custom-renderer.tar.gz",
             },
             assets: [],
           },
@@ -134,7 +134,7 @@ describe("desktop updater api", () => {
     await fetchDesktopManifest()
 
     expect(netFetchMock).toHaveBeenCalledWith(
-      "https://ota.folo.is/manifest",
+      "https://ota.diting.7373.com.cn/manifest",
       expect.objectContaining({
         headers: expect.objectContaining({
           "X-App-Renderer-Version": "1.5.0",

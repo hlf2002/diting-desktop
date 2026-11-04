@@ -1,4 +1,4 @@
-const PRODUCTION_API_URL = 'https://api.follow.is'
+const PRODUCTION_API_URL = 'https://diting.7373.com.cn'
 export const PRODUCTION_RSSHUB_ROUTES_URL =
   'https://docs.rsshub.app/routes.json'
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -387,7 +387,7 @@ const normalizeDescription = (value: string | null | undefined) => {
 
   return cleaned
     ? truncate(cleaned, 96)
-    : 'Fresh signal from a source that is trending inside production Folo timelines.'
+    : 'Fresh signal from a source that is trending inside production Diting timelines.'
 }
 
 const fetchJson = async <T>(url: string) => {

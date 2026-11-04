@@ -24,7 +24,7 @@ export const ENTRY_DETAIL: EntryDetail = {
   source: {
     name: 'Anthropic',
     host: 'anthropic.com',
-    icon: 'https://icons.folo.is/anthropic.com',
+    icon: 'https://diting.7373.com.cn/anthropic.com',
   },
   author: {
     name: 'Anthropic Research',

@@ -458,7 +458,7 @@ async function fetchWorker(
     country?: string
   },
 ) {
-  const request = new Request(`https://ota.folo.is${path}`, init)
+  const request = new Request(`https://diting.7373.com.cn${path}`, init)
   if (options?.country) {
     // Cloudflare attaches cf to incoming requests; the test runtime has no such property
     Object.defineProperty(request, "cf", { value: { country: options.country } })

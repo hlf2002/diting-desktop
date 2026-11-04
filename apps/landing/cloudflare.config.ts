@@ -1,10 +1,10 @@
 import { bindings, defineConfig, triggers } from 'cf/config'
 
-// folo.is
+// diting.7373.com.cn
 const zone = '115ea8e6a7865dbfc1cf4530d5f87f63'
 
 // Build with `vinext build --mode dev` and deploy with `cf deploy --prebuilt --mode dev` to ship
-// landing-next-dev to landing.dev.folo.is. Any other mode ships landing-vinext to folo.is. The
+// landing-next-dev to landing.dev.diting.7373.com.cn. Any other mode ships landing-vinext to diting.7373.com.cn. The
 // Cloudflare Vite plugin adds the client build to the Build Output as the static assets.
 export default defineConfig(({ mode }) => {
   const isDev = mode === 'dev'
@@ -30,7 +30,9 @@ export default defineConfig(({ mode }) => {
       },
       triggers: [
         triggers.fetch({
-          pattern: isDev ? 'landing.dev.folo.is/*' : 'folo.is/*',
+          pattern: isDev
+            ? 'landing.dev.diting.7373.com.cn/*'
+            : 'diting.7373.com.cn/*',
           zone,
         }),
       ],

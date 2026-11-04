@@ -47,7 +47,7 @@ export const TrustedBy: Component<TrustedByProps> = ({
           <div key={item.name} className="inline-flex items-center gap-2.5">
             <div className="flex size-8 items-center justify-center rounded-full bg-background-secondary p-1">
               <img
-                src={`https://icons.folo.is/${item.host}`}
+                src={`https://diting.7373.com.cn/${item.host}`}
                 alt={item.name}
                 className="size-full rounded-full object-cover grayscale"
                 loading="lazy"

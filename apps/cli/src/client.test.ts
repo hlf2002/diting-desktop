@@ -22,15 +22,19 @@ const stubFetch = (response: Response) => {
 describe("resolveApiUrl", () => {
   it("drops trailing slashes", () => {
     expect(resolveApiUrl("http://localhost:3000/")).toBe("http://localhost:3000")
-    expect(resolveApiUrl(" https://api.folo.is// ")).toBe("https://api.folo.is")
-    expect(resolveApiUrl("https://api.folo.is")).toBe("https://api.folo.is")
+    expect(resolveApiUrl(" https://api.diting.7373.com.cn// ")).toBe(
+      "https://api.diting.7373.com.cn",
+    )
+    expect(resolveApiUrl("https://api.diting.7373.com.cn")).toBe("https://api.diting.7373.com.cn")
   })
 
   it("rejects values that are not http URLs", () => {
     expect(() => resolveApiUrl("not-a-url")).toThrowError(
       new CLIError("INVALID_ARGUMENT", "Invalid API URL: not-a-url"),
     )
-    expect(() => resolveApiUrl("ftp://api.folo.is")).toThrowError(/Use an http or https URL/)
+    expect(() => resolveApiUrl("ftp://api.diting.7373.com.cn")).toThrowError(
+      /Use an http or https URL/,
+    )
   })
 })
 

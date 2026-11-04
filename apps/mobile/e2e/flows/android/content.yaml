@@ -1,4 +1,4 @@
-appId: is.follow
+appId: cn.com.diting
 name: Android subscription and reading journey
 ---
 - runFlow: ../shared/ensure-onboarding-unfollowed.yaml

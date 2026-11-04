@@ -21,7 +21,7 @@ describe("onboarding Markdown", () => {
 
   test("renders headings, emphasis and images through the regular article renderer", () => {
     const article = renderEntry({
-      url: "folo://onboarding/1",
+      url: "diting://onboarding/1",
       content: `Welcome to **Folo**.\n\n### Your Subscriptions\n\n![Guide](${coverImageUrl})`,
     })
 
@@ -34,7 +34,7 @@ describe("onboarding Markdown", () => {
   test("keeps media hiding and HTML sanitization for onboarding content", () => {
     window.__FO_BRIDGE__.dispatch("setNoMedia", "true")
     const article = renderEntry({
-      url: "folo://onboarding/1",
+      url: "diting://onboarding/1",
       content: `### Guide\n\n![Guide](${coverImageUrl})\n\n[Unsafe](javascript:alert(1))`,
     })
 

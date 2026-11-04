@@ -40,7 +40,7 @@ type MobileExpoClientConfig = {
   }
 }
 
-const MOBILE_UPDATE_URL = "https://ota.folo.is/manifest"
+const MOBILE_UPDATE_URL = "https://diting.7373.com.cn/manifest"
 const MOBILE_EAS_PROJECT_ID = "a6335b14-fb84-45aa-ba80-6f6ab8926920"
 
 export interface ManifestAsset {
@@ -193,13 +193,13 @@ function buildManifestExtra(release: OtaRelease): OtaManifest["extra"] {
 
 function buildMobileExpoClientConfig(release: Extract<OtaRelease, { product: "mobile" }>) {
   return {
-    name: "Folo",
-    slug: "follow",
-    owner: "follow",
+    name: "Diting",
+    slug: "diting",
+    owner: "diting",
     version: release.releaseVersion,
     runtimeVersion: release.runtimeVersion,
     orientation: "portrait",
-    scheme: ["follow", "folo"],
+    scheme: ["diting"],
     userInterfaceStyle: "automatic",
     updates: {
       url: MOBILE_UPDATE_URL,
@@ -213,12 +213,12 @@ function buildMobileExpoClientConfig(release: Extract<OtaRelease, { product: "mo
       checkAutomatically: "NEVER",
     },
     ios: {
-      bundleIdentifier: "is.follow",
+      bundleIdentifier: "cn.com.diting",
       supportsTablet: true,
       usesAppleSignIn: true,
     },
     android: {
-      package: "is.follow",
+      package: "cn.com.diting",
     },
     extra: {
       eas: {

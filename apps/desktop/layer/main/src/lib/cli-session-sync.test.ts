@@ -8,7 +8,7 @@ import { resolveCliSessionToken } from "./cli-login-token"
 
 vi.mock("electron", () => ({ net: { fetch: vi.fn() } }))
 vi.mock("@follow/shared/env.desktop", () => ({
-  env: { VITE_API_URL: "https://api.folo.is", VITE_WEB_URL: "https://app.folo.is" },
+  env: { VITE_API_URL: "https://diting.7373.com.cn", VITE_WEB_URL: "https://diting.7373.com.cn" },
 }))
 vi.mock("@pkg", () => ({ default: { version: "0.0.0" } }))
 vi.mock("~/manager/window", () => ({ WindowManager: { getMainWindow: () => null } }))
@@ -58,7 +58,7 @@ describe("syncSessionToCliConfig", () => {
     const configPath = join(home, ".folo", "config.json")
     expect(JSON.parse(await readFile(configPath, "utf8"))).toEqual({
       token: "abc=def",
-      apiUrl: "https://api.folo.is",
+      apiUrl: "https://diting.7373.com.cn",
     })
     if (process.platform !== "win32") {
       expect((await stat(configPath)).mode & 0o777).toBe(0o600)
@@ -78,7 +78,7 @@ describe("syncSessionToCliConfig", () => {
 
     await syncSessionToCliConfig()
     expect(JSON.parse(await readFile(configPath, "utf8"))).toEqual({
-      apiUrl: "https://api.folo.is",
+      apiUrl: "https://diting.7373.com.cn",
     })
   })
 })

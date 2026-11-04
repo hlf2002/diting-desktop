@@ -7,7 +7,7 @@ export type SocialSignInResult =
 const cancelledOAuthErrors = new Set(["access_denied"])
 
 /**
- * Reads the `folo://` URL a social sign-in auth session ended on. The server appends the session
+ * Reads the `diting://` URL a social sign-in auth session ended on. The server appends the session
  * cookies as `cookie` on success and redirects to the error callback URL with `error` otherwise.
  */
 export const parseSocialAuthCallbackURL = (

@@ -1,7 +1,7 @@
 import type { EntryModel } from "@follow/store/entry/types"
 import { parseHtml } from "@follow/utils/html"
 
-export const TTS_SERVICE_URL = "https://tts.folo.is"
+export const TTS_SERVICE_URL = "https://tts.diting.7373.com.cn"
 export const DEFAULT_TTS_VOICE = "en-US-AvaMultilingualNeural"
 
 export interface TtsVoice {

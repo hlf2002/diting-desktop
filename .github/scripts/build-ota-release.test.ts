@@ -333,8 +333,8 @@ releaseDate: 2026-04-11T10:00:00.000Z
 
     const result = await buildDesktopReleaseAssets({
       projectDir,
-      owner: "RSSNext",
-      repo: "Folo",
+      owner: "hlf2002",
+      repo: "diting-desktop",
     })
 
     expect(result.otaMetadata.schemaVersion).toBe(2)
@@ -406,8 +406,8 @@ releaseDate: 2026-04-11T10:00:00.000Z
 
     const result = await buildDesktopReleaseAssets({
       projectDir,
-      owner: "RSSNext",
-      repo: "Folo",
+      owner: "hlf2002",
+      repo: "diting-desktop",
     })
 
     expect(result.otaMetadata.schemaVersion).toBe(2)
@@ -421,7 +421,7 @@ releaseDate: 2026-04-11T10:00:00.000Z
         manifest: {
           name: "manifest.yml",
           downloadUrl:
-            "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/manifest.yml",
+            "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/manifest.yml",
         },
         launchAsset: expect.objectContaining({
           path: "custom-renderer.tar.gz",
@@ -464,8 +464,8 @@ releaseDate: 2026-04-11T10:00:00.000Z
     await expect(
       buildDesktopReleaseAssets({
         projectDir,
-        owner: "RSSNext",
-        repo: "Folo",
+        owner: "hlf2002",
+        repo: "diting-desktop",
       }),
     ).rejects.toThrow(/invalid files\[0\] entry/i)
   })
@@ -485,8 +485,8 @@ releaseDate: 2026-04-11T10:00:00.000Z
     await expect(
       buildDesktopReleaseAssets({
         projectDir,
-        owner: "RSSNext",
-        repo: "Folo",
+        owner: "hlf2002",
+        repo: "diting-desktop",
       }),
     ).rejects.toThrow(/requires direct installer manifests/i)
   })
@@ -514,8 +514,8 @@ filename: custom-renderer.tar.gz
     await expect(
       buildDesktopReleaseAssets({
         projectDir,
-        owner: "RSSNext",
-        repo: "Folo",
+        owner: "hlf2002",
+        repo: "diting-desktop",
       }),
     ).rejects.toThrow(/requires direct installer manifests/i)
   })
@@ -560,8 +560,8 @@ releaseDate: 2026-04-11T11:00:00.000Z
 
     const result = await buildDesktopReleaseAssets({
       projectDir,
-      owner: "RSSNext",
-      repo: "Folo",
+      owner: "hlf2002",
+      repo: "diting-desktop",
     })
 
     expect(result.otaMetadata.desktop.app.platforms.windows.files).toHaveLength(2)

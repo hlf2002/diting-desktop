@@ -16,9 +16,9 @@ export type MobileReviewRateTarget = "ios_app_store" | "google_play" | null
 
 const APPLE_REVIEW_URL =
   "https://apps.apple.com/us/app/folo-follow-everything/id6739802604?action=write-review"
-const GOOGLE_PLAY_REVIEW_URI = "market://details?id=is.follow&showAllReviews=true"
-const GOOGLE_PLAY_REVIEW_URL = "https://play.google.com/store/apps/details?id=is.follow"
-const SUPPORT_EMAIL = "support@folo.is"
+const GOOGLE_PLAY_REVIEW_URI = "market://details?id=cn.com.diting&showAllReviews=true"
+const GOOGLE_PLAY_REVIEW_URL = "https://play.google.com/store/apps/details?id=cn.com.diting"
+const SUPPORT_EMAIL = "support@diting.7373.com.cn"
 const REVIEW_PROMPT_STORAGE_PREFIX = "follow-rn-review-prompt"
 
 export const getMobileReviewPlatform = () => (isIOS ? "ios" : isAndroid ? "android" : "mobile")
@@ -109,9 +109,9 @@ export const openMobileFeedbackEmail = async ({
   distribution: MobileReviewDistribution
   userId: string | null
 }) => {
-  const subject = "Folo feedback"
+  const subject = "Diting feedback"
   const body = [
-    "Hi Folo team,",
+    "Hi Diting team,",
     "",
     "Here is my feedback:",
     "",

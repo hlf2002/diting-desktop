@@ -851,7 +851,7 @@ function resolveRepository(options) {
     return repository.split("/", 2)
   }
 
-  return ["RSSNext", "Folo"]
+  return ["hlf2002", "diting-desktop"]
 }
 
 function walkFiles(rootDir) {

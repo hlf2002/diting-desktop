@@ -1,6 +1,6 @@
 import type { SocialSignInResult } from "@/src/lib/social-auth"
 
-export const nativeOAuthCallbackURL = "folo://"
+export const nativeOAuthCallbackURL = "diting://"
 
 type LoginWithSocialProviderOptions = {
   providerId: string

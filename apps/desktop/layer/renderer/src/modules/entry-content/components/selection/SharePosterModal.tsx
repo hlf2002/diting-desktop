@@ -186,7 +186,7 @@ export function SharePosterModal({ selectedText, entryId }: SharePosterModalProp
         })
       : new Date().toLocaleDateString()
 
-    const headerText = `${feed?.title || "Folo"}  •  ${dateStr}`
+    const headerText = `${feed?.title || "Diting"}  •  ${dateStr}`
     ctx.fillText(headerText, padding, currentY)
 
     currentY += headerHeight

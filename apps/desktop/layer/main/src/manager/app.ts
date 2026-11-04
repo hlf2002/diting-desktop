@@ -124,8 +124,8 @@ class AppManagerStatic {
       firebase: JSON.parse(env.VITE_FIREBASE_CONFIG),
       persistentIds: persistentIds || [],
       credentials: credentials || undefined,
-      bundleId: "is.follow",
-      chromeId: "is.follow",
+      bundleId: "cn.com.diting",
+      chromeId: "cn.com.diting",
     })
     logger.info("PushReceiver initialized")
 

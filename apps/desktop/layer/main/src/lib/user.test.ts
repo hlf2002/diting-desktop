@@ -75,7 +75,7 @@ const credentials = {
     publicKey: "public-key",
   },
   config: {
-    bundleId: "is.follow",
+    bundleId: "cn.com.diting",
     projectId: "project-id",
     vapidKey: "vapid-key",
   },

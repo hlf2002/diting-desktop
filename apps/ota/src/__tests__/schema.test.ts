@@ -133,7 +133,7 @@ describe("otaReleaseSchema", () => {
         message: null,
         distributions: {
           direct: {
-            downloadUrl: "https://ota.folo.is/Folo-1.5.1-macos.dmg",
+            downloadUrl: "https://diting.7373.com.cn/Folo-1.5.1-macos.dmg",
           },
         },
       },
@@ -161,14 +161,14 @@ describe("otaReleaseSchema", () => {
               releaseDate: "2026-04-11T10:00:00Z",
               manifest: {
                 name: "latest.yml",
-                downloadUrl: "https://ota.folo.is/latest.yml",
+                downloadUrl: "https://diting.7373.com.cn/latest.yml",
               },
               files: [
                 {
                   filename: "Folo-1.5.1-windows-x64.exe",
                   sha512: "c".repeat(88),
                   size: 123456,
-                  downloadUrl: "https://ota.folo.is/Folo-1.5.1-windows-x64.exe",
+                  downloadUrl: "https://diting.7373.com.cn/Folo-1.5.1-windows-x64.exe",
                 },
               ],
             },

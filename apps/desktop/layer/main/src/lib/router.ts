@@ -6,7 +6,7 @@ import { logger } from "~/logger"
 import { WindowManager } from "~/manager/window"
 
 export const handleUrlRouting = (url: string) => {
-  // For example, the url is "follow://add?id=123&type=list&url=https://example.com"
+  // For example, the url is "diting://add?id=123&type=list&url=https://example.com"
   const doubleSlash = url.indexOf("://")
   if (doubleSlash === -1) {
     logger.error("url routing error: no protocol found", url)

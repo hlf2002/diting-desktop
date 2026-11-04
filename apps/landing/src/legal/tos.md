@@ -127,5 +127,5 @@ Folo may revise or update these Terms at any time. Any changes will become effec
 
 For any questions or concerns regarding these Terms, please contact us at:
 
-- General Support: <support@folo.is>
-- Legal and Copyright Matters: <legal@folo.is>
+- General Support: <support@diting.7373.com.cn>
+- Legal and Copyright Matters: <legal@diting.7373.com.cn>

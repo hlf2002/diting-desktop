@@ -2,7 +2,7 @@
 import { ListChatPlayer } from './components/chat/ListChatPlayer'
 import { TIMELINE_SUMMARY_STEPS } from './mocks'
 
-const INITIAL_HEADER_TITLE = 'Folo AI - Timeline Summary'
+const INITIAL_HEADER_TITLE = 'Diting AI - Timeline Summary'
 
 export const TimelineChatDemo = () => {
   return (

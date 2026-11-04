@@ -37,7 +37,7 @@ import { SettingsTabScreen } from "./screens/(stack)/(tabs)/settings"
 import { SubscriptionsTabScreen } from "./screens/(stack)/(tabs)/subscriptions"
 import { registerSitemap } from "./sitemap"
 // @ts-expect-error
-global.APP_NAME = "Folo"
+global.APP_NAME = "谛听"
 // @ts-expect-error
 global.ELECTRON = false
 // @ts-expect-error

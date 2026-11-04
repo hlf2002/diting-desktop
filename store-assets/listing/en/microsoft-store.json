@@ -1,5 +1,5 @@
 {
-  "shortDescription": "Folo is the AI RSS reader for Windows. Follow blogs, news, newsletters, videos and podcasts in one calm timeline, then let AI summarize, translate and answer questions about everything you follow.",
+  "shortDescription": "Diting is the AI RSS reader for Windows. Follow blogs, news, newsletters, videos and podcasts in one calm timeline, then let AI summarize, translate and answer questions about everything you follow.",
   "features": [
     "Follow RSS, Atom and JSON feeds, plus thousands of RSSHub routes for sites without a feed",
     "One timeline for articles, social posts, pictures, videos, podcasts and notifications",
@@ -8,7 +8,7 @@
     "Chat with AI about an article, a feed, a folder or your whole timeline",
     "Summarize your timeline into a quick digest",
     "AI tasks that deliver daily or weekly briefings to chat or email",
-    "Connect MCP services to bring your other tools into Folo AI",
+    "Connect MCP services to bring your other tools into Diting AI",
     "Choose your AI model or bring your own API key",
     "Text-to-speech with natural voices",
     "Actions: rules that filter, star, rewrite, notify or summarize new entries",
@@ -22,8 +22,8 @@
     "Open source under AGPL-3.0, with no ads"
   ],
   "screenshotCaptions": [
-    "All your feeds in one calm timeline, with Folo AI one click away.",
-    "Ask Folo AI about an article, a feed or everything you follow.",
+    "All your feeds in one calm timeline, with Diting AI one click away.",
+    "Ask Diting AI about an article, a feed or everything you follow.",
     "Turn hundreds of new entries into one quick digest.",
     "Read articles side by side with an AI translation in English, Chinese, Japanese or French.",
     "Pictures, videos and podcasts each get a layout made for them.",

@@ -45,19 +45,19 @@ describe("buildManifest", () => {
         },
       } satisfies MobileOtaRelease,
       {
-        origin: "https://ota.folo.is",
+        origin: "https://diting.7373.com.cn",
         platform: "ios",
       },
     )
 
     expect(manifest.launchAsset.url).toBe(
-      "https://ota.folo.is/assets/mobile/production/0.4.1/0.4.2/ios/bundles/ios-main.js",
+      "https://diting.7373.com.cn/assets/mobile/production/0.4.1/0.4.2/ios/bundles/ios-main.js",
     )
     expect(manifest.launchAsset.key).toBe("ios-main")
     expect(manifest.launchAsset.hash).toBe("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqo")
     expect(manifest.launchAsset.fileExtension).toBe(".js")
     expect(manifest.assets[0]?.url).toBe(
-      "https://ota.folo.is/assets/mobile/production/0.4.1/0.4.2/ios/assets/one.png",
+      "https://diting.7373.com.cn/assets/mobile/production/0.4.1/0.4.2/ios/assets/one.png",
     )
     expect(manifest.assets[0]?.key).toBe("one")
     expect(manifest.assets[0]?.hash).toBe("u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7s")
@@ -75,11 +75,11 @@ describe("buildManifest", () => {
     delete (release as Partial<MobileOtaRelease>).updateId
 
     const first = buildManifest(release, {
-      origin: "https://ota.folo.is",
+      origin: "https://diting.7373.com.cn",
       platform: "ios",
     })
     const second = buildManifest(release, {
-      origin: "https://ota.folo.is",
+      origin: "https://diting.7373.com.cn",
       platform: "ios",
     })
 
@@ -88,29 +88,29 @@ describe("buildManifest", () => {
 
   it("includes the embedded Expo config needed by expo-constants after an OTA launch", () => {
     const manifest = buildManifest(createRelease(), {
-      origin: "https://ota.folo.is",
+      origin: "https://diting.7373.com.cn",
       platform: "ios",
     })
 
     expect(manifest.extra).toMatchObject({
       expoClient: {
-        name: "Folo",
-        slug: "follow",
-        owner: "follow",
-        scheme: ["follow", "folo"],
+        name: "Diting",
+        slug: "diting",
+        owner: "diting",
+        scheme: ["diting"],
         version: "0.4.2",
         runtimeVersion: "0.4.1",
         updates: {
-          url: "https://ota.folo.is/manifest",
+          url: "https://diting.7373.com.cn/manifest",
           requestHeaders: {
             "expo-channel-name": "production",
           },
         },
         ios: {
-          bundleIdentifier: "is.follow",
+          bundleIdentifier: "cn.com.diting",
         },
         android: {
-          package: "is.follow",
+          package: "cn.com.diting",
         },
         extra: {
           eas: {
@@ -507,7 +507,7 @@ describe("/download", () => {
 
     expect(response.status).toBe(302)
     expect(response.headers.get("location")).toBe(
-      "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/Folo-1.5.1-windows-x64.exe",
+      "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/Folo-1.5.1-windows-x64.exe",
     )
   })
 
@@ -543,7 +543,7 @@ describe("/download", () => {
                         sha512: "f".repeat(88),
                         size: 654321,
                         downloadUrl:
-                          "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/Folo-1.5.1-macos-arm64.dmg",
+                          "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/Folo-1.5.1-macos-arm64.dmg",
                       },
                       ...createDesktopRelease().desktop.app!.platforms.macos!.files,
                     ],
@@ -558,7 +558,7 @@ describe("/download", () => {
 
     expect(response.status).toBe(302)
     expect(response.headers.get("location")).toBe(
-      "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/Folo-1.5.1-macos-arm64.dmg",
+      "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/Folo-1.5.1-macos-arm64.dmg",
     )
   })
 
@@ -594,14 +594,14 @@ describe("/download", () => {
                         sha512: "f".repeat(88),
                         size: 654321,
                         downloadUrl:
-                          "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/Folo-1.5.1-macos-arm64.dmg",
+                          "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/Folo-1.5.1-macos-arm64.dmg",
                       },
                       {
                         filename: "Folo-1.5.1-macos-x64.dmg",
                         sha512: "e".repeat(88),
                         size: 654322,
                         downloadUrl:
-                          "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/Folo-1.5.1-macos-x64.dmg",
+                          "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/Folo-1.5.1-macos-x64.dmg",
                       },
                       ...createDesktopRelease().desktop.app!.platforms.macos!.files,
                     ],
@@ -616,7 +616,7 @@ describe("/download", () => {
 
     expect(response.status).toBe(302)
     expect(response.headers.get("location")).toBe(
-      "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/Folo-1.5.1-macos-x64.dmg",
+      "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/Folo-1.5.1-macos-x64.dmg",
     )
   })
 
@@ -642,7 +642,7 @@ describe("/download", () => {
             publishedAt: "2026-09-18T12:32:03Z",
             tag: "mobile/v0.5.10",
             downloadUrl:
-              "https://github.com/RSSNext/Folo/releases/download/mobile/v0.5.10/build.apk",
+              "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.5.10/build.apk",
           },
         ],
       ]),
@@ -650,7 +650,7 @@ describe("/download", () => {
 
     expect(response.status).toBe(302)
     expect(response.headers.get("location")).toBe(
-      "https://github.com/RSSNext/Folo/releases/download/mobile/v0.5.10/build.apk",
+      "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.5.10/build.apk",
     )
     expect(fetchSpy).not.toHaveBeenCalled()
   })
@@ -659,7 +659,7 @@ describe("/download", () => {
     const fetchSpy = vi.fn(async (input: string | URL | Request) => {
       const url = String(input)
 
-      if (url === "https://api.github.com/repos/RSSNext/Folo/releases") {
+      if (url === "https://api.github.com/repos/hlf2002/diting-desktop/releases") {
         return new Response(
           JSON.stringify([
             createGitHubRelease("mobile/v0.5.12", {
@@ -708,7 +708,7 @@ describe("/download", () => {
 
     expect(response.status).toBe(302)
     expect(response.headers.get("location")).toBe(
-      "https://github.com/RSSNext/Folo/releases/download/mobile/v0.5.10/build.apk",
+      "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.5.10/build.apk",
     )
     expect(fetchSpy).toHaveBeenCalledTimes(1)
   })
@@ -741,7 +741,7 @@ describe("/download", () => {
 
     expect(response.status).toBe(302)
     expect(response.headers.get("location")).toBe(
-      "https://github.com/RSSNext/Folo/releases/download/mobile/v0.5.5/build.apk",
+      "https://github.com/hlf2002/diting-desktop/releases/download/mobile/v0.5.5/build.apk",
     )
   })
 
@@ -888,7 +888,7 @@ function createDesktopRelease(overrides: Partial<DesktopOtaRelease> = {}): Deskt
       message: null,
       distributions: {
         direct: {
-          downloadUrl: "https://ota.folo.is/Folo-1.5.1.exe",
+          downloadUrl: "https://diting.7373.com.cn/Folo-1.5.1.exe",
         },
         mas: {
           storeUrl: "https://apps.apple.com/app/id123456789",
@@ -905,7 +905,7 @@ function createDesktopRelease(overrides: Partial<DesktopOtaRelease> = {}): Deskt
         manifest: {
           name: "manifest.yml",
           downloadUrl:
-            "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/manifest.yml",
+            "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/manifest.yml",
         },
         launchAsset: {
           path: "renderer/custom-renderer.tar.gz",
@@ -923,7 +923,7 @@ function createDesktopRelease(overrides: Partial<DesktopOtaRelease> = {}): Deskt
               name: "latest-mac.yml",
               path: "latest-mac.yml",
               downloadUrl:
-                "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/latest-mac.yml",
+                "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/latest-mac.yml",
             },
             files: [
               {
@@ -931,7 +931,7 @@ function createDesktopRelease(overrides: Partial<DesktopOtaRelease> = {}): Deskt
                 sha512: "c".repeat(88),
                 size: 543210,
                 downloadUrl:
-                  "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/Folo-1.5.1-mac.zip",
+                  "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/Folo-1.5.1-mac.zip",
               },
             ],
           },
@@ -942,7 +942,7 @@ function createDesktopRelease(overrides: Partial<DesktopOtaRelease> = {}): Deskt
               name: "latest.yml",
               path: "latest.yml",
               downloadUrl:
-                "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/latest.yml",
+                "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/latest.yml",
             },
             files: [
               {
@@ -950,7 +950,7 @@ function createDesktopRelease(overrides: Partial<DesktopOtaRelease> = {}): Deskt
                 sha512: "d".repeat(88),
                 size: 654321,
                 downloadUrl:
-                  "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/Folo-1.5.1-windows-x64.exe",
+                  "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/Folo-1.5.1-windows-x64.exe",
               },
             ],
           },
@@ -961,7 +961,7 @@ function createDesktopRelease(overrides: Partial<DesktopOtaRelease> = {}): Deskt
               name: "latest-linux.yml",
               path: "latest-linux.yml",
               downloadUrl:
-                "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/latest-linux.yml",
+                "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/latest-linux.yml",
             },
             files: [
               {
@@ -969,7 +969,7 @@ function createDesktopRelease(overrides: Partial<DesktopOtaRelease> = {}): Deskt
                 sha512: "e".repeat(88),
                 size: 765432,
                 downloadUrl:
-                  "https://github.com/RSSNext/Folo/releases/download/desktop/v1.5.1/Folo-1.5.1.AppImage",
+                  "https://github.com/hlf2002/diting-desktop/releases/download/desktop/v1.5.1/Folo-1.5.1.AppImage",
               },
             ],
           },
@@ -997,7 +997,7 @@ async function fetchWorker(
   },
 ) {
   const response = await otaWorker.fetch(
-    new Request(`https://ota.folo.is${path}`, init),
+    new Request(`https://diting.7373.com.cn${path}`, init),
     createEnv(options),
     createExecutionContext(),
   )
@@ -1045,7 +1045,7 @@ function createGitHubRelease(
     published_at: options.publishedAt,
     assets: options.assetNames.map((name) => ({
       name,
-      browser_download_url: `https://github.com/RSSNext/Folo/releases/download/${tag}/${name}`,
+      browser_download_url: `https://github.com/hlf2002/diting-desktop/releases/download/${tag}/${name}`,
     })),
   }
 }

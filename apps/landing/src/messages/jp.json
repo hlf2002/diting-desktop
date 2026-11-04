@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "title": "Folo",
+    "title": "Diting",
     "description": "AI RSS Reader。文脈理解でノイズのない深い読書体験を。",
-    "keywords": "Folo, AI RSS リーダー, RSS, 要約, 翻訳, リサーチ, オープンソース, コンテンツ発見, インフォメーションブラウザ"
+    "keywords": "Diting, AI RSS リーダー, RSS, 要約, 翻訳, リサーチ, オープンソース, コンテンツ発見, インフォメーションブラウザ"
   },
   "common": {
     "actions": {
@@ -20,13 +20,13 @@
   "landing": {
     "hero": {
       "eyebrow": "AI RSS Reader · クリーンタイムライン",
-      "title": "<brand>Folo</brand> はあなたの <highlight>AI RSS Reader</highlight>",
+      "title": "<brand>Diting</brand> はあなたの <highlight>AI RSS Reader</highlight>",
       "bodyLine1": "インターネットの情報を AI が代わりに読み、",
       "bodyLine2": "雑音を取り除いて、本当に必要な知識だけを届けます。",
       "humanTab": "I'm a Human",
       "agentTab": "I'm an Agent",
-      "agentTitle": "Use Folo",
-      "agentBody": "Read <skill>https://api.folo.is/skill.md</skill> and follow the instructions to use Folo."
+      "agentTitle": "Use Diting",
+      "agentBody": "Read <skill>https://diting.7373.com.cn/skill.md</skill> and follow the instructions to use Diting."
     },
     "features": {
       "headline": "AI 時代のための新しい読書体験",
@@ -37,7 +37,7 @@
       },
       "twin": {
         "label": "デジタルツイン",
-        "titleStrong": "Folo でのすべてがあなたの AI を育てる",
+        "titleStrong": "Diting でのすべてがあなたの AI を育てる",
         "titleRest": "記憶し、理解し、アップデートのたびにあなたと共に進化します。"
       },
       "vibe": {
@@ -49,13 +49,13 @@
     "trustedBy": {
       "eyebrow": "導入が進むチーム",
       "researchersEyebrow": "導入が進む研究者",
-      "headline": "すでに Folo を使うチームがあります。",
-      "body": "本番環境の業務用メール登録サンプルをもとに、Folo を使い始めている企業を抽出しました。"
+      "headline": "すでに Diting を使うチームがあります。",
+      "body": "本番環境の業務用メール登録サンプルをもとに、Diting を使い始めている企業を抽出しました。"
     },
     "metrics": {
       "eyebrow": "本番スナップショット",
       "headline": "At a glance",
-      "body": "Folo の本番環境の規模です。",
+      "body": "Diting の本番環境の規模です。",
       "footnote": "本番スナップショット。概算値です。",
       "cards": {
         "feeds": {
@@ -68,7 +68,7 @@
         },
         "readers": {
           "label": "Readers",
-          "detail": "ノイズに埋もれず情報を追うために、すでに Folo を使っている人たちです。"
+          "detail": "ノイズに埋もれず情報を追うために、すでに Diting を使っている人たちです。"
         },
         "follows": {
           "label": "Follows",
@@ -87,20 +87,20 @@
       "licenseValue": "GPL-3.0",
       "repository": "リポジトリ",
       "repoDescriptionMobile": "コード公開。PR歓迎。",
-      "repoAriaLabel": "GitHub で Folo リポジトリを開く"
+      "repoAriaLabel": "GitHub で Diting リポジトリを開く"
     },
     "socialProof": {
       "eyebrow": "好奇心を持つ人に愛されています",
-      "headline": "AI 時代に好奇心旺盛な人が読むのは Folo です。"
+      "headline": "AI 時代に好奇心旺盛な人が読むのは Diting です。"
     }
   },
   "download": {
     "metadata": {
-      "title": "Folo をダウンロード",
+      "title": "Diting をダウンロード",
       "description": "デスクトップ版をダウンロードするか、Web で今すぐ利用できます。macOS・Windows・Linux に対応。"
     },
     "hero": {
-      "title": "<brand>Folo</brand> をダウンロード",
+      "title": "<brand>Diting</brand> をダウンロード",
       "subtitle": "AI RSS Reader をデスクトップで使うか、Web ですぐに開けます。"
     },
     "platforms": {
@@ -138,7 +138,7 @@
   "pricing": {
     "metadata": {
       "title": "Pricing",
-      "description": "Folo の読書ワークフローに合うプランを選べます。"
+      "description": "Diting の読書ワークフローに合うプランを選べます。"
     },
     "eyebrow": "Pricing",
     "headline": "読書ワークフローに合わせたプラン",

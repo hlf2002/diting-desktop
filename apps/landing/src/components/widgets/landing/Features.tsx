@@ -146,7 +146,7 @@ function DiscoverWindow({ sources }: { sources: DiscoverSource[] }) {
                 >
                   <div className="flex size-10 items-center justify-center rounded-2xl bg-white p-2 shadow-[0_12px_24px_-18px_rgba(0,0,0,0.35)]">
                     <img
-                      src={`https://icons.folo.is/${source.host}`}
+                      src={`https://diting.7373.com.cn/${source.host}`}
                       alt={source.name}
                       className="size-full rounded-xl object-cover"
                       loading="lazy"

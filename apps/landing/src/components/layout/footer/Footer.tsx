@@ -8,7 +8,7 @@ import { cx, focusRing } from '~/lib/cn'
 type LinkItem = { label: string; href: string; external?: boolean }
 
 const productLinks: LinkItem[] = [
-  { label: 'Web App', href: 'https://app.folo.is', external: true },
+  { label: 'Web App', href: 'https://diting.7373.com.cn', external: true },
   { label: 'Download', href: '/download', external: false },
   { label: 'Pricing', href: '/pricing', external: false },
   { label: 'Built Open', href: '/#open', external: false },
@@ -18,10 +18,10 @@ const communityLinks: LinkItem[] = [
   { label: 'Discord', href: 'https://discord.gg/AwWcAQ7euc', external: true },
   {
     label: 'GitHub',
-    href: 'https://github.com/RSSNext/Folo',
+    href: 'https://github.com/hlf2002/diting-desktop',
     external: true,
   },
-  { label: 'Twitter', href: 'https://x.com/folo_is', external: true },
+  { label: 'Twitter', href: 'https://x.com/diting_app', external: true },
 ]
 
 const legalLinks: LinkItem[] = [
@@ -35,7 +35,7 @@ const BrandBlock = () => (
   <div className="max-w-md">
     <Link href="/" className={cx('inline-flex items-center gap-3', focusRing)}>
       <Logo className="size-10 shrink-0" aria-hidden />
-      <span className="text-2xl font-semibold tracking-tight">Folo</span>
+      <span className="text-2xl font-semibold tracking-tight">Diting</span>
     </Link>
     <p className="mt-6 text-base leading-relaxed text-text-secondary">
       The AI that reads the internet for you,
@@ -105,7 +105,7 @@ export const Footer: Component<FooterProps> = ({ className }) => {
         {/* Bottom bar */}
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-border/60 pt-8 sm:flex-row">
           <p className="text-sm text-text-secondary">
-            © {year} Folo. All rights reserved.
+            © {year} Diting. All rights reserved.
           </p>
 
           <div className="flex flex-wrap items-center gap-6">

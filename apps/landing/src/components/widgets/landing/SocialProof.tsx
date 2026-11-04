@@ -15,7 +15,7 @@ const tweetList = [
   },
   {
     id: '1832896505528930551',
-    text: 'Folo is sick!!!! It is indeed the best RSS app on this planet, way better than any pure RSS app such as Reeder, Inoreader, or any apps with RSS features like Readwise Reader!!!',
+    text: 'Diting is sick!!!! It is indeed the best RSS app on this planet, way better than any pure RSS app such as Reeder, Inoreader, or any apps with RSS features like Readwise Reader!!!',
     name: "Poor Delmar's Handbook",
     screenName: '@delmarshandbook',
     profileImageUrl:
@@ -31,7 +31,7 @@ const tweetList = [
   },
   {
     id: '1819361867359535603',
-    text: "Just switched my RSS reader to Folo and it's a game-changer! The built-in AI summaries are saving me so much time. If you're drowning in feeds, this app might be your new best friend.",
+    text: "Just switched my RSS reader to Diting and it's a game-changer! The built-in AI summaries are saving me so much time. If you're drowning in feeds, this app might be your new best friend.",
     name: 'runes780',
     screenName: '@runes780',
     profileImageUrl:

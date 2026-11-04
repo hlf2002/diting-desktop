@@ -9,7 +9,7 @@ import type { ModelResult } from "vscode-languagedetection"
 
 import { detectCodeStringLanguage } from "../../modules/language-detection"
 
-const TTS_SERVICE_URL = "https://tts.folo.is"
+const TTS_SERVICE_URL = "https://tts.diting.7373.com.cn"
 
 interface ReadabilityInput {
   url: string

@@ -127,7 +127,7 @@ const extractParamsFromDeepLink = (incomingUrl: string | null): DeepLinkParams =
 
   try {
     const url = new URL(incomingUrl)
-    if (url.protocol !== "follow:" && url.protocol !== "folo:") return null
+    if (url.protocol !== "diting:" && url.protocol !== "cn.com.diting:") return null
 
     switch (url.hostname) {
       case "add":

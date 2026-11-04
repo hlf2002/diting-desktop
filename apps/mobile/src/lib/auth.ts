@@ -149,7 +149,7 @@ const plugins = [
     },
   }),
   expoClient({
-    scheme: "folo",
+    scheme: "diting",
     storagePrefix,
     storage: authCookieStorage,
   }),

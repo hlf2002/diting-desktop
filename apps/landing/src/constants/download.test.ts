@@ -17,22 +17,22 @@ const findChannel = (id: string) => {
 describe('PlatformDownloadGroups', () => {
   it('uses the APK asset for Android direct downloads', () => {
     expect(findChannel('android-apk').href).toBe(
-      'https://ota.folo.is/download/mobile/android/apk',
+      'https://diting.7373.com.cn/download/mobile/android/apk',
     )
   })
 
   it('uses desktop installer assets for desktop direct downloads', () => {
     expect(findChannel('macos-dmg').href).toBe(
-      'https://ota.folo.is/download/desktop/macos/dmg',
+      'https://diting.7373.com.cn/download/desktop/macos/dmg',
     )
     expect(findChannel('macos-dmg-x64').href).toBe(
-      'https://ota.folo.is/download/desktop/macos/dmg-x64',
+      'https://diting.7373.com.cn/download/desktop/macos/dmg-x64',
     )
     expect(findChannel('windows-exe').href).toBe(
-      'https://ota.folo.is/download/desktop/windows/exe',
+      'https://diting.7373.com.cn/download/desktop/windows/exe',
     )
     expect(findChannel('linux-appimage').href).toBe(
-      'https://ota.folo.is/download/desktop/linux/appimage',
+      'https://diting.7373.com.cn/download/desktop/linux/appimage',
     )
   })
 })

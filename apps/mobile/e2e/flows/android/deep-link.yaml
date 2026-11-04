@@ -1,8 +1,8 @@
-appId: is.follow
+appId: cn.com.diting
 name: Android cold-start queued follow route
 ---
 - stopApp
-- openLink: "folo://add?url=folo%3A%2F%2Fonboarding&type=url"
+- openLink: "diting://add?url=diting%3A%2F%2Fonboarding&type=url"
 - extendedWaitUntil:
     visible:
       id: follow-submit

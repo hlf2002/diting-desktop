@@ -50,7 +50,7 @@
     "badge": "開源 · GitHub 3.9 萬 Star"
   },
   "desktop.chat": {
-    "eyebrow": "Folo AI",
+    "eyebrow": "諦聽 AI",
     "headline": "有問題，\n*直接問你的訂閱。*",
     "sub": "針對一篇文章、一個訂閱來源或你關注的一切，和 AI 聊聊。"
   },
@@ -96,7 +96,7 @@
     ]
   },
   "play.featureGraphic": {
-    "eyebrow": "Folo",
+    "eyebrow": "諦聽",
     "headline": "AI *RSS 閱讀器*",
     "sub": "訂閱一切，只留重點。"
   }

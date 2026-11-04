@@ -44,7 +44,7 @@ export const toggleEntryReadability = async ({ id, url }: { id: string; url: str
   const isTurnOn = status !== ReadabilityStatus.INITIAL && !!status
 
   if (!isTurnOn && url) {
-    // The onboarding entries link to an internal folo:// address with no page to extract
+    // The onboarding entries link to an internal diting:// address with no page to extract
     if (isOnboardingEntryUrl(url)) return
     setReadabilityStatus({
       [id]: ReadabilityStatus.WAITING,

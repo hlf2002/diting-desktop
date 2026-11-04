@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "title": "Folo",
+    "title": "谛听",
     "description": "AI RSS Reader，具备上下文 AI，带来深度、无噪的阅读体验。",
-    "keywords": "Folo, AI RSS 阅读器, RSS, 摘要, 翻译, 研究, 开源, 内容发现, 信息浏览器"
+    "keywords": "谛听, AI RSS 阅读器, RSS, 摘要, 翻译, 研究, 开源, 内容发现, 信息浏览器"
   },
   "common": {
     "actions": {
@@ -20,13 +20,13 @@
   "landing": {
     "hero": {
       "eyebrow": "AI RSS Reader · 洁净时间线",
-      "title": "<brand>Folo</brand> 是你的 <highlight>AI RSS Reader</highlight>",
+      "title": "<brand>谛听</brand> 是你的 <highlight>AI RSS Reader</highlight>",
       "bodyLine1": "这款 AI 为你读遍全网，",
       "bodyLine2": "穿透噪音，只呈现你真正关心的洞见。",
       "humanTab": "I'm a Human",
       "agentTab": "I'm an Agent",
-      "agentTitle": "Use Folo",
-      "agentBody": "Read <skill>https://api.folo.is/skill.md</skill> and follow the instructions to use Folo."
+      "agentTitle": "Use 谛听",
+      "agentBody": "Read <skill>https://diting.7373.com.cn/skill.md</skill> and follow the instructions to use 谛听."
     },
     "features": {
       "headline": "在 AI 时代重新定义阅读",
@@ -37,7 +37,7 @@
       },
       "twin": {
         "label": "数字分身",
-        "titleStrong": "你在 Folo 的一切都在训练你的 AI",
+        "titleStrong": "你在 谛听 的一切都在训练你的 AI",
         "titleRest": "它会记住、理解，并随每次更新与你共同进化。"
       },
       "vibe": {
@@ -49,13 +49,13 @@
     "trustedBy": {
       "eyebrow": "已被这些团队采用",
       "researchersEyebrow": "已被这些研究者采用",
-      "headline": "已经有团队在用 Folo。",
-      "body": "我们基于生产环境中的工作邮箱注册样本，整理出了这些已经开始使用 Folo 的公司。"
+      "headline": "已经有团队在用 谛听。",
+      "body": "我们基于生产环境中的工作邮箱注册样本，整理出了这些已经开始使用 谛听 的公司。"
     },
     "metrics": {
       "eyebrow": "生产环境快照",
       "headline": "一眼看懂",
-      "body": "Folo 当前生产环境的数据规模。",
+      "body": "谛听 当前生产环境的数据规模。",
       "footnote": "生产快照，近似值。",
       "cards": {
         "feeds": {
@@ -68,7 +68,7 @@
         },
         "readers": {
           "label": "Readers",
-          "detail": "已经在用 Folo 追踪信息、同时避开噪音的人。"
+          "detail": "已经在用 谛听 追踪信息、同时避开噪音的人。"
         },
         "follows": {
           "label": "Follows",
@@ -87,20 +87,20 @@
       "licenseValue": "GPL-3.0",
       "repository": "代码仓库",
       "repoDescriptionMobile": "代码公开，欢迎 PR。",
-      "repoAriaLabel": "在 GitHub 打开 Folo 仓库"
+      "repoAriaLabel": "在 GitHub 打开 谛听 仓库"
     },
     "socialProof": {
-      "eyebrow": "好奇者热爱 Folo",
-      "headline": "在 AI 时代，好奇的人用 Folo 阅读。"
+      "eyebrow": "好奇者热爱 谛听",
+      "headline": "在 AI 时代，好奇的人用 谛听 阅读。"
     }
   },
   "download": {
     "metadata": {
-      "title": "下载 Folo",
-      "description": "下载 Folo 桌面端或直接在 Web 上体验。支持 macOS、Windows 和 Linux。"
+      "title": "下载 谛听",
+      "description": "下载 谛听 桌面端或直接在 Web 上体验。支持 macOS、Windows 和 Linux。"
     },
     "hero": {
-      "title": "下载 <brand>Folo</brand>",
+      "title": "下载 <brand>谛听</brand>",
       "subtitle": "在桌面端使用 AI RSS Reader，或直接在 Web 上打开。"
     },
     "platforms": {
@@ -138,7 +138,7 @@
   "pricing": {
     "metadata": {
       "title": "价格",
-      "description": "选择适合你阅读工作流的 Folo 计划。"
+      "description": "选择适合你阅读工作流的 谛听 计划。"
     },
     "eyebrow": "Pricing",
     "headline": "适合不同阅读工作流的计划",

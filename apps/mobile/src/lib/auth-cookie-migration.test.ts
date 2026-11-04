@@ -48,7 +48,7 @@ vi.mock("./native/user-agent", () => ({
 
 vi.mock("./proxy-env", () => ({
   proxyEnv: {
-    API_URL: "https://api.folo.is",
+    API_URL: "https://api.diting.7373.com.cn",
   },
 }))
 
@@ -62,7 +62,7 @@ describe("migrateLegacyApiSession", () => {
 
   it("uses the Folo native app scheme as the migration auth origin", async () => {
     const fetchMock = vi.fn(async (input: string, _options?: RequestInit): Promise<Response> => {
-      if (input === "https://api.folo.is/better-auth/get-session") {
+      if (input === "https://api.diting.7373.com.cn/better-auth/get-session") {
         return new Response(null, { status: 401 })
       }
 
@@ -84,7 +84,7 @@ describe("migrateLegacyApiSession", () => {
     expect(fetchMock).toHaveBeenCalledTimes(3)
     for (const [, options] of fetchMock.mock.calls) {
       expect(options?.headers).toMatchObject({
-        "expo-origin": "folo://",
+        "expo-origin": "diting://",
       })
     }
     expect(mocks.oneTimeTokenApply).toHaveBeenCalledWith({ token: "one-time-token" })

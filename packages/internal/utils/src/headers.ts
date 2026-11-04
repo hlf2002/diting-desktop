@@ -30,8 +30,8 @@ export const createBuildSafeHeaders =
     }
 
     if (
-      (headers.Referer && headers.Referer !== "app://folo.is") ||
-      (headers.Origin && headers.Origin !== "app://folo.is")
+      (headers.Referer && headers.Referer !== "app://diting.7373.com.cn") ||
+      (headers.Origin && headers.Origin !== "app://diting.7373.com.cn")
     ) {
       return headers
     }

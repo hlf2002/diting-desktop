@@ -1,4 +1,4 @@
-Folo ist ein KI-gestützter RSS-Reader, der all deine Quellen in einer übersichtlichen Timeline bündelt und dir beim Lesen hilft.
+Diting ist ein KI-gestützter RSS-Reader, der all deine Quellen in einer übersichtlichen Timeline bündelt und dir beim Lesen hilft.
 
 Folge Blogs, Nachrichtenseiten, Newslettern, Podcasts, Videokanälen und Social-Media-Feeds an einem Ort. Lass die KI lange Artikel zusammenfassen, fremdsprachige Beiträge übersetzen und den Rest vorlesen. So bleibst du informiert, ohne zwischen einem Dutzend Apps zu wechseln.
 
@@ -26,7 +26,7 @@ GANZ NACH DEINEM GESCHMACK
 • Abos, Lesestatus und Favoriten werden zwischen Android, iPhone, iPad, Windows, macOS, Linux und dem Web synchronisiert
 
 OPEN SOURCE, OHNE WERBUNG
-Folo ist Open Source unter der AGPL-3.0-Lizenz und enthält keine Werbung. Die App entsteht öffentlich, gemeinsam mit einer Community aus Lesern und Entwicklern. Ihre Oberfläche gibt es auf Englisch, Chinesisch, Japanisch und Französisch.
+Diting ist Open Source unter der AGPL-3.0-Lizenz und enthält keine Werbung. Die App entsteht öffentlich, gemeinsam mit einer Community aus Lesern und Entwicklern. Ihre Oberfläche gibt es auf Englisch, Chinesisch, Japanisch und Französisch.
 
 KOSTENLOS LOSLEGEN
-Folo kannst du kostenlos herunterladen. Mit einem kostenlosen Konto folgst du Feeds und synchronisierst sie auf all deinen Geräten. Kostenpflichtige Tarife bieten mehr Feed-Abos, höhere KI-Limits und Automatisierungen.
+Diting kannst du kostenlos herunterladen. Mit einem kostenlosen Konto folgst du Feeds und synchronisierst sie auf all deinen Geräten. Kostenpflichtige Tarife bieten mehr Feed-Abos, höhere KI-Limits und Automatisierungen.

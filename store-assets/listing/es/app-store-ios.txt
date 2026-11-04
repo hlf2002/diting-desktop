@@ -1,4 +1,4 @@
-Folo es el lector RSS con IA que reúne todo lo que sigues en una sola cronología, sin ruido, y te ayuda a leerlo.
+Diting es el lector RSS con IA que reúne todo lo que sigues en una sola cronología, sin ruido, y te ayuda a leerlo.
 
 Sigue blogs, webs de noticias, newsletters, podcasts, canales de vídeo y redes sociales en un mismo lugar. Deja que la IA resuma los artículos largos, traduzca los que están en otros idiomas y te lea el resto en voz alta, para estar al día sin perderte entre pestañas.
 
@@ -26,12 +26,12 @@ TU LECTOR, A TU MANERA
 • Tus suscripciones, lo que has leído y tus favoritos se sincronizan entre iPhone, iPad, Mac, Windows, Android y la web
 
 CÓDIGO ABIERTO, SIN ANUNCIOS
-Folo es de código abierto y no tiene anuncios. Se desarrolla de forma abierta junto a una comunidad de lectores y desarrolladores. La interfaz de Folo, los resúmenes y las traducciones con IA están disponibles en inglés, chino, japonés y francés.
+Diting es de código abierto y no tiene anuncios. Se desarrolla de forma abierta junto a una comunidad de lectores y desarrolladores. La interfaz de Diting, los resúmenes y las traducciones con IA están disponibles en inglés, chino, japonés y francés.
 
 EMPIEZA GRATIS
 Crea una cuenta gratuita para seguir feeds y sincronizarlos entre tus dispositivos. Los planes Basic, Plus y Pro añaden más suscripciones, límites de IA más altos y automatizaciones.
 
 Las suscripciones se cobran de forma mensual o anual y se renuevan automáticamente, salvo que se cancelen al menos 24 horas antes de que termine el periodo en curso. El pago se carga en tu Cuenta de Apple al confirmar la compra. Puedes gestionar o cancelar tu suscripción en cualquier momento desde los ajustes de tu cuenta del App Store.
 
-Política de privacidad: https://folo.is/privacy-policy
+Política de privacidad: https://diting.7373.com.cn/privacy-policy
 Condiciones de uso: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

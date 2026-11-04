@@ -174,7 +174,7 @@ describe("entry tts", () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(1)
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://tts.folo.is/tts",
+      "https://tts.diting.7373.com.cn/tts",
       expect.objectContaining({
         method: "POST",
         headers: {

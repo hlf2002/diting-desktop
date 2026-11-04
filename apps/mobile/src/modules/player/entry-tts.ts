@@ -125,7 +125,7 @@ export const playEntryTts = async (
     }
 
     const { voice } = getGeneralSettings()
-    const artist = getPreferredFeedTitle(entry.feedId) ?? "Folo"
+    const artist = getPreferredFeedTitle(entry.feedId) ?? "谛听"
     try {
       await ttsStreamController.play({
         artwork: entry.media?.find((media) => media.type === "photo")?.url ?? null,

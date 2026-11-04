@@ -37,7 +37,7 @@ export const LoginModalContent = (props: LoginModalContentProps) => {
       tos: "terms-of-service",
     }
 
-    window.open(`https://folo.is/${path[type]}`, "_blank")
+    window.open(`https://diting.7373.com.cn/${path[type]}`, "_blank")
   }
 
   useEffect(() => {

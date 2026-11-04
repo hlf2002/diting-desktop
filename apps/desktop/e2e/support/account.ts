@@ -12,7 +12,7 @@ export const createTestAccount = (name: string): TestAccount => {
 
   return {
     email: `folo-e2e-${name}-${suffix}@example.com`,
-    password: process.env.FOLO_E2E_PASSWORD ?? "Password123!",
+    password: process.env.DITING_E2E_PASSWORD ?? "Password123!",
   }
 }
 

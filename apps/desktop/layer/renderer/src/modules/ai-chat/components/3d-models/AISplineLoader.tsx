@@ -2,7 +2,7 @@ import { clamp, cn } from "@follow/utils"
 import Spline from "@splinetool/react-spline"
 import { useCallback, useEffect, useRef } from "react"
 
-const resolvedAIIconUrl = "https://assets.folo.is/ai2.splinecode"
+const resolvedAIIconUrl = "https://assets.diting.7373.com.cn/ai2.splinecode"
 
 export const AISplineLoader = ({ className }: { className?: string }) => {
   const containerRef = useRef<HTMLDivElement>(null)

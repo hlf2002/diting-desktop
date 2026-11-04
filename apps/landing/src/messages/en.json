@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "title": "Folo",
+    "title": "Diting",
     "description": "AI RSS Reader for deep, noise-free reading with contextual AI.",
-    "keywords": "Folo, AI RSS reader, RSS, summarize, translate, research, open source, content discovery, information browser"
+    "keywords": "Diting, AI RSS reader, RSS, summarize, translate, research, open source, content discovery, information browser"
   },
   "common": {
     "actions": {
@@ -20,13 +20,13 @@
   "landing": {
     "hero": {
       "eyebrow": "AI RSS Reader · Clean Timeline",
-      "title": "<brand>Folo</brand> is the <highlight>AI RSS Reader</highlight>",
+      "title": "<brand>Diting</brand> is the <highlight>AI RSS Reader</highlight>",
       "bodyLine1": "The AI that reads the internet for you,",
       "bodyLine2": "cutting through noise to surface the knowledge you actually care about.",
       "humanTab": "I'm a Human",
       "agentTab": "I'm an Agent",
-      "agentTitle": "Use Folo",
-      "agentBody": "Read <skill>https://api.folo.is/skill.md</skill> and follow the instructions to use Folo."
+      "agentTitle": "Use Diting",
+      "agentBody": "Read <skill>https://diting.7373.com.cn/skill.md</skill> and follow the instructions to use Diting."
     },
     "features": {
       "headline": "Reading reimagined in the AI era",
@@ -37,7 +37,7 @@
       },
       "twin": {
         "label": "Digital Twin",
-        "titleStrong": "Everything you Folo trains your AI",
+        "titleStrong": "Everything you Diting trains your AI",
         "titleRest": "to think like you. It remembers, adapts, and evolves with every update."
       },
       "vibe": {
@@ -49,13 +49,13 @@
     "trustedBy": {
       "eyebrow": "Trusted by teams at",
       "researchersEyebrow": "Trusted by researchers at",
-      "headline": "Teams already using Folo.",
-      "body": "We sampled production work-email registrations to find the companies that have already started reading with Folo."
+      "headline": "Teams already using Diting.",
+      "body": "We sampled production work-email registrations to find the companies that have already started reading with Diting."
     },
     "metrics": {
       "eyebrow": "Production Snapshot",
       "headline": "At a glance",
-      "body": "Live production scale from Folo.",
+      "body": "Live production scale from Diting.",
       "footnote": "Production snapshot. Approximate.",
       "cards": {
         "feeds": {
@@ -68,7 +68,7 @@
         },
         "readers": {
           "label": "Readers",
-          "detail": "People already using Folo to keep up without drowning in noise."
+          "detail": "People already using Diting to keep up without drowning in noise."
         },
         "follows": {
           "label": "Follows",
@@ -87,20 +87,20 @@
       "licenseValue": "GPL-3.0",
       "repository": "Repository",
       "repoDescriptionMobile": "Code public. PRs welcome.",
-      "repoAriaLabel": "Open Folo repository on GitHub"
+      "repoAriaLabel": "Open Diting repository on GitHub"
     },
     "socialProof": {
       "eyebrow": "Loved by The Curious",
-      "headline": "Folo is how the curious read in the AI era."
+      "headline": "Diting is how the curious read in the AI era."
     }
   },
   "download": {
     "metadata": {
-      "title": "Download Folo",
-      "description": "Download Folo for Desktop or use it on the Web. Available on macOS, Windows, and Linux."
+      "title": "Download Diting",
+      "description": "Download Diting for Desktop or use it on the Web. Available on macOS, Windows, and Linux."
     },
     "hero": {
-      "title": "Download <brand>Folo</brand>",
+      "title": "Download <brand>Diting</brand>",
       "subtitle": "Get the AI RSS Reader on Desktop, or open it instantly on the Web."
     },
     "platforms": {
@@ -138,7 +138,7 @@
   "pricing": {
     "metadata": {
       "title": "Pricing",
-      "description": "Choose the Folo plan that fits your reading workflow."
+      "description": "Choose the Diting plan that fits your reading workflow."
     },
     "eyebrow": "Pricing",
     "headline": "Plans for every reading workflow",

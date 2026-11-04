@@ -1,4 +1,4 @@
-appId: is.follow
+appId: cn.com.diting
 ---
 - runFlow: open-auth.yaml
 # A device someone signed in on before opens the screen on signing in

@@ -26,7 +26,7 @@
   },
   "routes": [
     {
-      "pattern": "folo.is/*",
+      "pattern": "diting.7373.com.cn/*",
       "zone_id": "115ea8e6a7865dbfc1cf4530d5f87f63",
     },
   ],
@@ -35,7 +35,7 @@
       "name": "landing-next-dev",
       "routes": [
         {
-          "pattern": "landing.dev.folo.is/*",
+          "pattern": "dev.diting.7373.com.cn/*",
           "zone_id": "115ea8e6a7865dbfc1cf4530d5f87f63",
         },
       ],

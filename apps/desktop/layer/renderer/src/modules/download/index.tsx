@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next"
 export function DownloadPage() {
   const { t } = useTranslation()
   const openDownloadPage = () => {
-    window.open("https://folo.is/download", "_blank", "noopener,noreferrer")
+    window.open("https://diting.7373.com.cn/download", "_blank", "noopener,noreferrer")
   }
 
   const mobilePlatform = getMobilePlatform()

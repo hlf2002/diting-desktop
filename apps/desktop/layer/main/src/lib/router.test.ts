@@ -47,8 +47,8 @@ describe("handleUrlRouting", () => {
     const mainWindow = createMainWindow()
     mocks.getMainWindow.mockReturnValue(mainWindow)
 
-    handleUrlRouting("folo://this/is/not-a-route?x=1")
-    handleUrlRouting("folo://entry?id=1&view=0")
+    handleUrlRouting("diting://this/is/not-a-route?x=1")
+    handleUrlRouting("diting://entry?id=1&view=0")
 
     expect(mocks.createWindow).not.toHaveBeenCalled()
     expect(mainWindow.focus).toHaveBeenCalledTimes(2)
@@ -57,18 +57,18 @@ describe("handleUrlRouting", () => {
   it("opens the main window first when it is gone, then routes the link again", () => {
     mocks.getMainWindow.mockReturnValue(null)
 
-    handleUrlRouting("folo://this/is/not-a-route")
+    handleUrlRouting("diting://this/is/not-a-route")
 
     expect(mocks.createWindow).not.toHaveBeenCalled()
     expect(mocks.createMainWindow).toHaveBeenCalledTimes(1)
-    expect(mocks.openDeepLink).toHaveBeenCalledWith("folo://this/is/not-a-route")
+    expect(mocks.openDeepLink).toHaveBeenCalledWith("diting://this/is/not-a-route")
   })
 
   it("keeps routing the links the app knows", () => {
     const mainWindow = createMainWindow()
     mocks.getMainWindow.mockReturnValue(mainWindow)
 
-    handleUrlRouting("folo://feed?id=41&view=2")
+    handleUrlRouting("diting://feed?id=41&view=2")
 
     expect(mocks.goToFeed).toHaveBeenCalledWith({ id: "41", view: 2 })
     expect(mocks.createWindow).not.toHaveBeenCalled()

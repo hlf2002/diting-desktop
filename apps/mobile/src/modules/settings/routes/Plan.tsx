@@ -210,7 +210,7 @@ const isFeatureValueVisible = (value: PaymentFeature[keyof PaymentFeature] | nul
 const isAppleProductId = (value: string | undefined): value is string => typeof value === "string"
 
 const APPLE_STANDARD_EULA_URL = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
-const TERMS_OF_SERVICE_URL = "https://folo.is/terms-of-service"
+const TERMS_OF_SERVICE_URL = "https://diting.7373.com.cn/terms-of-service"
 
 const BILLING_PERIOD_RANK: Record<BillingPeriod, number> = {
   monthly: 0,
@@ -531,7 +531,7 @@ export const PlanScreen: NavigationControllerView = () => {
       const response = await authClient.subscription.upgrade({
         plan: planId,
         annual,
-        successUrl: "folo://refresh",
+        successUrl: "diting://refresh",
         cancelUrl: proxyEnv.WEB_URL,
         disableRedirect: true,
       })
@@ -754,7 +754,7 @@ export const PlanScreen: NavigationControllerView = () => {
               </Pressable>
               <Pressable
                 accessibilityRole="link"
-                onPress={() => void openURL("https://folo.is/privacy-policy")}
+                onPress={() => void openURL("https://diting.7373.com.cn/privacy-policy")}
                 className="min-h-11 justify-center px-2"
               >
                 <Text className="text-center text-sm text-link underline">

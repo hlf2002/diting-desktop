@@ -213,7 +213,7 @@ export const ProfileButton: FC<ProfileButtonProps> = memo((props) => {
             <DropdownMenuItem
               className="pl-3"
               onClick={() => {
-                window.open("https://folo.is/download", "_blank", "noopener,noreferrer")
+                window.open("https://diting.7373.com.cn/download", "_blank", "noopener,noreferrer")
               }}
               icon={<i className="i-mgc-download-2-cute-re" />}
             >

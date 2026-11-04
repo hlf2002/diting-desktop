@@ -34,7 +34,8 @@ const getOneTimeTokenFromResult = (result: unknown) => {
 }
 
 const LATEST_WITH_NPX_COMMAND = "npx --yes folocli@latest --help"
-const AGENT_PROMPT = "Read https://api.folo.is/skill.md and follow the instructions to use Folo."
+const AGENT_PROMPT =
+  "Read https://diting.7373.com.cn/skill.md and follow the instructions to use Diting."
 
 export const SettingCli = () => {
   interface CliInstallStatus {

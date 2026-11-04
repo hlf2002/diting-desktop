@@ -9,10 +9,10 @@ import {
 
 describe("Apple IAP purchase identifiers", () => {
   it("matches subscriptions by product ID instead of transaction ID", () => {
-    const knownSubscriptionIds = new Set(["is.follow.basic.monthly"])
+    const knownSubscriptionIds = new Set(["cn.com.diting.basic.monthly"])
     const purchase = {
       id: "2000001234567890",
-      productId: "is.follow.basic.monthly",
+      productId: "cn.com.diting.basic.monthly",
     }
 
     expect(isKnownAppleSubscriptionPurchase(purchase, knownSubscriptionIds)).toBe(true)
@@ -23,7 +23,7 @@ describe("Apple IAP purchase identifiers", () => {
       {
         id: "2000001234567890",
         originalTransactionIdentifierIOS: "2000001000000000",
-        productId: "is.follow.basic.monthly",
+        productId: "cn.com.diting.basic.monthly",
         transactionId: "2000001234567890",
       },
       "header.payload.signature",
@@ -40,7 +40,7 @@ describe("Apple IAP purchase identifiers", () => {
     expect(
       buildAppleVerificationRequest({
         id: "2000001234567890",
-        productId: "is.follow.basic.monthly",
+        productId: "cn.com.diting.basic.monthly",
       }),
     ).toEqual({
       originalTransactionId: undefined,
@@ -58,7 +58,7 @@ describe("Apple IAP purchase identifiers", () => {
       buildAppleVerificationRequest(
         {
           id: "2000001234567890",
-          productId: "is.follow.basic.monthly",
+          productId: "cn.com.diting.basic.monthly",
           purchaseToken: "2000001234567890",
         },
         "2000001234567890",

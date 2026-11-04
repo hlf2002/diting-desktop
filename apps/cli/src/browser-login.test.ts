@@ -166,7 +166,7 @@ describe("browser login helpers", () => {
     expect(token).toBe("session-token")
     expect(fetchMock).toHaveBeenCalledTimes(1)
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://api.folo.is/better-auth/one-time-token/apply",
+      "https://api.diting.7373.com.cn/better-auth/one-time-token/apply",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ token: "one-time-token" }),
@@ -201,7 +201,7 @@ describe("browser login helpers", () => {
     expect(token).toBe("session-token")
     expect(fetchMock).toHaveBeenNthCalledWith(
       1,
-      "https://api.folo.is/better-auth/one-time-token/apply",
+      "https://api.diting.7373.com.cn/better-auth/one-time-token/apply",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ token: "one-time-token" }),
@@ -209,7 +209,7 @@ describe("browser login helpers", () => {
     )
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
-      "https://api.folo.is/better-auth/one-time-token/verify",
+      "https://api.diting.7373.com.cn/better-auth/one-time-token/verify",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ token: "one-time-token" }),
@@ -246,7 +246,7 @@ describe("browser login helpers", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2)
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
-      "https://api.folo.is/better-auth/get-session",
+      "https://api.diting.7373.com.cn/better-auth/get-session",
       expect.objectContaining({
         method: "GET",
         headers: expect.objectContaining({

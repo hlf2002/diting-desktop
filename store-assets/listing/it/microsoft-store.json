@@ -1,5 +1,5 @@
 {
-  "shortDescription": "Folo è il lettore RSS con IA per Windows. Segui blog, notizie, newsletter, video e podcast in un’unica timeline pulita, poi lascia che l’IA riassuma, traduca e risponda alle tue domande su tutto ciò che segui.",
+  "shortDescription": "Diting è il lettore RSS con IA per Windows. Segui blog, notizie, newsletter, video e podcast in un’unica timeline pulita, poi lascia che l’IA riassuma, traduca e risponda alle tue domande su tutto ciò che segui.",
   "features": [
     "Feed RSS, Atom e JSON, più migliaia di route RSSHub per i siti senza feed",
     "Un’unica timeline per articoli, post social, immagini, video, podcast e notifiche",
@@ -8,7 +8,7 @@
     "Chatta con l’IA su un articolo, un feed, una cartella o l’intera timeline",
     "Riassumi la timeline in un riepilogo veloce",
     "Attività IA che inviano briefing giornalieri o settimanali in chat o via email",
-    "Collega servizi MCP per integrare in Folo AI gli altri strumenti che usi",
+    "Collega servizi MCP per integrare in Diting AI gli altri strumenti che usi",
     "Scegli il modello di IA o usa la tua chiave API",
     "Sintesi vocale con voci naturali",
     "Actions: regole che filtrano, aggiungono ai preferiti, riscrivono o riassumono i nuovi contenuti, o ti inviano una notifica",
@@ -22,8 +22,8 @@
     "Open source con licenza AGPL-3.0, senza pubblicità"
   ],
   "screenshotCaptions": [
-    "Tutti i tuoi feed in un’unica timeline pulita, con Folo AI a portata di clic.",
-    "Fai domande a Folo AI su un articolo, un feed o tutto ciò che segui.",
+    "Tutti i tuoi feed in un’unica timeline pulita, con Diting AI a portata di clic.",
+    "Fai domande a Diting AI su un articolo, un feed o tutto ciò che segui.",
     "Trasforma centinaia di nuovi contenuti in un unico riepilogo veloce.",
     "Leggi gli articoli con la traduzione IA affiancata, in inglese, cinese, giapponese o francese.",
     "Immagini, video e podcast hanno ciascuno un layout pensato apposta.",

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm_production_deploy:
-        description: Deploy the selected branch to production (app.folo.is)
+        description: Deploy the selected branch to production (diting.7373.com.cn)
         required: true
         default: false
         type: boolean
@@ -61,21 +61,21 @@ jobs:
             fi
 
             echo "environment=prod" >> "$GITHUB_OUTPUT"
-            echo "vite_web_url=https://app.folo.is" >> "$GITHUB_OUTPUT"
-            echo "vite_api_url=https://api.folo.is" >> "$GITHUB_OUTPUT"
+            echo "vite_web_url=https://diting.7373.com.cn" >> "$GITHUB_OUTPUT"
+            echo "vite_api_url=https://api.diting.7373.com.cn" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           if [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
-            echo "vite_web_url=https://dev.folo.is" >> "$GITHUB_OUTPUT"
-            echo "vite_api_url=https://api.dev.folo.is" >> "$GITHUB_OUTPUT"
+            echo "vite_web_url=https://dev.diting.7373.com.cn" >> "$GITHUB_OUTPUT"
+            echo "vite_api_url=https://api.dev.diting.7373.com.cn" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           echo "environment=prod" >> "$GITHUB_OUTPUT"
-          echo "vite_web_url=https://app.folo.is" >> "$GITHUB_OUTPUT"
-          echo "vite_api_url=https://api.folo.is" >> "$GITHUB_OUTPUT"
+          echo "vite_web_url=https://diting.7373.com.cn" >> "$GITHUB_OUTPUT"
+          echo "vite_api_url=https://api.diting.7373.com.cn" >> "$GITHUB_OUTPUT"
 
       - name: Build desktop web (SSR assets)
         working-directory: apps/desktop

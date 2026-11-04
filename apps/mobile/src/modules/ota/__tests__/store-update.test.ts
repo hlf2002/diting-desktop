@@ -37,8 +37,8 @@ describe("getStoreUpdateTarget", () => {
   it("sends Google Play installs to the Play Store app", () => {
     expect(getStoreUpdateTarget({ platform: "android", isGooglePlayInstall: true })).toEqual({
       store: "google_play",
-      appUrl: "market://details?id=is.follow",
-      url: "https://play.google.com/store/apps/details?id=is.follow",
+      appUrl: "market://details?id=cn.com.diting",
+      url: "https://play.google.com/store/apps/details?id=cn.com.diting",
     })
   })
 

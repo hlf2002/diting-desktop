@@ -49,7 +49,7 @@ const product = (subscriptionOffers: SubscriptionOffer[]): ProductSubscription =
   currency: "USD",
   description: "Folo Plus",
   displayPrice: "$9.99",
-  id: "is.follow.plus.monthly",
+  id: "cn.com.diting.plus.monthly",
   nameAndroid: "Folo Plus",
   platform: "android",
   subscriptionOffers,
@@ -74,13 +74,13 @@ describe("Google Play offers", () => {
 
   it("shows the price charged after the free trial and keeps the offer token to buy it", () => {
     expect(toGooglePlaySubscriptionProduct(product([basePlanOffer, freeTrialOffer]))).toEqual({
-      id: "is.follow.plus.monthly",
+      id: "cn.com.diting.plus.monthly",
       displayPrice: "$9.99",
       offerToken: "free-trial-token",
       freeTrial: { unit: "day", count: 7 },
     })
     expect(toGooglePlaySubscriptionProduct(product([basePlanOffer]))).toEqual({
-      id: "is.follow.plus.monthly",
+      id: "cn.com.diting.plus.monthly",
       displayPrice: "$9.99",
       offerToken: "base-plan-token",
       freeTrial: null,
@@ -94,18 +94,18 @@ describe("Google Play plan products", () => {
     { name: "Free" },
     {
       name: "Plus",
-      googlePlayProductIdentifier: "is.follow.plus.monthly",
-      googlePlayProductIdentifierAnnual: "is.follow.plus.yearly",
+      googlePlayProductIdentifier: "cn.com.diting.plus.monthly",
+      googlePlayProductIdentifierAnnual: "cn.com.diting.plus.yearly",
     },
   ]
 
   it("reads the product of each billing period from the server plans", () => {
-    expect(getGooglePlayProductId(plans[1]!, false)).toBe("is.follow.plus.monthly")
-    expect(getGooglePlayProductId(plans[1]!, true)).toBe("is.follow.plus.yearly")
+    expect(getGooglePlayProductId(plans[1]!, false)).toBe("cn.com.diting.plus.monthly")
+    expect(getGooglePlayProductId(plans[1]!, true)).toBe("cn.com.diting.plus.yearly")
     expect(getGooglePlayProductId(plans[0]!, true)).toBeNull()
     expect(getGooglePlayProductIds(plans)).toEqual([
-      "is.follow.plus.monthly",
-      "is.follow.plus.yearly",
+      "cn.com.diting.plus.monthly",
+      "cn.com.diting.plus.yearly",
     ])
   })
 })

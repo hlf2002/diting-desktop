@@ -1,4 +1,4 @@
-appId: is.follow
+appId: cn.com.diting
 ---
 - waitForAnimationToEnd:
     timeout: 15000

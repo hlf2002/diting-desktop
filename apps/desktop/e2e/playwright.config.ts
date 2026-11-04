@@ -26,8 +26,8 @@ export default defineConfig({
     cwd: env.desktopAppDir,
     env: {
       ...process.env,
-      VITE_API_URL: process.env.FOLO_E2E_WEB_DEV_API_URL ?? env.apiURL,
-      VITE_WEB_URL: process.env.FOLO_E2E_WEB_DEV_WEB_URL ?? env.webURL,
+      VITE_API_URL: process.env.DITING_E2E_WEB_DEV_API_URL ?? env.apiURL,
+      VITE_WEB_URL: process.env.DITING_E2E_WEB_DEV_WEB_URL ?? env.webURL,
     },
     url: env.webDevServerURL,
     timeout: 120_000,

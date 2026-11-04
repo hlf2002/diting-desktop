@@ -30,7 +30,7 @@ const credentials = {
     publicKey: "public-key",
   },
   config: {
-    bundleId: "is.follow",
+    bundleId: "cn.com.diting",
     projectId: "project-id",
     vapidKey: "vapid-key",
   },
@@ -92,9 +92,9 @@ vi.mock("@follow/shared/bridge", () => ({
 }))
 
 vi.mock("@follow/shared/constants", () => ({
-  APP_PROTOCOL: "folo",
+  APP_PROTOCOL: "diting",
   DEV: false,
-  LEGACY_APP_PROTOCOL: "follow",
+  LEGACY_APP_PROTOCOL: "diting",
 }))
 
 vi.mock("@follow/shared/env.desktop", () => ({

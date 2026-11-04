@@ -50,7 +50,7 @@
     "badge": "オープンソース · GitHubで39Kスター"
   },
   "desktop.chat": {
-    "eyebrow": "Folo AI",
+    "eyebrow": "Diting AI",
     "headline": "フィードに\n*なんでも聞ける。*",
     "sub": "記事やフィード、フォロー中のすべてについてチャットできます。"
   },
@@ -96,7 +96,7 @@
     ]
   },
   "play.featureGraphic": {
-    "eyebrow": "Folo",
+    "eyebrow": "Diting",
     "headline": "AI *RSSリーダー*",
     "sub": "すべてのフィードを、ノイズなしで。"
   }

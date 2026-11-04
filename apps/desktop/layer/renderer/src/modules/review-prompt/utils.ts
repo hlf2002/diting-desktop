@@ -19,7 +19,7 @@ const APPLE_REVIEW_URL =
 const MICROSOFT_PRODUCT_ID = "9NVFZPV0V0HT"
 const MICROSOFT_REVIEW_URI = `ms-windows-store://review/?ProductId=${MICROSOFT_PRODUCT_ID}`
 const MICROSOFT_REVIEW_URL = "https://apps.microsoft.com/detail/9nvfzpv0v0ht?mode=direct"
-const SUPPORT_EMAIL = "support@folo.is"
+const SUPPORT_EMAIL = "support@diting.7373.com.cn"
 const REVIEW_PROMPT_STORAGE_PREFIX = getStorageNS("review-prompt")
 
 export const getDesktopReviewPlatform = () =>

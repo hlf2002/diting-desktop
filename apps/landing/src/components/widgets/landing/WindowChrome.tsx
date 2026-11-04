@@ -26,7 +26,7 @@ export function WindowChrome({
 
         {showTryOnWeb ? (
           <a
-            href="https://app.folo.is"
+            href="https://diting.7373.com.cn"
             target="_blank"
             rel="noreferrer"
             className="ml-auto text-xs  pointer-events-auto text-text-secondary cursor-pointer hover:text-text transition-colors"

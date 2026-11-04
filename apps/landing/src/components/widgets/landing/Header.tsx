@@ -84,14 +84,14 @@ export const LandingHeader: Component = () => {
           {/* Actions */}
           <div className="flex items-center gap-2">
             {/* <Link
-              href="https://github.com/RSSNext/Folo"
+              href="https://github.com/hlf2002/diting-desktop"
               target="_blank"
               rel="noreferrer noopener"
               className={cx(
                 'hidden md:inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition-colors',
                 'border-border bg-background text-text hover:bg-fill-secondary',
               )}
-              aria-label="Star Folo on GitHub"
+              aria-label="Star Diting on GitHub"
             >
               <i className="i-simple-icons-github size-4" aria-hidden />
               <span className="whitespace-nowrap">GitHub Stars</span>
@@ -103,7 +103,7 @@ export const LandingHeader: Component = () => {
             </Link> */}
 
             <Link
-              href="https://app.folo.is"
+              href="https://diting.7373.com.cn"
               target="_blank"
               rel="noreferrer noopener"
             >
@@ -160,14 +160,14 @@ LandingHeader.displayName = 'LandingHeader'
 
 //       <div className="flex flex-col gap-3">
 //         <Link
-//           href="https://github.com/RSSNext/Folo"
+//           href="https://github.com/hlf2002/diting-desktop"
 //           target="_blank"
 //           rel="noreferrer noopener"
 //           className={cx(
 //             'inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors',
 //             'border-border bg-background text-text hover:bg-fill-secondary',
 //           )}
-//           aria-label="Star Folo on GitHub"
+//           aria-label="Star Diting on GitHub"
 //         >
 //           <i className="i-simple-icons-github size-4" aria-hidden />
 //           <span className="whitespace-nowrap">GitHub Stars</span>
@@ -179,7 +179,7 @@ LandingHeader.displayName = 'LandingHeader'
 //         </Link>
 
 //         <Link
-//           href="https://app.folo.is"
+//           href="https://diting.7373.com.cn"
 //           target="_blank"
 //           rel="noreferrer noopener"
 //           className="relative w-full flex"

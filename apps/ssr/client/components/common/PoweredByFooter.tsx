@@ -10,12 +10,12 @@ export const PoweredByFooter: Component = ({ className }) => (
         {/* Left: copyright + legal */}
         <div className="flex flex-col items-center gap-3 sm:items-start">
           <p className="text-center text-xs text-text-tertiary md:text-left">
-            © {new Date().getFullYear()} <a href="https://app.folo.is">Folo</a>. All rights
+            © {new Date().getFullYear()} <a href="https://diting.7373.com.cn">Diting</a>. All rights
             reserved.
           </p>
           <div className="flex items-center justify-center gap-4 md:justify-start">
             <a
-              href="https://folo.is/privacy-policy"
+              href="https://diting.7373.com.cn/privacy-policy"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-text-secondary transition-colors hover:text-text"
@@ -23,7 +23,7 @@ export const PoweredByFooter: Component = ({ className }) => (
               Privacy Policy
             </a>
             <a
-              href="https://folo.is/terms-of-service"
+              href="https://diting.7373.com.cn/terms-of-service"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-text-secondary transition-colors hover:text-text"

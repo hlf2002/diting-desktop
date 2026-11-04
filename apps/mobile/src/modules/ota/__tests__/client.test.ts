@@ -20,7 +20,7 @@ describe("fetchStorePolicy", () => {
 
   it("returns the parsed policy response", async () => {
     const result = await fetchStorePolicy({
-      baseUrl: "https://ota.folo.is",
+      baseUrl: "https://ota.diting.7373.com.cn",
       product: "mobile",
       platform: "ios",
       channel: "production",
@@ -30,7 +30,7 @@ describe("fetchStorePolicy", () => {
     expect(result.action).toBe("block")
     expect(result.targetVersion).toBe("0.4.3")
     expect(fetch).toHaveBeenCalledWith(
-      "https://ota.folo.is/policy?product=mobile&platform=ios&channel=production&installedBinaryVersion=0.4.1",
+      "https://ota.diting.7373.com.cn/policy?product=mobile&platform=ios&channel=production&installedBinaryVersion=0.4.1",
     )
   })
 
@@ -47,7 +47,7 @@ describe("fetchStorePolicy", () => {
 
     await expect(
       fetchStorePolicy({
-        baseUrl: "https://ota.folo.is",
+        baseUrl: "https://ota.diting.7373.com.cn",
         product: "mobile",
         platform: "ios",
         channel: "production",
@@ -69,7 +69,7 @@ describe("fetchStorePolicy", () => {
 
     await expect(
       fetchStorePolicy({
-        baseUrl: "https://ota.folo.is",
+        baseUrl: "https://ota.diting.7373.com.cn",
         product: "mobile",
         platform: "ios",
         channel: "production",

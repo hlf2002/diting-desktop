@@ -144,7 +144,7 @@ const translationRows = async (title: string) => {
     "simctl",
     "get_app_container",
     udid,
-    "is.follow",
+    "cn.com.diting",
     "data",
   ])
   const db = join(container.trim(), "Documents/SQLite/follow.db")

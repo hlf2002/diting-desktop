@@ -1,4 +1,4 @@
-Folo est le lecteur RSS avec IA qui réunit tout ce que vous suivez dans une seule chronologie apaisée, puis vous aide à y voir clair.
+Diting est le lecteur RSS avec IA qui réunit tout ce que vous suivez dans une seule chronologie apaisée, puis vous aide à y voir clair.
 
 Suivez blogs, sites d’actualité, newsletters, podcasts, chaînes vidéo et réseaux sociaux au même endroit. Interrogez l’IA sur vos lectures, obtenez un condensé de toute votre chronologie et laissez résumés et traductions faire le gros du travail.
 
@@ -29,7 +29,7 @@ PARTOUT OÙ VOUS LISEZ
 Abonnements, état de lecture et favoris se synchronisent entre Windows, macOS, Linux, Android, iPhone, iPad et le Web.
 
 OPEN SOURCE ET SANS PUBLICITÉ
-Folo est open source, sous licence AGPL-3.0, et ne contient aucune publicité. Il est développé au grand jour avec une communauté de lecteurs et de développeurs.
+Diting est open source, sous licence AGPL-3.0, et ne contient aucune publicité. Il est développé au grand jour avec une communauté de lecteurs et de développeurs.
 
 FORFAITS
-Un compte gratuit suffit pour utiliser Folo. Les forfaits Basic, Plus et Pro permettent de suivre davantage de flux, relèvent les quotas IA et ajoutent des automatisations comme les tâches IA, les boîtes de réception ou l’utilisation de votre propre clé API.
+Un compte gratuit suffit pour utiliser Diting. Les forfaits Basic, Plus et Pro permettent de suivre davantage de flux, relèvent les quotas IA et ajoutent des automatisations comme les tâches IA, les boîtes de réception ou l’utilisation de votre propre clé API.

@@ -1,4 +1,4 @@
-appId: is.follow
+appId: cn.com.diting
 ---
 - runFlow:
     file: ./dismiss-system-dialogs.yaml

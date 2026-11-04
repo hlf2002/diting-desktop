@@ -1,4 +1,4 @@
-// Brand tokens shared by every store asset. Values follow the folo.is landing
+// Brand tokens shared by every store asset. Values follow the diting.7373.com.cn landing
 // page (apps/landing/src/styles/globals.css) so the listings and the website
 // read as one product.
 

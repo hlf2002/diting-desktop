@@ -62,7 +62,7 @@ export function Login() {
               }}
             >
               <Text className="text-3xl font-semibold">{`${isRegister ? t("signin.sign_up_to") : t("signin.sign_in_to")} `}</Text>
-              <Text className="text-3xl font-bold">Folo</Text>
+              <Text className="text-3xl font-bold">谛听</Text>
             </Text>
             {isEmail ? (
               isRegister ? (
@@ -160,14 +160,14 @@ const TermsText = () => {
       <Text className="text-center text-sm text-secondary-label">{t("login.agree_to")} </Text>
       <View className="flex-row items-center">
         <Pressable
-          onPress={() => Linking.openURL("https://folo.is/terms-of-service")}
+          onPress={() => Linking.openURL("https://diting.7373.com.cn/terms-of-service")}
           className="text-secondary-label"
         >
           <Text className="font-semibold">{t("login.terms")}</Text>
         </Pressable>
         <Text className="text-secondary-label">&nbsp;&&nbsp;</Text>
         <Pressable
-          onPress={() => Linking.openURL("https://folo.is/privacy-policy")}
+          onPress={() => Linking.openURL("https://diting.7373.com.cn/privacy-policy")}
           className="text-secondary-label"
         >
           <Text className="font-semibold">{t("login.privacy")}</Text>

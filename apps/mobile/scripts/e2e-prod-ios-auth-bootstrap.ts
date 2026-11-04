@@ -25,7 +25,7 @@ type CookieValue = {
 
 type CookieMap = Record<string, CookieValue>
 
-const DEFAULT_BUNDLE_ID = "is.follow"
+const DEFAULT_BUNDLE_ID = "cn.com.diting"
 const DEFAULT_PASSWORD = "Password123!"
 const COOKIE_STORAGE_KEY = "follow_secure_store_fallback:follow_auth_cookie"
 const SESSION_TOKEN_STORAGE_KEY = "follow_secure_store_fallback:__Secure-better-auth.session_token"
@@ -39,8 +39,8 @@ const envProfileDefaults = {
     callbackUrl: "http://localhost:2233/login",
   },
   prod: {
-    apiUrl: "https://api.folo.is",
-    callbackUrl: "https://app.folo.is/login",
+    apiUrl: "https://api.diting.7373.com.cn",
+    callbackUrl: "https://app.diting.7373.com.cn/login",
   },
 } as const
 

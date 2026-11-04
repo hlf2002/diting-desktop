@@ -10,7 +10,7 @@ export const Audience: Component = () => {
     () => [
       {
         key: 'researchers',
-        label: 'Folo.is for Researchers',
+        label: 'Diting for Researchers',
         title: (
           <>
             <a
@@ -19,7 +19,7 @@ export const Audience: Component = () => {
               target="_blank"
               rel="noreferrer"
             >
-              Folo.is
+              Diting
             </a>{' '}
             for Researchers
           </>
@@ -29,7 +29,7 @@ export const Audience: Component = () => {
       },
       {
         key: 'builders',
-        label: 'Folo.is for Builders',
+        label: 'Diting for Builders',
         title: (
           <>
             <a
@@ -38,7 +38,7 @@ export const Audience: Component = () => {
               target="_blank"
               rel="noreferrer"
             >
-              Folo.is
+              Diting
             </a>{' '}
             for Builders
           </>
@@ -48,7 +48,7 @@ export const Audience: Component = () => {
       },
       {
         key: 'creators',
-        label: 'Folo.is for Creators',
+        label: 'Diting for Creators',
         title: (
           <>
             <a
@@ -57,7 +57,7 @@ export const Audience: Component = () => {
               target="_blank"
               rel="noreferrer"
             >
-              Folo.is
+              Diting
             </a>{' '}
             for Creators
           </>
@@ -67,7 +67,7 @@ export const Audience: Component = () => {
       },
       {
         key: 'investors',
-        label: 'Folo.is for Investors',
+        label: 'Diting for Investors',
         title: (
           <>
             <a
@@ -76,7 +76,7 @@ export const Audience: Component = () => {
               target="_blank"
               rel="noreferrer"
             >
-              Folo.is
+              Diting
             </a>{' '}
             for Investors
           </>
@@ -191,12 +191,12 @@ export const Audience: Component = () => {
           Made for modern knowledge workers
         </h2>
         <p className="text-pretty text-text-secondary">
-          Folo is shaped by practices that keep you focused: clean timelines,
+          Diting is shaped by practices that keep you focused: clean timelines,
           contextual AI, and performance built in. Switch from scattered tabs to
           signal-first reading.{' '}
           <a
             className="text-accent underline underline-offset-4"
-            href="https://app.folo.is"
+            href="https://diting.7373.com.cn"
             target="_blank"
             rel="noreferrer"
           >
