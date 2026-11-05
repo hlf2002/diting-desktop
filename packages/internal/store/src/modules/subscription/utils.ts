@@ -36,7 +36,11 @@ export const getDefaultCategory = (subscription?: SubscriptionModel) => {
   const isOnboardingFeed = isOnboardingFeedUrl(feed.url)
   if (isOnboardingFeed) return "Onboarding Feeds"
   const siteUrl = getFeedById(feedId)?.siteUrl
-  if (!siteUrl) return null
+  // A feed whose site URL is not known yet (e.g. the first rsshub fetch returned 202 queued and
+  // no siteUrl was stored) must not vanish from the subscription column: group it under a
+  // placeholder category instead of returning null, which drops the feed from the auto-grouped
+  // list entirely.
+  if (!siteUrl) return "Uncategorized"
   const parsed = parseUrl(siteUrl)
   return parsed?.domain ? capitalizeFirstLetter(parsed.domain) : siteUrl
 }
