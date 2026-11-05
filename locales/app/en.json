@@ -323,6 +323,7 @@
   "feed_form.fill_default": "Fill",
   "feed_form.follow": "Follow",
   "feed_form.followed": "🎉 Followed.",
+  "feed_form.followed_fetching": "🎉 Followed. Fetching in the background — entries will appear in 1–15 min.",
   "feed_form.hide_from_timeline": "Hide from Timeline",
   "feed_form.hide_from_timeline_description": "Whether this subscription's entries are visible on your main view timeline.",
   "feed_form.private_follow": "Private Follow",

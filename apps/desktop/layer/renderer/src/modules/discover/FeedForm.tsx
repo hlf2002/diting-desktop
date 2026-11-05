@@ -356,8 +356,10 @@ const FeedInnerForm = ({
       if (feedId) {
         feedQuery.byId({ id: feedId }).invalidate()
       }
-      toast(isEdit ? t("feed_form.updated") : t("feed_form.followed"), {
-        duration: 1000,
+      // New subscriptions fetch in the background (server no longer blocks on the first crawl),
+      // so tell the user entries may take up to 15 min to appear instead of a bare "followed".
+      toast(isEdit ? t("feed_form.updated") : t("feed_form.followed_fetching"), {
+        duration: isEdit ? 1000 : 5000,
       })
 
       onSuccess?.()

@@ -51,9 +51,11 @@ interface FeedItemProps {
   isPreview?: boolean
 }
 
-const FEED_ERROR_INDICATOR_DELAY_MS = 24 * 60 * 60 * 1000
+const FEED_ERROR_INDICATOR_DELAY_MS = 0
 
 const shouldShowFeedErrorIndicator = (errorAt?: string | null) => {
+  // Show the error indicator immediately on the first crawl failure so users can spot and
+  // remove broken feeds. Previously this was a 24h delay, which hid failures that matter.
   if (!errorAt) return false
 
   const errorTime = Date.parse(errorAt)
