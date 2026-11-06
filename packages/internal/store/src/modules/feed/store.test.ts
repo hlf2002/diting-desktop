@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { apiContext } from "../../context"
+import { getSyncModelHandler } from "../../sync/model-registry"
+import type { SyncAction } from "../../sync/types"
 import type { FollowAPI } from "../../types"
 import { findFeedByUrl, getFeedByUrl, getFeedServerId } from "./getter"
 import { feedActions, feedSyncServices, useFeedStore } from "./store"
@@ -59,6 +61,59 @@ describe("feedActions.upsertManyInSession", () => {
     feedActions.upsertManyInSession([feed({ subscriptionCount: 15 })])
 
     expect(useFeedStore.getState().feeds["feed-1"]?.subscriptionCount).toBe(15)
+  })
+})
+
+describe("feed sync model (crawler feed-correction changelog)", () => {
+  beforeEach(() => {
+    useFeedStore.setState({ feeds: {}, resolvedUrls: {} })
+  })
+
+  const applyFeedAction = async (action: Partial<SyncAction>) => {
+    const handler = getSyncModelHandler("feed")
+    expect(handler).toBeDefined()
+    await handler!.apply({
+      model: "feed",
+      modelId: "feed-1",
+      action: "U",
+      data: null,
+      ...action,
+    } as SyncAction)
+  }
+
+  it("overwrites the stale error snapshot with the corrected feed", async () => {
+    feedActions.upsertManyInSession([
+      feed({ title: "rsshub://weibo/user/1892653244", errorAt: "2026-11-05T14:49:24.944Z" }),
+    ])
+
+    await applyFeedAction({
+      data: {
+        id: "feed-1",
+        title: "卢伟冰的微博",
+        url: "https://weibo.com/1892653244/",
+        siteUrl: "https://weibo.com/1892653244/",
+        errorAt: null,
+        errorMessage: null,
+        updatedAt: 1738700000000,
+      },
+    })
+
+    expect(useFeedStore.getState().feeds["feed-1"]).toMatchObject({
+      title: "卢伟冰的微博",
+      siteUrl: "https://weibo.com/1892653244/",
+      errorAt: null,
+      errorMessage: null,
+    })
+  })
+
+  it("ignores non-update actions and data without an id", async () => {
+    feedActions.upsertManyInSession([feed({ title: "Before" })])
+
+    await applyFeedAction({ action: "D", data: { id: "feed-1", title: "Deleted" } })
+    expect(useFeedStore.getState().feeds["feed-1"]?.title).toBe("Before")
+
+    await applyFeedAction({ data: { title: "No id" } })
+    expect(useFeedStore.getState().feeds["feed-1"]?.title).toBe("Before")
   })
 })
 

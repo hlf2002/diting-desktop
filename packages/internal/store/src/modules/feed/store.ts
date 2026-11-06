@@ -6,6 +6,7 @@ import { getDateISOString, isBizId } from "@follow/utils"
 import { api } from "../../context"
 import type { Hydratable, Resetable } from "../../lib/base"
 import { createImmerSetter, createTransaction, createZustandStore } from "../../lib/helper"
+import { registerSyncModel } from "../../sync/model-registry"
 import { whoami } from "../user/getters"
 import type { FeedModel } from "./types"
 
@@ -302,3 +303,14 @@ class FeedSyncServices {
 }
 export const feedSyncServices = new FeedSyncServices()
 export const feedActions = new FeedActions()
+
+// 服务端 crawler 在 feed 修正（title/errorAt/errorMessage 等变化）后写 changelog，
+// 客户端在这里应用 delta：直接 upsert 本地 feed 快照，第一栏的红色错误/URL 标题即可自动恢复。
+registerSyncModel("feed", {
+  apply: async (action) => {
+    if (action.action !== "U") return
+    const feed = action.data as Partial<FeedSchema> | null
+    if (!feed || !feed.id) return
+    await feedActions.upsertMany([feed as FeedSchema])
+  },
+})
