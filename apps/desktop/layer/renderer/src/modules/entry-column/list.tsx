@@ -15,6 +15,7 @@ import { useEventCallback } from "usehooks-ts"
 
 import { useGeneralSettingKey } from "~/atoms/settings/general"
 import { m } from "~/components/common/Motion"
+import { isOverseasBlockedError } from "~/lib/error-parser"
 import { useFeedHeaderTitle } from "~/store/feed/hooks"
 
 import { VirtualRowItem } from "./components/VirtualRowItem"
@@ -49,8 +50,12 @@ export const EntryEmptyList = ({
       {error != null ? (
         <div className="flex -translate-y-6 flex-col items-center justify-center gap-3">
           <i className="i-mgc-warning-cute-re text-3xl text-red" />
-          <span className="text-base">{t("entry_list.load_failed")}</span>
-          {onRetry && (
+          <span className="text-base">
+            {isOverseasBlockedError(error)
+              ? t("entry_list.overseas_blocked")
+              : t("entry_list.load_failed")}
+          </span>
+          {onRetry && !isOverseasBlockedError(error) && (
             <Button variant="outline" isLoading={isRetrying} onClick={onRetry}>
               {t("retry", { ns: "common" })}
             </Button>

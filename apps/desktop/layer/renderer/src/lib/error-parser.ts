@@ -41,6 +41,13 @@ const PAID_RSSHUB_ROUTE_ERROR_CODE = 2013
 export const isPaidRSSHubRouteError = (error: unknown) =>
   error instanceof FollowAPIError && getServerCode(error) === PAID_RSSHUB_ROUTE_ERROR_CODE
 
+/** 服务端海外内容访问控制的拒绝 message（与 diting-server 的 OVERSEAS_DENY_MSG 一致） */
+const OVERSEAS_BLOCKED_MESSAGE = "依据中国大陆地区法律，您无法浏览海外网站信息。"
+
+/** 是否海外内容访问控制拒绝错误（第二栏据此显示「大陆地区无法浏览」，不提供重试） */
+export const isOverseasBlockedError = (error: unknown) =>
+  error instanceof Error && error.message.includes(OVERSEAS_BLOCKED_MESSAGE)
+
 /** What to tell the user about an error the auth client resolved with, translated where it can */
 export const getAuthErrorMessage = (error: AuthClientError | null | undefined) =>
   describeAuthError(error, (key) => t(key, { ns: "common" }))
