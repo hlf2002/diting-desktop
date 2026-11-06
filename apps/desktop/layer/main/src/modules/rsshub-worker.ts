@@ -46,6 +46,18 @@ function isIdle(): boolean {
   }
 }
 
+/**
+ * 探测本地 RSSHub 已配置的登录能力（caps）。
+ * 桌面端 worker 依赖用户本机自启的 RSSHub（127.0.0.1:1200），其登录配置
+ * 从启动 RSSHub 的进程环境变量里读取（launchd plist / systemd 注入）。
+ * 只取「登录类」变量名（含 TOKEN/COOKIE/SECRET/PASSWORD/REFRESHTOKEN/KEY 等），
+ * 值本身不上报，只上报配置项名——服务端据此把需要登录的任务优先分给有能力节点。
+ */
+function detectLocalCaps(): string[] {
+  const loginVarRe = /TOKEN|COOKIE|SECRET|PASSWORD|REFRESHTOKEN|_KEY|_ID|USERNAME|SESSION/i
+  return Object.keys(process.env).filter((k) => loginVarRe.test(k))
+}
+
 /** 每小时配额重置 */
 function checkHourlyQuota(): boolean {
   const now = Date.now()
@@ -55,10 +67,12 @@ function checkHourlyQuota(): boolean {
   return state.tasksThisHour.count < MAX_TASKS_PER_HOUR
 }
 
-/** 从服务器领一个待抓任务 */
+/** 从服务器领一个待抓任务（带本地登录能力 caps，scheduler 优先分配需登录任务） */
 async function claimTask(): Promise<string | null> {
   try {
-    const res = await fetch(`${SERVER_URL}/api/pending`, {
+    const caps = detectLocalCaps()
+    const query = caps.length > 0 ? `?caps=${caps.join(",")}` : ""
+    const res = await fetch(`${SERVER_URL}/api/pending${query}`, {
       signal: AbortSignal.timeout(10_000),
     })
     if (!res.ok) return null
