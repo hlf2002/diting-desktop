@@ -122,6 +122,7 @@
   "words.manage": "マネージ",
   "words.maximize": "最大化",
   "words.minimize": "最小化",
+  "words.need_login_hint": "このソースはログイン資格情報が必要です。取得できるかはフェッチャーのローカルログイン状態に依存します。",
   "words.next": "次へ",
   "words.record": "記録",
   "words.record_one": "記録",

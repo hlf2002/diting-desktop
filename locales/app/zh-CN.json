@@ -326,6 +326,7 @@
   "feed_form.followed_fetching": "🎉 订阅成功，正在后台抓取，条目将在 1~15 分钟内出现",
   "feed_form.hide_from_timeline": "在时间线上隐藏",
   "feed_form.hide_from_timeline_description": "开启后，此订阅将不再显示在主时间线中",
+  "feed_form.need_login_hint": "该源需要登录凭据才能抓取，能否抓到取决于抓取机的本地登录状态。",
   "feed_form.private_follow": "私密订阅",
   "feed_form.private_follow_description": "开启后，此订阅不再显示在个人资料页面。",
   "feed_form.retry": "重试",

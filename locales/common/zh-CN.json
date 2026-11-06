@@ -122,6 +122,7 @@
   "words.manage": "管理",
   "words.maximize": "最大化",
   "words.minimize": "最小化",
+  "words.need_login_hint": "该源需要登录凭据才能抓取，能否抓到取决于抓取机的本地登录状态。",
   "words.next": "下一步",
   "words.record": "记录",
   "words.record_one": "记录",

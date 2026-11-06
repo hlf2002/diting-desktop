@@ -122,6 +122,7 @@
   "words.manage": "Manage",
   "words.maximize": "Maximize",
   "words.minimize": "Minimize",
+  "words.need_login_hint": "This source requires login credentials to fetch. Whether it can be fetched depends on the crawler machine's local login state.",
   "words.next": "Next",
   "words.record": "record",
   "words.record_one": "record",

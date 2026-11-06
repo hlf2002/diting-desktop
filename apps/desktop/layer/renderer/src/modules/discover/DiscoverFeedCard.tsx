@@ -1,10 +1,16 @@
 import { Button } from "@follow/components/ui/button/index.js"
 import { Card, CardContent, CardHeader } from "@follow/components/ui/card/index.jsx"
 import { RelativeTime } from "@follow/components/ui/datetime/index.js"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipTrigger,
+} from "@follow/components/ui/tooltip/index.js"
 import { useIsSubscribed } from "@follow/store/subscription/hooks"
 import { getBackgroundGradient } from "@follow/utils/color"
 import { cn, formatNumber } from "@follow/utils/utils"
-import type { DiscoveryItem, TrendingFeedItem } from "@follow-app/client-sdk"
+import type { DiscoveryItem, FeedDiscoveryResult, TrendingFeedItem } from "@follow-app/client-sdk"
 import type { FC } from "react"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
@@ -16,6 +22,9 @@ import { navigateEntry } from "~/hooks/biz/useNavigateEntry"
 import { useFeedSafeUrl } from "~/hooks/common/useFeedSafeUrl"
 
 import { FollowSummary } from "../feed/feed-summary"
+
+/** 服务端在发现结果里标记「该源需要登录凭据才能抓取」（rsshub 路由反查，SDK 类型未含） */
+type FeedWithNeedLogin = FeedDiscoveryResult & { needLogin?: boolean }
 
 export function FeedCardActions<T extends TrendingFeedItem | DiscoveryItem>({
   item,
@@ -111,7 +120,23 @@ export const DiscoverFeedCard: FC<DiscoverFeedCardProps> = memo(
         )}
       >
         <CardHeader className="p-4 pb-2">
-          <FollowSummary feed={(item.feed || item.list!) as any} docs={item.docs} />
+          <div className="flex items-start gap-2">
+            <FollowSummary
+              feed={(item.feed || item.list!) as any}
+              docs={item.docs}
+              className="min-w-0 flex-1"
+            />
+            {(item.feed as FeedWithNeedLogin | undefined)?.needLogin && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <i className="i-mgc-lock-cute-re mt-1 shrink-0 text-amber-500" />
+                </TooltipTrigger>
+                <TooltipPortal>
+                  <TooltipContent>{t("words.need_login_hint", { ns: "common" })}</TooltipContent>
+                </TooltipPortal>
+              </Tooltip>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="px-4">
           {item.docs ? (

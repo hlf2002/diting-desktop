@@ -3,6 +3,12 @@ import { Card } from "@follow/components/ui/card/index.jsx"
 import { Input } from "@follow/components/ui/input/Input.js"
 import { LoadingCircle } from "@follow/components/ui/loading/index.js"
 import { useScrollElementUpdate } from "@follow/components/ui/scroll-area/hooks.js"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipTrigger,
+} from "@follow/components/ui/tooltip/index.js"
 import { EllipsisHorizontalTextWithTooltip } from "@follow/components/ui/typography/EllipsisWithTooltip.js"
 import { CategoryMap, RSSHubCategories } from "@follow/constants"
 import { cn, formatNumber } from "@follow/utils/utils"
@@ -341,6 +347,7 @@ const RouteItem = memo(
       routeData.path = routeData.path.find((p: string) => p === route) ?? routeData.path[0]
     }
 
+    const { t } = useTranslation()
     const analytics = rsshubAnalyticsData?.[`/${routePrefix}${routeData.path}`]
 
     return (
@@ -359,6 +366,18 @@ const RouteItem = memo(
                     {routeData.name}
                   </EllipsisHorizontalTextWithTooltip>
                   <EllipsisHorizontalTextWithTooltip className="text-xs text-text-secondary">{`rsshub://${routePrefix}${routeData.path}`}</EllipsisHorizontalTextWithTooltip>
+                  {routeData.needLogin && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <i className="i-mgc-lock-cute-re text-xs text-amber-500" />
+                      </TooltipTrigger>
+                      <TooltipPortal>
+                        <TooltipContent>
+                          {t("words.need_login_hint", { ns: "common" })}
+                        </TooltipContent>
+                      </TooltipPortal>
+                    </Tooltip>
+                  )}
                 </div>
               </div>
             </div>

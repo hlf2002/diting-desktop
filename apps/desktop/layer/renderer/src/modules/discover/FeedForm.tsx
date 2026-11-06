@@ -175,6 +175,7 @@ export const FeedForm: Component<{
                         defaultValues,
                         id,
                         url,
+                        needLogin: feedQuery.data?.needLogin,
 
                         onSuccess,
                         isLoading: feedQuery.isLoading,
@@ -249,6 +250,7 @@ const getDefaultFollowView = () => {
 const FeedInnerForm = ({
   defaultValues,
   id,
+  needLogin,
 
   onSuccess,
   subscriptionData,
@@ -261,6 +263,7 @@ const FeedInnerForm = ({
 }: {
   defaultValues?: z.infer<typeof formSchema>
   id?: string
+  needLogin?: boolean
 
   onSuccess?: () => void
   subscriptionData?: {
@@ -406,6 +409,12 @@ const FeedInnerForm = ({
   return (
     <div className="flex flex-1 flex-col gap-y-4">
       <FeedSummary isLoading={isLoading} feed={feed} analytics={analytics} showAnalytics />
+      {needLogin && (
+        <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-600 dark:text-amber-400">
+          <i className="i-mgc-lock-cute-re mt-0.5 shrink-0" />
+          <span>{t("feed_form.need_login_hint")}</span>
+        </div>
+      )}
       <Form {...form}>
         <form
           id="feed-form"

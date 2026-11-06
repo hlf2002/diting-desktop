@@ -220,6 +220,9 @@ class FeedSyncServices {
     return {
       ...res.data,
       ...feed,
+      // 服务端在 GET /feeds 响应顶层标记「该源需登录凭据」（rsshub 路由反查），
+      // 不进 feed 对象/本地库，仅用于预览表单提示
+      needLogin: (res.data as { needLogin?: boolean }).needLogin,
     }
   }
 
