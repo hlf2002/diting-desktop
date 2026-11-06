@@ -163,6 +163,9 @@ const seedCursor = (lastSyncId: number, calibratedAt = Date.now()) => {
   syncMetaStore.set("lastSyncId", String(lastSyncId))
   syncMetaStore.set("unreadCalibratedAt", String(calibratedAt))
   syncMetaStore.set("subscriptionsCalibratedAt", String(calibratedAt))
+  // A bootstrapped client has loaded every registered model in full; the feed model keeps
+  // its snapshot fresh through the delta feed, so no full refetch is due.
+  syncMetaStore.set("bootstrapped:feed", "1")
 }
 
 const deltaResponse = (

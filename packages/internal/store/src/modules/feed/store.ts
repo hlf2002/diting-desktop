@@ -6,7 +6,9 @@ import { getDateISOString, isBizId } from "@follow/utils"
 import { api } from "../../context"
 import type { Hydratable, Resetable } from "../../lib/base"
 import { createImmerSetter, createTransaction, createZustandStore } from "../../lib/helper"
+import { apiMorph } from "../../morph/api"
 import { registerSyncModel } from "../../sync/model-registry"
+import { isSyncEngineBootstrapping } from "../../sync/sync-status"
 import { whoami } from "../user/getters"
 import type { FeedModel } from "./types"
 
@@ -315,5 +317,15 @@ registerSyncModel("feed", {
     const feed = action.data as Partial<FeedSchema> | null
     if (!feed || !feed.id) return
     await feedActions.upsertMany([feed as FeedSchema])
+  },
+  bootstrap: async () => {
+    // 没有 feed handler 的旧会话会把 feed 修正 changelog 静默跳过（lastSyncId 照常推进、
+    // 不重放），本地快照从此停留在旧的错误值（红色 URL 标题）。sync-engine 在模型被跳过
+    // 时会删除 bootstrapped 标记，这里靠全量拉订阅（响应带 feeds）补齐本地快照。
+    // 全量 bootstrap 流程里 subscriptionSyncService.fetch() 已更新过 feeds，跳过避免重复。
+    if (isSyncEngineBootstrapping()) return
+    const { data } = await api().subscriptions.get()
+    const { collections } = apiMorph.toSubscription(data)
+    if (collections.feeds.length > 0) await feedActions.upsertMany(collections.feeds)
   },
 })

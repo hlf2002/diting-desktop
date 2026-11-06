@@ -29,6 +29,9 @@ export const setSyncEngineBootstrapping = (next: boolean) => {
  */
 export const willSyncEngineDeliver = () => active || bootstrapping
 
+/** Whether the engine is currently loading the full snapshots (bootstrap). */
+export const isSyncEngineBootstrapping = () => bootstrapping
+
 /**
  * The parts of the sync engine that hooks and services need. They are reached through this
  * module for the same reason: no imports, so nothing ends up in an import cycle.
