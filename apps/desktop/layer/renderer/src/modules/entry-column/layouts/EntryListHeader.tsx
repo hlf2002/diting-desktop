@@ -228,7 +228,9 @@ export const EntryListHeader: FC<{
                   tooltip={t("entry_list_header.refresh")}
                   onClick={() => {
                     onBeforeRefresh?.()
-                    void refreshFeed()
+                    // 服务端 /feeds/refresh 是异步入队（BullMQ），成功后立即重新拉列表，
+                    // 否则列表永远不更新，用户点刷新「没反应」
+                    void refreshFeed().then(() => refetch())
                   }}
                 >
                   <RotatingRefreshIcon isRefreshing={isPending} />
