@@ -293,6 +293,155 @@ export interface BrowserLoginResult {
   loginUrl: string
 }
 
+/* ------------------------- Q助理扫码登录 ------------------------- */
+
+const QZHULI_AUTHORIZE_PATH = "/api/auth/qzhuli/authorize"
+const QZHULI_STATUS_PATH = "/api/auth/qzhuli/status"
+const QZHULI_POLL_INTERVAL_MS = 2000
+
+const qzhuliErrorMessages: Record<string, string> = {
+  denied: "You denied the authorization request. Please run `diting-cli login` again.",
+  state_invalid: "The sign-in session is missing or expired. Please run `diting-cli login` again.",
+  reused: "This authorization was already used. Please run `diting-cli login` again.",
+  server_error: "The server failed to complete sign-in. Please try again later.",
+}
+
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
+
+export interface QzhuliScanResult {
+  token: string
+  user?: { id: string; name: string | null; image: string | null; handle: string | null } | null
+}
+
+/**
+ * 谛听唯一登录入口是 Q助理扫码（服务端关闭了邮箱密码，且未启用 one-time-token 插件，
+ * 官方 Folo 的 /login 浏览器登录页在生产不存在）。
+ *
+ * 流程复用桌面端的 /api/auth/qzhuli/*：
+ *   1. GET /api/auth/qzhuli/authorize?mode=app -> { state, authorizeUrl }
+ *   2. 用系统浏览器打开 authorizeUrl，用户用 Q助理 App 扫码确认
+ *   3. 轮询 GET /api/auth/qzhuli/status?state=... 直到 success（拿到 session token）
+ */
+export const loginWithQzhuliScan = async (
+  options: BrowserLoginOptions,
+): Promise<QzhuliScanResult> => {
+  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS
+  const onStatus = options.onStatus ?? (() => {})
+
+  if (timeoutMs <= 0) {
+    throw new CLIError("INVALID_ARGUMENT", "Browser login timeout must be greater than 0.")
+  }
+
+  let response: Response
+  try {
+    response = await fetch(
+      `${resolveAuthEndpointUrl(options.apiUrl, QZHULI_AUTHORIZE_PATH)}?mode=app`,
+      { method: "GET" },
+    )
+  } catch (error) {
+    throw toLoginNetworkError(options.apiUrl, error, "Failed to start Q助理 sign-in")
+  }
+
+  if (!response.ok) {
+    const message = await extractErrorMessage(response)
+    throw new CLIError(
+      `HTTP_${response.status}`,
+      message || `Authorize request failed with HTTP ${response.status}.`,
+    )
+  }
+
+  const body = await readJSONBody(response, options.apiUrl)
+  const data = isRecord(body) && isRecord(body.data) ? body.data : null
+  const state = data && typeof data.state === "string" ? data.state : null
+  const authorizeUrl = data && typeof data.authorizeUrl === "string" ? data.authorizeUrl : null
+
+  if (!state || !authorizeUrl) {
+    throw toInvalidResponseError(
+      options.apiUrl,
+      "started Q助理 sign-in without state or authorizeUrl",
+    )
+  }
+
+  onStatus(`Open this URL to sign in with Q助理: ${authorizeUrl}`)
+  try {
+    openBrowser(authorizeUrl)
+    onStatus("Waiting for QR code confirmation in Q助理...")
+  } catch (error) {
+    onStatus((error as Error).message)
+    onStatus("Waiting for QR code confirmation...")
+  }
+
+  const deadline = Date.now() + timeoutMs
+
+  while (Date.now() < deadline) {
+    let statusResponse: Response
+    try {
+      statusResponse = await fetch(
+        `${resolveAuthEndpointUrl(options.apiUrl, QZHULI_STATUS_PATH)}?state=${encodeURIComponent(state)}`,
+        { method: "GET" },
+      )
+    } catch (error) {
+      throw toLoginNetworkError(options.apiUrl, error, "Failed to check sign-in status")
+    }
+
+    if (!statusResponse.ok) {
+      const message = await extractErrorMessage(statusResponse)
+      throw new CLIError(
+        `HTTP_${statusResponse.status}`,
+        message || `Status check failed with HTTP ${statusResponse.status}.`,
+      )
+    }
+
+    const statusBody = await readJSONBody(statusResponse, options.apiUrl)
+    const statusData = isRecord(statusBody) && isRecord(statusBody.data) ? statusBody.data : null
+    const status = statusData && typeof statusData.status === "string" ? statusData.status : null
+
+    if (status === "success") {
+      const token = statusData && typeof statusData.token === "string" ? statusData.token : null
+      if (!token) {
+        throw toInvalidResponseError(options.apiUrl, "finished sign-in without a session token")
+      }
+      const user = statusData && isRecord(statusData.user) ? statusData.user : null
+      return {
+        token,
+        user: user as {
+          id: string
+          name: string | null
+          image: string | null
+          handle: string | null
+        } | null,
+      }
+    }
+
+    if (status === "error") {
+      const errorKind =
+        statusData && typeof statusData.error === "string" ? statusData.error : undefined
+      throw new CLIError(
+        "UNAUTHORIZED",
+        (errorKind && qzhuliErrorMessages[errorKind]) || "Q助理 sign-in failed.",
+      )
+    }
+
+    if (status === "expired") {
+      throw new CLIError(
+        "UNAUTHORIZED",
+        "The Q助理 sign-in expired. Please run `diting-cli login` again.",
+      )
+    }
+
+    if (status !== "pending") {
+      throw toInvalidResponseError(options.apiUrl, "answered an unknown sign-in status")
+    }
+
+    await sleep(QZHULI_POLL_INTERVAL_MS)
+  }
+
+  throw new CLIError(
+    "TIMEOUT",
+    "Timed out waiting for Q助理 sign-in. Please run `diting-cli login` again.",
+  )
+}
+
 export const loginWithBrowser = async (
   options: BrowserLoginOptions,
 ): Promise<BrowserLoginResult> => {

@@ -3,7 +3,12 @@ import { Agent, request } from "node:http"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { DEFAULT_VALUES } from "../../../packages/internal/shared/src/env.common"
-import { loginWithBrowser, resolveBrowserLoginToken, resolveCLILoginUrl } from "./browser-login"
+import {
+  loginWithBrowser,
+  loginWithQzhuliScan,
+  resolveBrowserLoginToken,
+  resolveCLILoginUrl,
+} from "./browser-login"
 import { CLIError } from "./output"
 
 vi.mock("node:child_process", () => ({
@@ -286,5 +291,123 @@ describe("browser login helpers", () => {
     await expect(resolveBrowserLoginToken("not-a-url", "token")).rejects.toEqual(
       new CLIError("INVALID_ARGUMENT", "Invalid API URL: not-a-url"),
     )
+  })
+})
+
+describe("Q助理 scan login", () => {
+  const jsonResponse = (body: unknown) =>
+    new Response(JSON.stringify(body), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    })
+
+  it("authorizes, polls and returns the session token", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse({
+          code: 0,
+          data: {
+            state: "s1",
+            authorizeUrl: "https://qzhuli.example/authorize?state=s1",
+            mode: "app",
+          },
+        }),
+      )
+      .mockResolvedValueOnce(jsonResponse({ code: 0, data: { status: "pending" } }))
+      .mockResolvedValueOnce(
+        jsonResponse({
+          code: 0,
+          data: { status: "success", token: "session-token", user: { id: "user-1" } },
+        }),
+      )
+    vi.stubGlobal("fetch", fetchMock)
+
+    let loginUrl: string | undefined
+    const result = await loginWithQzhuliScan({
+      apiUrl: DEFAULT_VALUES.PROD.API_URL,
+      timeoutMs: 5_000,
+      onStatus: (message) => {
+        const prefix = "Open this URL to sign in with Q助理: "
+        if (message.startsWith(prefix)) {
+          loginUrl = message.slice(prefix.length)
+        }
+      },
+    })
+
+    expect(result.token).toBe("session-token")
+    expect(result.user).toEqual({ id: "user-1" })
+    expect(loginUrl).toBe("https://qzhuli.example/authorize?state=s1")
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      "https://diting.7373.com.cn/api/auth/qzhuli/authorize?mode=app",
+      expect.objectContaining({ method: "GET" }),
+    )
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      "https://diting.7373.com.cn/api/auth/qzhuli/status?state=s1",
+      expect.objectContaining({ method: "GET" }),
+    )
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      3,
+      "https://diting.7373.com.cn/api/auth/qzhuli/status?state=s1",
+      expect.objectContaining({ method: "GET" }),
+    )
+  })
+
+  it("fails fast when the user denies the request", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse({
+          code: 0,
+          data: {
+            state: "s2",
+            authorizeUrl: "https://qzhuli.example/authorize?state=s2",
+            mode: "app",
+          },
+        }),
+      )
+      .mockResolvedValueOnce(jsonResponse({ code: 0, data: { status: "error", error: "denied" } }))
+    vi.stubGlobal("fetch", fetchMock)
+
+    await expect(
+      loginWithQzhuliScan({ apiUrl: DEFAULT_VALUES.PROD.API_URL, timeoutMs: 5_000 }),
+    ).rejects.toThrowError(/denied the authorization request/)
+  })
+
+  it("fails when the sign-in session expires", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse({
+          code: 0,
+          data: {
+            state: "s3",
+            authorizeUrl: "https://qzhuli.example/authorize?state=s3",
+            mode: "app",
+          },
+        }),
+      )
+      .mockResolvedValueOnce(jsonResponse({ code: 0, data: { status: "expired" } }))
+    vi.stubGlobal("fetch", fetchMock)
+
+    await expect(
+      loginWithQzhuliScan({ apiUrl: DEFAULT_VALUES.PROD.API_URL, timeoutMs: 5_000 }),
+    ).rejects.toThrowError(/expired/)
+  })
+
+  it("surfaces an authorize failure with the server message", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(
+      new Response(JSON.stringify({ code: 1, message: "Q助理登录未配置" }), {
+        status: 503,
+        headers: { "content-type": "application/json" },
+      }),
+    )
+    vi.stubGlobal("fetch", fetchMock)
+
+    await expect(
+      loginWithQzhuliScan({ apiUrl: DEFAULT_VALUES.PROD.API_URL, timeoutMs: 5_000 }),
+    ).rejects.toEqual(new CLIError("HTTP_503", "Q助理登录未配置"))
   })
 })

@@ -1,7 +1,7 @@
 import type { Command } from "commander"
 
 import { parsePositiveInt } from "../args"
-import { loginWithBrowser, resolveBrowserLoginToken } from "../browser-login"
+import { loginWithQzhuliScan, resolveBrowserLoginToken } from "../browser-login"
 import { fetchAuthSession, getGlobalOptions, normalizeToken } from "../client"
 import { runCommand } from "../command"
 import { clearToken, getConfigPath, updateConfig } from "../config"
@@ -30,7 +30,7 @@ export const resolveLoginToken = async ({
     }
   }
 
-  const browserLogin = await loginWithBrowser({
+  const browserLogin = await loginWithQzhuliScan({
     apiUrl,
     timeoutMs,
     onStatus,
@@ -121,7 +121,7 @@ const registerLoginCommand = (program: Command, name: string, description: strin
   program
     .command(name)
     .description(description)
-    .option("--token <token>", "Session or one-time token from Folo")
+    .option("--token <token>", "Session token from Diting")
     .option(
       "--timeout <seconds>",
       "Browser login timeout in seconds (default: 180)",
