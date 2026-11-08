@@ -10,6 +10,10 @@ export const [, , useDiscoverSearchData, , getDiscoverSearchData, setDiscoverSea
 
 export const useHasDiscoverSearchData = () => {
   return useAtomValue(
-    useMemo(() => selectAtom(internalAtom, (data) => Object.keys(data).length > 0), []),
+    useMemo(
+      () =>
+        selectAtom(internalAtom, (data) => Object.values(data).some((items) => items.length > 0)),
+      [],
+    ),
   )
 }

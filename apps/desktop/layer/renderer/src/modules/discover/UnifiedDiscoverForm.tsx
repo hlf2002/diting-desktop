@@ -489,7 +489,7 @@ export function UnifiedDiscoverForm() {
               ? t("discover.search.list_results", { count: discoverSearchData?.length || 0 })
               : t("discover.search.results", { count: discoverSearchData?.length || 0 })}
 
-            {discoverSearchData && discoverSearchData.length > 0 && (
+            {mutation.isSuccess || (discoverSearchData && discoverSearchData.length > 0) ? (
               <MotionButtonBase
                 className="flex cursor-button items-center justify-between gap-2 hover:text-accent"
                 type="button"
@@ -501,7 +501,7 @@ export function UnifiedDiscoverForm() {
               >
                 <i className="i-mgc-close-cute-re" />
               </MotionButtonBase>
-            )}
+            ) : null}
           </div>
         )}
         <div className="space-y-4 text-sm">
