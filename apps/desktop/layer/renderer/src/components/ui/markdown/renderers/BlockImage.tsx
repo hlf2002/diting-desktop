@@ -31,10 +31,21 @@ export const MarkdownBlockImage = (
     props.src ? record[props.src] : null,
   )
 
+  // When the HTML carries explicit width/height attributes, the AspectRatio
+  // logic inside Media owns the rendered size. Strip any hard-coded
+  // width/height from the inline style, otherwise sources like Weibo
+  // (`style="width: 2048px;height: 2730px"`) blow out the container and push
+  // the image to one side. Keep other style properties intact.
+  const style =
+    props.width && props.height
+      ? { ...(props.style as React.CSSProperties | undefined), width: undefined, height: undefined }
+      : props.style
+
   return (
     <Media
       type="photo"
       {...props}
+      style={style}
       loading="lazy"
       src={src}
       height={media?.height || props.height}

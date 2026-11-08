@@ -102,4 +102,59 @@ describe("MarkdownBlockImage", () => {
       "https://example.com/image.png",
     )
   })
+
+  test("strips hard-coded width/height from inline style when width/height attributes exist", async () => {
+    ;({ container, root } = await renderComponent(
+      <MarkdownRenderActionContext
+        value={{
+          ensureAndRenderTimeStamp: () => false,
+          isAudio: () => false,
+          onImageContextMenu: undefined,
+          transformUrl: (url) => url,
+        }}
+      >
+        <MarkdownBlockImage
+          src="https://tvax1.sinaimg.cn/mw2000/test.jpg"
+          width={2048}
+          height={2730}
+          style={{ width: "2048px", height: "2730px", margin: "auto" }}
+        />
+      </MarkdownRenderActionContext>,
+    ))
+
+    const image = container?.querySelector('[data-testid="media"]') as HTMLElement & {
+      style: CSSStyleDeclaration
+    }
+    expect(image).not.toBeNull()
+    // Other style properties are preserved…
+    expect(image.style.margin).toBe("auto")
+    // …but the hard-coded width/height are dropped so Media's AspectRatio owns the size
+    expect(image.style.width).toBe("")
+    expect(image.style.height).toBe("")
+  })
+
+  test("keeps inline style untouched when width/height attributes are absent", async () => {
+    ;({ container, root } = await renderComponent(
+      <MarkdownRenderActionContext
+        value={{
+          ensureAndRenderTimeStamp: () => false,
+          isAudio: () => false,
+          onImageContextMenu: undefined,
+          transformUrl: (url) => url,
+        }}
+      >
+        <MarkdownBlockImage
+          src="https://example.com/icon.png"
+          style={{ width: "1rem", height: "1rem" }}
+        />
+      </MarkdownRenderActionContext>,
+    ))
+
+    const image = container?.querySelector('[data-testid="media"]') as HTMLElement & {
+      style: CSSStyleDeclaration
+    }
+    expect(image).not.toBeNull()
+    expect(image.style.width).toBe("1rem")
+    expect(image.style.height).toBe("1rem")
+  })
 })
