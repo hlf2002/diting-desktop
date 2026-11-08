@@ -4,7 +4,8 @@ import { ResponsiveSelect } from "@follow/components/ui/select/responsive.js"
 import { Skeleton } from "@follow/components/ui/skeleton/index.jsx"
 import { FeedViewType, getView, getViewList } from "@follow/constants"
 import { cn } from "@follow/utils/utils"
-import { useQuery } from "@tanstack/react-query"
+import type { GetTrendingFeedsRequest } from "@follow-app/client-sdk"
+import { useInfiniteQuery } from "@tanstack/react-query"
 import { cloneElement, useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -75,19 +76,29 @@ export function Trending({
   const [selectedView, setSelectedView] = useState<View>("all")
   const viewOptions = useMemo(() => buildViewOptions(), [])
 
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["trending", lang, selectedView],
-    queryFn: async () => {
-      return await followClient.api.trending.getFeeds({
-        language: trendingLanguage === "all" ? undefined : trendingLanguage,
-        view: selectedView === "all" ? undefined : Number(selectedView),
-        limit,
-      })
-    },
-    meta: {
-      persist: true,
-    },
-  })
+  const { data, isLoading, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["trending", lang, selectedView],
+      queryFn: async ({ pageParam }) => {
+        return await followClient.api.trending.getFeeds({
+          language: trendingLanguage === "all" ? undefined : trendingLanguage,
+          view: selectedView === "all" ? undefined : Number(selectedView),
+          limit,
+          offset: pageParam,
+        } as GetTrendingFeedsRequest & { offset: number })
+      },
+      initialPageParam: 0,
+      getNextPageParam: (lastPage, allPages) => {
+        const count = lastPage.data?.length ?? 0
+        if (count < limit) return undefined
+        return allPages.length * limit
+      },
+      meta: {
+        persist: true,
+      },
+    })
+
+  const items = useMemo(() => data?.pages.flatMap((page) => page.data ?? []) ?? [], [data])
 
   useEffect(() => {
     if (!isLoading) {
@@ -203,43 +214,61 @@ export function Trending({
             {tCommon("retry")}
           </Button>
         </div>
-      ) : !isLoading && !data?.data?.length ? (
+      ) : !isLoading && !items.length ? (
         <p className="py-16 text-center text-sm text-text-secondary">
           {t("discover.trending_empty")}
         </p>
       ) : (
-        <div className={cn("grid grid-cols-2 gap-x-7 gap-y-3", narrow && "grid-cols-1")}>
-          {isLoading ? (
-            <>
-              {Array.from({ length: limit }).map((_, index) => (
-                <Skeleton key={index} className="h-[146px] w-[386px]" />
-              ))}
-            </>
-          ) : (
-            data?.data?.map((item, index) => (
-              <div className="relative m-4" key={item.feed.id}>
-                <TrendingFeedCard item={item} />
-                <div className="pointer-events-none absolute inset-0 -left-5 -top-6 overflow-hidden rounded-xl">
-                  <div
-                    className={cn(
-                      "center absolute -left-5 -top-6 size-12 rounded-br-3xl pl-4 pt-5 text-xs",
-                      index < 3
-                        ? cn(
-                            "bg-accent text-white",
-                            index === 0 && "bg-accent",
-                            index === 1 && "bg-accent/90",
-                            index === 2 && "bg-accent/80",
-                          )
-                        : "bg-material-opaque",
-                    )}
-                  >
-                    {index + 1}
+        <>
+          <div className={cn("grid grid-cols-2 gap-x-7 gap-y-3", narrow && "grid-cols-1")}>
+            {isLoading ? (
+              <>
+                {Array.from({ length: limit }).map((_, index) => (
+                  <Skeleton key={index} className="h-[146px] w-[386px]" />
+                ))}
+              </>
+            ) : (
+              items.map((item, index) => (
+                <div className="relative m-4" key={item.feed.id}>
+                  <TrendingFeedCard item={item} />
+                  <div className="pointer-events-none absolute inset-0 -left-5 -top-6 overflow-hidden rounded-xl">
+                    <div
+                      className={cn(
+                        "center absolute -left-5 -top-6 size-12 rounded-br-3xl pl-4 pt-5 text-xs",
+                        index < 3
+                          ? cn(
+                              "bg-accent text-white",
+                              index === 0 && "bg-accent",
+                              index === 1 && "bg-accent/90",
+                              index === 2 && "bg-accent/80",
+                            )
+                          : "bg-material-opaque",
+                      )}
+                    >
+                      {index + 1}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              ))
+            )}
+          </div>
+          {hasNextPage && (
+            <div className="flex justify-center py-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => void fetchNextPage()}
+                disabled={isFetchingNextPage}
+              >
+                {isFetchingNextPage ? (
+                  <i className="i-mgc-loading-cute-re animate-spin" />
+                ) : (
+                  t("discover.load_more")
+                )}
+              </Button>
+            </div>
           )}
-        </div>
+        </>
       )}
     </div>
   )

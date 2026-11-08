@@ -81,6 +81,7 @@
   "discover.invalid_rsshub_route": "RSSHub ルートが無効です",
   "discover.keyword_input_placeholder": "キーワードまたは URL を入力...",
   "discover.keyword_required": "URL またはキーワードを入力してください。",
+  "discover.load_more": "さらに読み込む",
   "discover.no_results": "検索に一致するフィードが見つかりませんでした。",
   "discover.preview": "プレビュー",
   "discover.route_param_required": "このパラメーターは必須です。",

@@ -33,6 +33,7 @@
   "discover.category.university": "大學資訊",
   "discover.empty.no_content": "此分類下暫無內容",
   "discover.empty.try_another_category_or_language": "請嘗試選擇其他分類或語言",
+  "discover.load_more": "載入更多",
   "discover.search.results_one": "找到 {{count}} 筆結果",
   "discover.search.results_other": "找到 {{count}} 筆結果",
   "discover.search.results_zero": "搜尋結果為空",

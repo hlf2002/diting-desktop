@@ -33,6 +33,7 @@
   "discover.category.university": "大学",
   "discover.empty.no_content": "このカテゴリーにはコンテンツがありません。",
   "discover.empty.try_another_category_or_language": "別のカテゴリーまたは言語を選択してください。",
+  "discover.load_more": "さらに読み込む",
   "discover.search.results_one": "{{count}} 件の結果が見つかりました",
   "discover.search.results_other": "{{count}} 件の結果が見つかりました",
   "discover.search.results_zero": "結果が見つかりませんでした。",

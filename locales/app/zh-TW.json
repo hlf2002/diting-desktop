@@ -81,6 +81,7 @@
   "discover.invalid_rsshub_route": "RSSHub 路由無效",
   "discover.keyword_input_placeholder": "輸入關鍵字或 URL...",
   "discover.keyword_required": "請輸入 URL 或關鍵字。",
+  "discover.load_more": "載入更多",
   "discover.no_results": "找不到符合搜尋條件的 RSS 摘要。",
   "discover.preview": "預覽",
   "discover.route_param_required": "此參數為必填。",

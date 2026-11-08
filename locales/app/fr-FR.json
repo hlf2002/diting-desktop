@@ -81,6 +81,7 @@
   "discover.invalid_rsshub_route": "Route RSSHub non valide",
   "discover.keyword_input_placeholder": "Saisissez des mots-clés ou une URL...",
   "discover.keyword_required": "Saisissez une URL ou un mot-clé.",
+  "discover.load_more": "Charger plus",
   "discover.no_results": "Aucun flux trouvé pour votre recherche.",
   "discover.preview": "Aperçu",
   "discover.route_param_required": "Ce paramètre est obligatoire.",

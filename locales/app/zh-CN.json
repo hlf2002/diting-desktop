@@ -81,6 +81,7 @@
   "discover.invalid_rsshub_route": "RSSHub 路由无效",
   "discover.keyword_input_placeholder": "输入关键词或 URL...",
   "discover.keyword_required": "请输入链接或关键词。",
+  "discover.load_more": "加载更多",
   "discover.no_results": "没有找到与搜索匹配的订阅源。",
   "discover.preview": "预览",
   "discover.route_param_required": "此参数为必填项。",

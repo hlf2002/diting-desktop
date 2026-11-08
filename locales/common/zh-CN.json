@@ -33,6 +33,7 @@
   "discover.category.university": "大学通知",
   "discover.empty.no_content": "此分类下暂无内容",
   "discover.empty.try_another_category_or_language": "请尝试选择其他分类或语言",
+  "discover.load_more": "加载更多",
   "discover.search.results_one": "找到 {{count}} 条结果",
   "discover.search.results_other": "找到 {{count}} 条结果",
   "discover.search.results_zero": "搜索结果为空",

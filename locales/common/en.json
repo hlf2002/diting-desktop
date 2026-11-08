@@ -33,6 +33,7 @@
   "discover.category.university": "University",
   "discover.empty.no_content": "No content found in this category.",
   "discover.empty.try_another_category_or_language": "Try selecting another category or language.",
+  "discover.load_more": "Load more",
   "discover.search.results_one": "Found {{count}} result",
   "discover.search.results_other": "Found {{count}} results",
   "discover.search.results_zero": "No results found.",
