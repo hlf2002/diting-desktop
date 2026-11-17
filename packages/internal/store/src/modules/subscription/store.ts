@@ -49,6 +49,34 @@ const catchUpBeforeRename = async () => {
   clearTimeout(timer)
 }
 
+/**
+ * 新订阅 rsshub:// 源后通知桌面端 main 立即抓（B 通道，秒级）。
+ * 只走 Electron 桌面端（window.electron.ipcRenderer 存在）；web/mobile/无 IPC 静默跳过，
+ * launchd worker 轮询（A 通道）与服务端巡检兜底。channel 由 electron-ipc-decorator
+ * 按 `${groupName}.${methodName}` 生成，见 AuthService.groupName="auth"。
+ */
+async function notifyLocalWorkerFetchNow(feedUrl?: string | null) {
+  if (!feedUrl || !feedUrl.startsWith("rsshub://")) return
+  const route = `/${feedUrl.slice("rsshub://".length).replace(/^\/+/, "")}`
+  try {
+    // 只走 Electron 桌面端：web/mobile 渲染进程没有 window.electron（无需 IN_ELECTRON 宏，
+    // 该宏依赖 vite define，vitest 单测环境会 ReferenceError）
+    const ipc = (
+      globalThis as unknown as {
+        window?: {
+          electron?: {
+            ipcRenderer?: { invoke: (channel: string, ...args: unknown[]) => Promise<unknown> }
+          }
+        }
+      }
+    ).window?.electron?.ipcRenderer
+    if (!ipc) return
+    await ipc.invoke("auth.fetchRSSHubRouteNow", route)
+  } catch {
+    // IPC 失败不影响订阅主流程：静默，worker 兜底
+  }
+}
+
 export interface SubscriptionState {
   /**
    * Key: FeedId, ListId, `inbox/${inboxId}`
@@ -617,6 +645,8 @@ class SubscriptionSyncService {
     if (data.feed) {
       feedActions.upsertMany([data.feed as any])
       tracker.subscribe({ feedId: data.feed.id, view: subscription.view })
+      // 新订阅 rsshub 源 → 桌面端立即抓（秒级），不用等服务端巡检
+      void notifyLocalWorkerFetchNow(data.feed.url)
     }
 
     if (data.list) {

@@ -26,12 +26,13 @@ import {
 } from "../../lib/cli-session-sync"
 import { deleteNotificationsToken, updateNotificationsToken } from "../../lib/user"
 import { logger } from "../../logger"
-import { startRSSHubWorker, stopRSSHubWorker } from "../../modules/rsshub-worker"
+import { fetchRouteNow, startRSSHubWorker, stopRSSHubWorker } from "../../modules/rsshub-worker"
 
 export class AuthService extends IpcService {
   static override readonly groupName = "auth"
 
   private pendingTwoFactorCookieHeader: string | null = null
+  private sessionToken: string | null = null
 
   private async getManagedCookieHeader(): Promise<string> {
     const mainWindow = WindowManager.getMainWindow()
@@ -236,6 +237,7 @@ export class AuthService extends IpcService {
 
   @IpcMethod()
   async sessionChanged(preferredToken?: string): Promise<void> {
+    this.sessionToken = preferredToken ?? null
     await updateNotificationsToken()
 
     // Q助理登录成功 → 启动 RSSHub P2P 抓取 worker
@@ -254,7 +256,18 @@ export class AuthService extends IpcService {
   }
 
   @IpcMethod()
+  async fetchRSSHubRouteNow(route: string): Promise<void> {
+    // 新订阅 rsshub:// 源后立即抓（B 通道，秒级）：renderer 订阅成功 → IPC → 本地抓 + 落库
+    if (!this.sessionToken) {
+      logger.warn("[rsshub-worker] 无 session token，跳过立即抓")
+      return
+    }
+    await fetchRouteNow(route, this.sessionToken)
+  }
+
+  @IpcMethod()
   async signOut(): Promise<void> {
+    this.sessionToken = null
     // 登出 → 停止 RSSHub P2P 抓取 worker
     stopRSSHubWorker()
 

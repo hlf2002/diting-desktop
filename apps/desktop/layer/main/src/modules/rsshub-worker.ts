@@ -15,6 +15,7 @@
  * - 单个用户单日最多处理 N 个任务（以后改成服务端配额）
  */
 
+import { env } from "@follow/shared/env.desktop"
 import { powerMonitor } from "electron"
 
 const SERVER_URL = "https://rsshub.7373.com.cn"
@@ -136,6 +137,58 @@ async function pollOnce() {
     console.log(`[rsshub-worker] 完成: ${route} (${result.itemCount} items)`)
   } else {
     console.warn(`[rsshub-worker] 回传失败: ${route}`)
+  }
+}
+
+/**
+ * 订阅后立即抓（B 通道，秒级）：用户刚订阅 rsshub:// 源时由 renderer 触发。
+ * 本地 RSSHub 抓 → 回传 scheduler 缓存 → 通知 diting-server 立即落库。
+ * 与轮询不同：不占每小时配额、不要求用户空闲（订阅动作本身就是用户操作）。
+ */
+async function notifyFeedFetched(route: string, token: string): Promise<void> {
+  try {
+    const apiUrl = env.VITE_API_URL || "https://diting.7373.com.cn"
+    const res = await fetch(`${apiUrl}/api/worker/feed-fetched`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ route }),
+      signal: AbortSignal.timeout(20_000),
+    })
+    if (!res.ok) {
+      console.warn(`[rsshub-worker] 通知落库失败: ${route} (${res.status})`)
+    }
+  } catch (err) {
+    console.warn(`[rsshub-worker] 通知落库异常: ${route}`, err)
+  }
+}
+
+export async function fetchRouteNow(
+  route: string,
+  bearerToken?: string,
+): Promise<{ ok: boolean; itemCount?: number }> {
+  try {
+    const result = await fetchLocalRSSHub(route)
+    if (!result) {
+      console.warn(`[rsshub-worker] 立即抓失败(本地 RSSHub 不可用): ${route}`)
+      return { ok: false }
+    }
+
+    const posted = await postResult(route, result.xml, result.itemCount)
+    if (!posted) {
+      console.warn(`[rsshub-worker] 立即抓回传失败: ${route}`)
+      return { ok: false, itemCount: result.itemCount }
+    }
+
+    // 通知 diting-server 立即落库（session 通道，Bearer 用户 token）
+    if (bearerToken) {
+      await notifyFeedFetched(route, bearerToken)
+    }
+
+    console.log(`[rsshub-worker] 立即抓完成: ${route} (${result.itemCount} items)`)
+    return { ok: true, itemCount: result.itemCount }
+  } catch (err) {
+    console.warn(`[rsshub-worker] 立即抓异常: ${route}`, err)
+    return { ok: false }
   }
 }
 
