@@ -327,6 +327,7 @@
   "feed_form.followed": "🎉 跟隨成功。",
   "feed_form.hide_from_timeline": "從時間軸隱藏",
   "feed_form.hide_from_timeline_description": "開啟後，此訂閱將不再顯示在主時間軸中",
+  "feed_form.latest_entries": "最近更新",
   "feed_form.private_follow": "私人跟隨",
   "feed_form.private_follow_description": "啟用後，此跟隨將不再顯示於個人資料頁面上。",
   "feed_form.retry": "重試",

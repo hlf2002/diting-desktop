@@ -203,6 +203,8 @@ class FeedSyncServices {
     const res = await api().feeds.get({
       id,
       url,
+      // 预览时把最近条目带给添加订阅源页面（服务端 GET /feeds 支持 1-12，默认 4）
+      entriesLimit: 10,
     })
 
     const nonce = Math.random().toString(36).slice(2, 15)

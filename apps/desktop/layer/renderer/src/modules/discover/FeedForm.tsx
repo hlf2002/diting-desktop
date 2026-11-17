@@ -39,6 +39,7 @@ import { z } from "zod"
 
 import { useIsPaymentEnabled } from "~/atoms/server-configs"
 import { Autocomplete } from "~/components/ui/auto-completion"
+import { RelativeTime } from "~/components/ui/datetime"
 import {
   useCurrentModal,
   useIsInModal,
@@ -413,6 +414,31 @@ const FeedInnerForm = ({
         <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-600 dark:text-amber-400">
           <i className="i-mgc-lock-cute-re mt-0.5 shrink-0" />
           <span>{t("feed_form.need_login_hint")}</span>
+        </div>
+      )}
+      {entries && entries.length > 0 && (
+        <div className="flex flex-col rounded-xl border border-border/80 bg-fill-tertiary/40">
+          <div className="flex items-center justify-between px-3 pb-1 pt-2.5">
+            <span className="text-xs font-medium text-text-secondary">
+              {t("feed_form.latest_entries")}
+            </span>
+          </div>
+          <div className="flex flex-col px-1 pb-2">
+            {entries.map((entry, index) => (
+              <a
+                key={entry.id ?? entry.guid ?? index}
+                href={entry.url ?? undefined}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="flex min-w-0 items-center gap-2 rounded-lg px-2 py-1.5 duration-200 hover:bg-fill-quaternary"
+              >
+                <span className="truncate text-sm text-text">{entry.title}</span>
+                <span className="ml-auto shrink-0 pl-3 text-xs text-text-tertiary">
+                  <RelativeTime date={entry.publishedAt} displayAbsoluteTimeAfterDay={Infinity} />
+                </span>
+              </a>
+            ))}
+          </div>
         </div>
       )}
       <Form {...form}>
