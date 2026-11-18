@@ -39,10 +39,15 @@ export const EntriesProvider: React.FC<React.PropsWithChildren> = ({ children })
   const onResetRef = useRef<(() => void) | null>(null)
   const { view } = useRouteParams()
 
+  // Stable identity: useFocusEntries's effect depends on `onReset`, and an inline
+  // arrow would re-trigger a scroll-to-top on every provider re-render (clicking
+  // an entry, loading the next page, etc.).
+  const onResetStable = useCallback(() => {
+    onResetRef.current?.()
+  }, [])
+
   const entries = useEntriesByView({
-    onReset: () => {
-      onResetRef.current?.()
-    },
+    onReset: onResetStable,
   })
 
   const { type: syncType } = entries

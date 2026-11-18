@@ -150,7 +150,15 @@ function getEntryIdsFromMultiplePlace(...entryIds: Array<string[] | undefined | 
  * the entry store (entries that are still present locally), newest first, and
  * paginated in the same way as the local list.
  */
-const useFocusEntries = ({ onReset }: { onReset?: () => void }) => {
+const useFocusEntries = ({
+  onReset,
+  enabled,
+}: {
+  onReset?: () => void
+  /** Only the focus timeline should reset its scroll (mount time); the regular
+   *  views must never scroll to top when the provider re-renders. */
+  enabled: boolean
+}) => {
   const focusEntryIds = useFocusEntryIds()
 
   const allEntries = useEntryStore(
@@ -178,10 +186,11 @@ const useFocusEntries = ({ onReset }: { onReset?: () => void }) => {
   }, [entries.length, allEntries])
 
   useEffect(() => {
+    if (!enabled) return
     nextFrame(() => {
       onReset?.()
     })
-  }, [onReset])
+  }, [enabled, onReset])
 
   const refetch = useCallback(async () => {
     setPage(0)
@@ -365,7 +374,7 @@ export const useEntriesByView = ({ onReset }: { onReset?: () => void }) => {
 
   const remoteQuery = useRemoteEntries()
   const localQuery = useLocalEntries()
-  const focusQuery = useFocusEntries({ onReset })
+  const focusQuery = useFocusEntries({ onReset, enabled: isFocus })
 
   useFetchEntryContentByStream(isFocus ? focusQuery.entriesIds : remoteQuery.entriesIds)
 
@@ -387,7 +396,7 @@ export const useEntriesByView = ({ onReset }: { onReset?: () => void }) => {
         onReset?.()
       })
     }
-  }, [isFetchingFirstPage, query.queryKey])
+  }, [isFetchingFirstPage, onReset, query.queryKey])
 
   const groupByDate = useGeneralSettingKey("groupByDate")
   const groupedCounts: number[] | undefined = useMemo(() => {
