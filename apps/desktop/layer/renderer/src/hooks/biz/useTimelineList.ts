@@ -4,7 +4,7 @@ import { useSubscriptionStore } from "@follow/store/subscription/store"
 import { useMemo } from "react"
 
 import { useUISettingKey } from "~/atoms/settings/ui"
-import { ROUTE_VIEW_ALL } from "~/constants/app"
+import { ROUTE_VIEW_ALL, ROUTE_VIEW_FOCUS } from "~/constants/app"
 
 import { getTimelineIdByView, parseView } from "./useRouteParams"
 
@@ -108,4 +108,14 @@ export const useTimelineList = (options?: {
 
     return result
   }, [hidden, options?.hidden, options?.visible, options?.withAll, visible])
+}
+
+/**
+ * The timeline tab bar order: the always-on "重点关注内容" tab comes first,
+ * followed by the configured view tabs. The focus tab is device-local and never
+ * part of the `timelineTabs` customization.
+ */
+export const useTimelineTabs = () => {
+  const timelineList = useTimelineList({ withAll: true, visible: true })
+  return useMemo(() => [ROUTE_VIEW_FOCUS, ...timelineList], [timelineList])
 }

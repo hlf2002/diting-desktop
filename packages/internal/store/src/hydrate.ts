@@ -5,6 +5,7 @@ import { actionActions } from "./modules/action/store"
 import { collectionActions } from "./modules/collection/store"
 import { entryActions } from "./modules/entry/store"
 import { feedActions } from "./modules/feed/store"
+import { focusActions } from "./modules/focus/store"
 import { imageActions } from "./modules/image/store"
 import { inboxActions } from "./modules/inbox/store"
 import { listActions } from "./modules/list/store"
@@ -31,6 +32,7 @@ const hydrates: Hydratable[] = [
   translationActions,
   imageActions,
   actionActions,
+  focusActions,
 ]
 
 export const hydrateDatabaseToStore = async (options?: { migrateDatabase?: boolean }) => {

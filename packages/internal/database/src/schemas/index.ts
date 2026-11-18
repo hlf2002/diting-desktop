@@ -235,3 +235,15 @@ export const syncMetaTable = sqliteTable("sync_meta", (t) => ({
   key: t.text("key").notNull().primaryKey(),
   value: t.text("value").notNull(),
 }))
+
+/**
+ * Local "focus" marks: entries that the on-device AI flagged as matching the user's
+ * focus areas. `analyzed_at` records that an entry has been scored (whether it matched
+ * or not) so it is not re-scored on every refresh; `is_focus` is the match result.
+ * Device-local only — never synced to the server.
+ */
+export const focusEntriesTable = sqliteTable("focus_entries", (t) => ({
+  entryId: t.text("entry_id").notNull().primaryKey(),
+  isFocus: t.integer("is_focus", { mode: "boolean" }).notNull().default(false),
+  analyzedAt: t.integer("analyzed_at", { mode: "timestamp_ms" }),
+}))

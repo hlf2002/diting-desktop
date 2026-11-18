@@ -16,6 +16,7 @@ import { takeAuthRedirectError } from "./lib/auth-redirect-error"
 import { ipcServices } from "./lib/client"
 import { appLog } from "./lib/log"
 import { Titlebar } from "./modules/app/Titlebar"
+import { useFocusAnalyzer } from "./modules/focus/useFocusAnalyzer"
 import { RootProviders } from "./providers/root-providers"
 
 function App() {
@@ -35,8 +36,14 @@ function App() {
       )}
 
       <AppLayer />
+      <FocusAnalyzerMount />
     </RootProviders>
   )
+}
+
+const FocusAnalyzerMount = () => {
+  useFocusAnalyzer()
+  return null
 }
 
 const AppLayer = () => {

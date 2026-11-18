@@ -1,6 +1,7 @@
 import { useDroppable } from "@dnd-kit/core"
 import { ActionButton } from "@follow/components/ui/button/index.js"
 import { FeedViewType, getView } from "@follow/constants"
+import { useFocusEntryIds } from "@follow/store/focus/hooks"
 import { useUnreadByView } from "@follow/store/unread/hooks"
 import { cn } from "@follow/utils/utils"
 import type { FC } from "react"
@@ -10,6 +11,7 @@ import { useTranslation } from "react-i18next"
 import { MenuItemText, useShowContextMenu } from "~/atoms/context-menu"
 import { setUISetting, useUISettingKey } from "~/atoms/settings/ui"
 import { FocusablePresets } from "~/components/common/Focusable"
+import { ROUTE_VIEW_FOCUS } from "~/constants"
 import { useNavigateEntry } from "~/hooks/biz/useNavigateEntry"
 import { parseView, useRouteParamsSelector } from "~/hooks/biz/useRouteParams"
 import { useTimelineList } from "~/hooks/biz/useTimelineList"
@@ -48,6 +50,17 @@ export function SubscriptionTabButton({
   }, [navigateToTimeline, timelineId])
 
   const view = parseView(timelineId)
+
+  if (timelineId === ROUTE_VIEW_FOCUS) {
+    return (
+      <FocusSwitchButton
+        timelineId={timelineId}
+        isActive={isActive}
+        setActive={setActive}
+        shortcut={shortcut}
+      />
+    )
+  }
 
   if (view === FeedViewType.All) {
     return (
@@ -135,6 +148,53 @@ const useSubscriptionTabContextMenu = ({
   })
 
   return contextMenuProps
+}
+
+const FocusSwitchButton: FC<{
+  timelineId: string
+  isActive: boolean
+  setActive: () => void
+  shortcut: string
+}> = ({ timelineId, isActive, setActive, shortcut }) => {
+  const { t } = useTranslation()
+  const showSidebarUnreadCount = useUISettingKey("sidebarShowUnreadCount")
+  const focusCount = useFocusEntryIds().size
+
+  return (
+    <ActionButton
+      data-testid="timeline-tab-focus"
+      aria-pressed={isActive}
+      shortcutScope={FocusablePresets.isNotFloatingLayerScope}
+      key={timelineId}
+      tooltip={t("sidebar.timeline_tabs.focus")}
+      shortcut={shortcut}
+      className={cn(
+        isActive && "text-accent",
+        "flex h-11 w-8 shrink-0 grow flex-col items-center gap-1 text-[1.375rem]",
+        ELECTRON ? "hover:!bg-theme-item-hover" : "",
+      )}
+      onClick={(e) => {
+        startTransition(() => {
+          setActive()
+        })
+        e.stopPropagation()
+      }}
+    >
+      <i className={cn("i-mgc-star-cute-fi", isActive ? "" : "opacity-80")} />
+      {showSidebarUnreadCount ? (
+        <div className="text-[0.625rem] font-medium leading-none">
+          {focusCount > 99 ? <span className="-mr-0.5">99+</span> : focusCount}
+        </div>
+      ) : (
+        <i
+          className={cn(
+            "i-mgc-round-cute-fi text-[0.25rem]",
+            focusCount ? (isActive ? "opacity-100" : "opacity-60") : "opacity-0",
+          )}
+        />
+      )}
+    </ActionButton>
+  )
 }
 
 const ViewAllSwitchButton: FC<{

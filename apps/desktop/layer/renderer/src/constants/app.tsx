@@ -8,6 +8,7 @@ export const I18N_LOCALE_KEY = getStorageNS("I18N_LOCALE")
 
 /// Route Keys
 export const ROUTE_VIEW_ALL = "all"
+export const ROUTE_VIEW_FOCUS = "focus"
 export const ROUTE_FEED_PENDING = "all"
 export const ROUTE_ENTRY_PENDING = "pending"
 export const ROUTE_FEED_IN_FOLDER = "folder-"

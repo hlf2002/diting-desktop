@@ -11,6 +11,7 @@ import {
 } from "@follow/store/entry/hooks"
 import { entryActions, entrySyncServices, useEntryStore } from "@follow/store/entry/store"
 import type { UseEntriesReturn } from "@follow/store/entry/types"
+import { useFocusEntryIds } from "@follow/store/focus/hooks"
 import { useFolderFeedsByFeedId } from "@follow/store/subscription/hooks"
 import { unreadSyncService } from "@follow/store/unread/store"
 import { nextFrame } from "@follow/utils"
@@ -22,7 +23,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { useGeneralSettingKey } from "~/atoms/settings/general"
-import { ROUTE_FEED_PENDING } from "~/constants/app"
+import { ROUTE_FEED_PENDING, ROUTE_VIEW_FOCUS } from "~/constants/app"
 import { useFeature } from "~/hooks/biz/useFeature"
 import { useRouteParams } from "~/hooks/biz/useRouteParams"
 import { toastFetchError } from "~/lib/error-parser"
@@ -142,6 +143,75 @@ const useRemoteEntries = (): RemoteEntriesReturn => {
 
 function getEntryIdsFromMultiplePlace(...entryIds: Array<string[] | undefined | null>) {
   return entryIds.find((ids) => ids?.length) ?? []
+}
+
+/**
+ * The "重点关注内容" timeline: device-local focus marks. The list is built from
+ * the entry store (entries that are still present locally), newest first, and
+ * paginated in the same way as the local list.
+ */
+const useFocusEntries = ({ onReset }: { onReset?: () => void }) => {
+  const focusEntryIds = useFocusEntryIds()
+
+  const allEntries = useEntryStore(
+    useCallback(
+      (state) => {
+        const ids = [...focusEntryIds].filter((id) => Boolean(state.data[id]))
+        return ids.sort(
+          (a, b) =>
+            (state.data[b]?.publishedAt?.getTime() ?? 0) -
+            (state.data[a]?.publishedAt?.getTime() ?? 0),
+        )
+      },
+      [focusEntryIds],
+    ),
+  )
+
+  const [page, setPage] = useState(0)
+  const pageSize = 30
+  const entries = useMemo(() => {
+    return allEntries?.slice(0, (page + 1) * pageSize) || []
+  }, [allEntries, page, pageSize])
+
+  const hasNext = useMemo(() => {
+    return entries.length < (allEntries?.length || 0)
+  }, [entries.length, allEntries])
+
+  useEffect(() => {
+    nextFrame(() => {
+      onReset?.()
+    })
+  }, [onReset])
+
+  const refetch = useCallback(async () => {
+    setPage(0)
+  }, [])
+
+  const fetchNextPage = useCallback(
+    debounce(async () => {
+      setPage(page + 1)
+    }, 300),
+    [page],
+  )
+
+  return {
+    entriesIds: entries,
+    hasNext,
+    refetch,
+    fetchNextPage: fetchNextPage as () => Promise<void>,
+    isLoading: false,
+    isRefetching: false,
+    isReady: true,
+    isFetchingNextPage: false,
+    isFetching: false,
+    hasNextPage: hasNext,
+    error: null,
+    type: "local" as const,
+    groupedCounts: undefined,
+    isOffline: false,
+    fetchedTime: undefined,
+    queryKey: undefined,
+  }
 }
 
 const useLocalEntries = (): UseEntriesReturn => {
@@ -290,12 +360,14 @@ const useLocalEntries = (): UseEntriesReturn => {
 }
 
 export const useEntriesByView = ({ onReset }: { onReset?: () => void }) => {
-  const { view, listId } = useRouteParams()
+  const { view, listId, timelineId } = useRouteParams()
+  const isFocus = timelineId === ROUTE_VIEW_FOCUS
 
   const remoteQuery = useRemoteEntries()
   const localQuery = useLocalEntries()
+  const focusQuery = useFocusEntries({ onReset })
 
-  useFetchEntryContentByStream(remoteQuery.entriesIds)
+  useFetchEntryContentByStream(isFocus ? focusQuery.entriesIds : remoteQuery.entriesIds)
 
   // If remote data is not available, we use the local data, get the local data length
   // FIXME: remote first, then local store data
@@ -304,7 +376,7 @@ export const useEntriesByView = ({ onReset }: { onReset?: () => void }) => {
   // then we have no way to incrementally update the data.
   // We need to add an interface to incrementally update the data based on the version hash.
 
-  const query = remoteQuery.isReady ? remoteQuery : localQuery
+  const query = isFocus ? focusQuery : remoteQuery.isReady ? remoteQuery : localQuery
   const entryIds: string[] = query.entriesIds
 
   const isFetchingFirstPage = remoteQuery.isFetching && !remoteQuery.isFetchingNextPage
@@ -353,8 +425,13 @@ export const useEntriesByView = ({ onReset }: { onReset?: () => void }) => {
   return {
     ...query,
 
-    type: remoteQuery.isReady ? ("remote" as const) : ("local" as const),
+    type: isFocus
+      ? ("local" as const)
+      : remoteQuery.isReady
+        ? ("remote" as const)
+        : ("local" as const),
     refetch: useCallback(() => {
+      if (isFocus) return focusQuery.refetch()
       // Until the remote query has succeeded the local query is shown, but a
       // refresh still has to retry the remote request.
       const promise = remoteQuery.isReady
@@ -362,14 +439,14 @@ export const useEntriesByView = ({ onReset }: { onReset?: () => void }) => {
         : Promise.all([remoteQuery.refetch(), localQuery.refetch()]).then(() => {})
       void unreadSyncService.refresh({ calibrate: true })
       return promise
-    }, [localQuery, remoteQuery]),
+    }, [focusQuery, isFocus, localQuery, remoteQuery]),
     entriesIds: entryIds,
-    groupedCounts,
-    isFetching: remoteQuery.isFetching,
-    isFetchingNextPage: remoteQuery.isFetchingNextPage,
-    isLoading: remoteQuery.isLoading,
-    isOffline: remoteQuery.isOffline === true,
-    error: remoteQuery.error,
+    groupedCounts: isFocus ? undefined : groupedCounts,
+    isFetching: isFocus ? false : remoteQuery.isFetching,
+    isFetchingNextPage: isFocus ? false : remoteQuery.isFetchingNextPage,
+    isLoading: isFocus ? false : remoteQuery.isLoading,
+    isOffline: isFocus ? false : remoteQuery.isOffline === true,
+    error: isFocus ? null : remoteQuery.error,
   }
 }
 

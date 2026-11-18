@@ -30,6 +30,7 @@ export const EntryEmptyList = ({
   offline,
   isRetrying,
   onRetry,
+  focusEmpty,
   ...props
 }: HTMLMotionProps<"div"> & {
   ref?: React.Ref<HTMLDivElement | null>
@@ -38,9 +39,24 @@ export const EntryEmptyList = ({
   offline?: boolean
   isRetrying?: boolean
   onRetry?: () => void
+  /** The 重点关注内容 timeline is empty (device-local focus marks). */
+  focusEmpty?: boolean
 }) => {
   const unreadOnly = useGeneralSettingKey("unreadOnly")
   const { t } = useTranslation()
+  if (focusEmpty) {
+    return (
+      <m.div
+        className="absolute -mt-6 flex size-full grow flex-col items-center justify-center gap-2 text-zinc-400"
+        {...props}
+        ref={ref}
+      >
+        <i className="i-mgc-star-cute-re text-3xl text-text-tertiary" />
+        <span className="text-base">{t("entry_list.focus_empty")}</span>
+        <span className="text-sm text-text-tertiary">{t("entry_list.focus_empty_hint")}</span>
+      </m.div>
+    )
+  }
   return (
     <m.div
       className="absolute -mt-6 flex size-full grow flex-col items-center justify-center gap-2 text-zinc-400"

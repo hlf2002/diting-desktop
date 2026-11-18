@@ -4,6 +4,7 @@ import { useCollectionEntry, useIsEntryStarred } from "@follow/store/collection/
 import { useEntry } from "@follow/store/entry/hooks"
 import type { EntryModel } from "@follow/store/entry/types"
 import { useFeedById } from "@follow/store/feed/hooks"
+import { useFocusEntryIds } from "@follow/store/focus/hooks"
 import { useInboxById } from "@follow/store/inbox/hooks"
 import { clsx, cn, formatEstimatedMins, formatTimeToSeconds, isSafari } from "@follow/utils/utils"
 import { useMemo } from "react"
@@ -72,9 +73,11 @@ export function ListItem({
 }) {
   const isMobile = useMobile()
   const entry = useEntry(entryId, entrySelector)
+  const { t } = useTranslation()
 
   const isInCollection = useIsEntryStarred(entryId)
   const collectionCreatedAt = useCollectionEntry(entryId)?.createdAt
+  const isFocus = useFocusEntryIds().has(entryId)
 
   const isRead = useEntryIsRead(entryId)
 
@@ -213,6 +216,14 @@ export function ListItem({
           </EllipsisHorizontalTextWithTooltip>
           <span className="shrink-0">·</span>
           <span className="shrink-0">{!!displayTime && <RelativeTime date={displayTime} />}</span>
+          {isFocus && (
+            <span
+              data-testid="entry-focus-badge"
+              className="shrink-0 rounded bg-accent/10 px-1 py-px text-[9px] font-medium text-accent"
+            >
+              {t("entry_list.focus_badge")}
+            </span>
+          )}
         </div>
         <div
           className={cn(

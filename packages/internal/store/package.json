@@ -41,6 +41,11 @@
       "require": "./src/modules/feed/*.ts",
       "import": "./src/modules/feed/*.ts"
     },
+    "./focus/*": {
+      "types": "./src/modules/focus/*.ts",
+      "require": "./src/modules/focus/*.ts",
+      "import": "./src/modules/focus/*.ts"
+    },
     "./hydrate": {
       "types": "./src/hydrate.ts",
       "require": "./src/hydrate.ts",

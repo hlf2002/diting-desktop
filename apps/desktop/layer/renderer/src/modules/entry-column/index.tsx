@@ -15,7 +15,12 @@ import { useTranslation } from "react-i18next"
 import { useGeneralSettingKey } from "~/atoms/settings/general"
 import { Focusable } from "~/components/common/Focusable"
 import { FeedNotFound } from "~/components/errors/FeedNotFound"
-import { FEED_COLLECTION_LIST, HotkeyScope, ROUTE_FEED_PENDING } from "~/constants"
+import {
+  FEED_COLLECTION_LIST,
+  HotkeyScope,
+  ROUTE_FEED_PENDING,
+  ROUTE_VIEW_FOCUS,
+} from "~/constants"
 import { useNavigateEntry } from "~/hooks/biz/useNavigateEntry"
 import { useRouteParams, useRouteParamsSelector } from "~/hooks/biz/useRouteParams"
 import { useFeedQuery } from "~/queries/feed"
@@ -101,6 +106,7 @@ function EntryColumnContent() {
     feedId: routeFeedId,
     isPendingEntry,
     isCollection,
+    timelineId,
   } = useRouteParams()
 
   const entry = useEntry(activeEntryId, (state) => {
@@ -289,6 +295,7 @@ function EntryColumnContent() {
               offline={state.isOffline}
               isRetrying={state.isFetching}
               onRetry={actions.refetch}
+              focusEmpty={timelineId === ROUTE_VIEW_FOCUS}
             />
           )
         ) : (

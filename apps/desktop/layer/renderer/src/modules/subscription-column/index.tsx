@@ -27,7 +27,7 @@ import { HotkeyScope } from "~/constants"
 import { useBackHome } from "~/hooks/biz/useNavigateEntry"
 import { useReduceMotion } from "~/hooks/biz/useReduceMotion"
 import { parseView, useRouteParamsSelector } from "~/hooks/biz/useRouteParams"
-import { useTimelineList } from "~/hooks/biz/useTimelineList"
+import { useTimelineTabs } from "~/hooks/biz/useTimelineList"
 import { useSettingModal } from "~/modules/settings/modal/useSettingModal"
 
 import { WindowUnderBlur } from "../../components/ui/background"
@@ -64,10 +64,7 @@ export function SubscriptionColumn({
   usePrefetchUnread()
 
   const carouselRef = useRef<HTMLDivElement>(null)
-  const timelineList = useTimelineList({
-    withAll: true,
-    visible: true,
-  })
+  const timelineList = useTimelineTabs()
 
   const routeParams = useRouteParamsSelector((s) => ({
     timelineId: s.timelineId,
@@ -204,7 +201,7 @@ export function SubscriptionColumn({
 const SwipeWrapper: FC<{ active: string; children: React.JSX.Element[] }> = memo(
   ({ children, active }) => {
     const reduceMotion = useReduceMotion()
-    const timelineList = useTimelineList({ withAll: true, visible: true })
+    const timelineList = useTimelineTabs()
     const viewIndex = timelineList.indexOf(active)
 
     const feedColumnWidth = useUISettingKey("feedColWidth")
@@ -257,7 +254,7 @@ const SwipeWrapper: FC<{ active: string; children: React.JSX.Element[] }> = memo
 )
 
 const TabsRow: FC = () => {
-  const timelineList = useTimelineList({ withAll: true, visible: true })
+  const timelineList = useTimelineTabs()
 
   return (
     <div className="flex h-11 items-center px-1 text-xl text-text-secondary">
