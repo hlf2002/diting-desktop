@@ -15,6 +15,8 @@ export interface FocusAnalysisResult {
   matchedIds: string[]
   /** Every id that was actually scored (matched or not). */
   analyzedIds: string[]
+  /** Ids that could not be scored (network/provider errors) — caller should retry them. */
+  failedIds: string[]
   /** True when the analysis was skipped (no criteria / no AI config), so the caller can decide. */
   skipped: boolean
 }
@@ -125,14 +127,15 @@ export const analyzeEntriesForFocus = async (
   candidates: FocusCandidate[],
 ): Promise<FocusAnalysisResult> => {
   const criteria = extractPlainText(getAISettings().personalizePrompt)
-  if (!criteria) return { matchedIds: [], analyzedIds: [], skipped: true }
+  if (!criteria) return { matchedIds: [], analyzedIds: [], failedIds: [], skipped: true }
 
   const provider = pickProvider()
-  if (!provider) return { matchedIds: [], analyzedIds: [], skipped: true }
+  if (!provider) return { matchedIds: [], analyzedIds: [], failedIds: [], skipped: true }
 
   const results: FocusAnalysisResult = {
     matchedIds: [],
     analyzedIds: [],
+    failedIds: [],
     skipped: false,
   }
 
@@ -161,6 +164,7 @@ export const analyzeEntriesForFocus = async (
         })
         if (!response.ok) {
           console.error("[focus-analyzer] provider request failed", response.status)
+          results.failedIds.push(...batch.map((entry) => entry.id))
           continue
         }
         const data = (await response.json()) as {
@@ -172,9 +176,10 @@ export const analyzeEntriesForFocus = async (
         clearTimeout(timeout)
       }
     } catch (error) {
-      // Transient network/provider errors: leave the batch unscored so a later
-      // trigger with fresh entries retries it.
+      // Transient network/provider errors: report the batch as failed so the
+      // caller can put it back on the queue and retry on the next trigger.
       console.error("[focus-analyzer] request failed", error)
+      results.failedIds.push(...batch.map((entry) => entry.id))
       continue
     }
 

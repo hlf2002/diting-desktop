@@ -57,9 +57,11 @@ export const PersonalizePromptSection = () => {
       setAISetting("personalizePrompt", savedPrompt)
       // Re-score the most recent entries so the change shows up in the
       // 重点关注 tab right away, not only when new entries arrive.
-      // Only fire when the stored value actually changed to avoid re-scoring
-      // the same batch repeatedly.
-      if (savedPrompt !== aiSettings.personalizePrompt) {
+      // Fire on every save with a non-empty prompt (not only when the value
+      // changed): the user clicking 保存 expects the backfill to run, and
+      // opening the editor after a JSON->plain-text migration always looks
+      // unchanged even though the stored value differs.
+      if (savedPrompt) {
         setRetroTrigger((v) => v + 1)
       }
       toast.success(t("personalize.saved"))

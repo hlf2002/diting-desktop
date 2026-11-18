@@ -72,6 +72,13 @@ export const useFocusAnalyzer = () => {
           pendingRef.current.unshift(...batch)
           break
         }
+        if (result.failedIds && result.failedIds.length > 0) {
+          // Provider/network errors: put the whole batch back and stop draining.
+          // It will be retried on the next enqueue; otherwise a single bad
+          // response would permanently drop the batch and the tab stays empty.
+          pendingRef.current.unshift(...batch)
+          break
+        }
         if (result.analyzedIds.length > 0) {
           focusActions.markAnalyzedInSession(result.analyzedIds, result.matchedIds)
           await focusActions.persistAnalyzed(result.analyzedIds, result.matchedIds)
