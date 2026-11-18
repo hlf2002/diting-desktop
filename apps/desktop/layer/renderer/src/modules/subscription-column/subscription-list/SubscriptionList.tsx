@@ -43,6 +43,7 @@ import { FeedItem, ListItemAutoHideUnread } from "../FeedItem"
 import { useShouldFreeUpSpace } from "../hook"
 import { SortableFeedList, SortByAlphabeticalInbox, SortByAlphabeticalList } from "../sort-by"
 import { EmptyFeedList, SubscriptionLoadError } from "./EmptyFeedList"
+import { FocusItem } from "./FocusItem"
 import { ListHeader } from "./ListHeader"
 import { StarredItem } from "./StarredItem"
 import type { SubscriptionProps } from "./SubscriptionListGuard"
@@ -265,6 +266,7 @@ const SubscriptionImpl = ({
         viewportClassName={cn("!px-1", shouldFreeUpSpace && "!overflow-visible")}
         rootClassName={cn("h-full", shouldFreeUpSpace && "overflow-visible")}
       >
+        <FocusItem />
         <StarredItem view={view} />
         {(hasListData || (isListPreview && listId)) && (
           <>
