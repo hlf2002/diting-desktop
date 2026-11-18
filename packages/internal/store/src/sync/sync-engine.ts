@@ -156,6 +156,8 @@ class SyncEngine implements Resetable {
   private intervalTimer: ReturnType<typeof setInterval> | null = null
   private listenersAttached = false
   private detachQueueListener: (() => void) | null = null
+  /** 本次会话是否已在启动（launch）时校准过订阅/feed 快照（每启动一次） */
+  private launchCalibrated = false
 
   getLastSyncId() {
     return this.lastSyncId
@@ -392,6 +394,7 @@ class SyncEngine implements Resetable {
     this.subscriptionsCalibratedAt = 0
     this.lastPullFinishedAt = 0
     this.unhandledModels.clear()
+    this.launchCalibrated = false
     this.pendingNewEntryViews.clear()
     this.pendingNewestEntryAt = 0
     setSyncEngineActive(false)
@@ -439,6 +442,19 @@ class SyncEngine implements Resetable {
 
     // After the delta, so a snapshot taken now is never overwritten by an older action.
     await this.bootstrapRegisteredModels()
+
+    // 每次启动（launch pull）校准一次订阅/feed 快照：本地 SQLite 的 feed 快照可能因错过
+    // 服务端 feed 修正 changelog 而残留旧值（第一栏红色 URL 标题），delta 不重放，
+    // 只有 bootstrap（退出登录重登）或 24h 校准才能恢复。这里用全量拉取覆盖本地快照，
+    // 让每次启动都能自动对齐服务端数据。bootstrap 路径（lastSyncId 为 null）已在
+    // bootstrap() 里全量拉过，不会走到这里。
+    if (reason === "launch" && !this.launchCalibrated) {
+      this.launchCalibrated = true
+      await this.calibrateSubscriptions().catch((error) => {
+        console.error("[sync-engine] failed to calibrate subscriptions at launch", error)
+      })
+    }
+
     await this.finishPull(summary, reason)
   }
 
