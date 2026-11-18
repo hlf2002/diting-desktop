@@ -22,7 +22,7 @@
 
   --fo-text-primary: 0 0% 80%;
 
-  --fo-item-active: theme(colors.neutral.600/0.4);
+  --fo-item-active: theme(colors.neutral.500/0.5);
   --fo-item-hover: theme(colors.neutral.700/0.3);
 
   --fo-inactive: 0 0% 50%;

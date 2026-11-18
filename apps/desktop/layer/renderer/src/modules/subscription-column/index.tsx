@@ -20,7 +20,7 @@ import { useRootContainerElement } from "~/atoms/dom"
 import { useIsInMASReview } from "~/atoms/server-configs"
 import { setTimelineColumnShow, useSubscriptionColumnShow } from "~/atoms/sidebar"
 import { Focusable } from "~/components/common/Focusable"
-import { HotkeyScope } from "~/constants"
+import { HotkeyScope, ROUTE_VIEW_FOCUS } from "~/constants"
 import { useBackHome } from "~/hooks/biz/useNavigateEntry"
 import { parseView, useRouteParamsSelector } from "~/hooks/biz/useRouteParams"
 import { useTimelineTabs } from "~/hooks/biz/useTimelineList"
@@ -61,6 +61,12 @@ export function SubscriptionColumn({
 
   const carouselRef = useRef<HTMLDivElement>(null)
   const timelineList = useTimelineTabs()
+  // 顶部 tab 栏不展示「重点关注」（ROUTE_VIEW_FOCUS）：重点关注只通过底部订阅列表的
+  // FocusItem 进入。SwipeWrapper 仍用完整 timelineList 渲染 focus 视图内容。
+  const tabList = useMemo(
+    () => timelineList.filter((id) => id !== ROUTE_VIEW_FOCUS),
+    [timelineList],
+  )
 
   const routeParams = useRouteParamsSelector((s) => ({
     timelineId: s.timelineId,
@@ -79,7 +85,7 @@ export function SubscriptionColumn({
     (args: string | ((prev: string | undefined, index: number) => string)) => {
       let nextActive
       if (typeof args === "function") {
-        const index = timelineId ? timelineList.indexOf(timelineId) : 0
+        const index = timelineId ? tabList.indexOf(timelineId) : 0
         nextActive = args(timelineId, index)
       } else {
         nextActive = args
@@ -88,7 +94,7 @@ export function SubscriptionColumn({
       navigateBackHome(nextActive)
       resetSelectedFeedIds()
     },
-    [navigateBackHome, timelineId, timelineList],
+    [navigateBackHome, tabList, timelineId],
   )
 
   useWheel(
@@ -97,7 +103,7 @@ export function SubscriptionColumn({
         const s = lethargy.check(event)
         if (s) {
           if (!wait && Math.abs(dex) > 20) {
-            setActive((_, i) => timelineList[clamp(i + dx, 0, timelineList.length - 1)]!)
+            setActive((_, i) => tabList[clamp(i + dx, 0, tabList.length - 1)]!)
             return true
           } else {
             return
@@ -143,7 +149,7 @@ export function SubscriptionColumn({
         }
       }, [navigateBackHome])}
     >
-      <CommandsHandler setActive={setActive} timelineList={timelineList} />
+      <CommandsHandler setActive={setActive} timelineList={tabList} />
       <SubscriptionColumnHeader />
       {!feedColumnShow && (
         <RootPortal to={rootContainerElement}>
@@ -217,11 +223,11 @@ const SwipeWrapper: FC<{ active: string; children: React.JSX.Element[] }> = memo
 )
 
 const TabsRow: FC = () => {
-  const timelineList = useTimelineTabs()
+  const tabList = useTimelineTabs().filter((id) => id !== ROUTE_VIEW_FOCUS)
 
   return (
     <div className="flex h-11 items-center px-1 text-xl text-text-secondary">
-      {timelineList.map((timelineId, index) => (
+      {tabList.map((timelineId, index) => (
         <SubscriptionTabButton key={timelineId} timelineId={timelineId} shortcut={`${index + 1}`} />
       ))}
     </div>

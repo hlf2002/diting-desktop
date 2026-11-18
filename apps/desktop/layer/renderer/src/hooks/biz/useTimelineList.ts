@@ -111,9 +111,11 @@ export const useTimelineList = (options?: {
 }
 
 /**
- * The timeline tab bar order: the always-on "重点关注内容" tab comes first,
- * followed by the configured view tabs. The focus tab is device-local and never
- * part of the `timelineTabs` customization.
+ * The full timeline tab list: the device-local "重点关注内容" (focus) entry comes
+ * first, followed by the configured view tabs. The focus entry is never part of the
+ * `timelineTabs` customization. Note: the top tab bar (TabsRow) deliberately filters
+ * out the focus entry — 重点关注 only appears in the bottom subscription list
+ * (FocusItem). This hook still includes it so SwipeWrapper can render the focus view.
  */
 export const useTimelineTabs = () => {
   const timelineList = useTimelineList({ withAll: true, visible: true })
