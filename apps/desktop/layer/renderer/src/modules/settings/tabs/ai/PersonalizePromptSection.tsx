@@ -1,6 +1,7 @@
 import { Spring } from "@follow/components/constants/spring.js"
 import { Button } from "@follow/components/ui/button/index.js"
 import { LexicalRichEditorTextArea } from "@follow/components/ui/lexical-rich-editor/index.js"
+import { useSetAtom } from "jotai"
 import { AnimatePresence } from "motion/react"
 import { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -9,6 +10,7 @@ import { toast } from "sonner"
 import { setAISetting, useAISettingValue } from "~/atoms/settings/ai"
 import { m } from "~/components/common/Motion"
 import { MentionPlugin } from "~/modules/ai-chat/editor"
+import { focusRetroAnalyzeTriggerAtom } from "~/modules/focus/useFocusAnalyzer"
 
 import { SettingDescription } from "../../control"
 import { SettingModalContentPortal } from "../../modal/layout"
@@ -20,6 +22,7 @@ let unsavedDraft: string | null = null
 export const PersonalizePromptSection = () => {
   const { t } = useTranslation("ai")
   const aiSettings = useAISettingValue()
+  const setRetroTrigger = useSetAtom(focusRetroAnalyzeTriggerAtom)
   const [initialValue] = useState(() => unsavedDraft ?? aiSettings.personalizePrompt)
   const promptRef = useRef(unsavedDraft ?? "")
   const [isSaving, setIsSaving] = useState(false)
@@ -29,12 +32,13 @@ export const PersonalizePromptSection = () => {
   const MAX_CHARACTERS = 500
   const isOverLimit = currentLength > MAX_CHARACTERS
 
-  const handleEditorChange = (value: string, textLength: number) => {
+  const handleEditorChange = (_value: string, textLength: number, textContent: string) => {
     // The editor also reports selection changes, and an empty editor serializes to a
     // non-empty state, so compare text when nothing is stored yet
     const storedPrompt = aiSettings.personalizePrompt
-    // An editor with no text clears the prompt instead of storing an empty editor state
-    promptRef.current = textLength === 0 ? "" : value
+    // Store the plain text (not the Lexical serialized JSON) so the focus analyzer
+    // and any other consumer receive the user's actual words.
+    promptRef.current = textLength === 0 ? "" : textContent
     setCurrentLength(textLength)
     const changed = storedPrompt ? promptRef.current !== storedPrompt : textLength > 0
     setHasChanges(changed)
@@ -49,7 +53,15 @@ export const PersonalizePromptSection = () => {
 
     setIsSaving(true)
     try {
-      setAISetting("personalizePrompt", promptRef.current)
+      const savedPrompt = promptRef.current
+      setAISetting("personalizePrompt", savedPrompt)
+      // Re-score the most recent entries so the change shows up in the
+      // 重点关注 tab right away, not only when new entries arrive.
+      // Only fire when the stored value actually changed to avoid re-scoring
+      // the same batch repeatedly.
+      if (savedPrompt !== aiSettings.personalizePrompt) {
+        setRetroTrigger((v) => v + 1)
+      }
       toast.success(t("personalize.saved"))
       setHasChanges(false)
       unsavedDraft = null

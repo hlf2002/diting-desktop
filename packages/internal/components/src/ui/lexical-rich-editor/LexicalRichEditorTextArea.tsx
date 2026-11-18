@@ -21,8 +21,9 @@ interface LexicalRichEditorTextAreaProps extends Omit<LexicalRichEditorProps, "i
    * Callback when editor content changes
    * @param serializedState - JSON string of the editor state
    * @param textLength - Length of plain text content
+   * @param textContent - Plain text content (use this for storing a prompt)
    */
-  onValueChange?: (serializedState: string, textLength: number) => void
+  onValueChange?: (serializedState: string, textLength: number, textContent: string) => void
   /**
    * Callback when editor is ready
    */
@@ -89,7 +90,7 @@ export const LexicalRichEditorTextArea = ({
 
           // Notify parent with serialized state
           const serializedState = JSON.stringify(editorState.toJSON())
-          onValueChange(serializedState, length)
+          onValueChange(serializedState, length, textContent)
         })
       }
 

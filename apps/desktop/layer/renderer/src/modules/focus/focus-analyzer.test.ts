@@ -1,8 +1,68 @@
 import { describe, expect, it } from "vitest"
 
-import { extractIdArray } from "./focus-analyzer"
+import { extractIdArray, extractPlainText } from "./focus-analyzer"
 
 const VALID_ID = "1721025600000" // 13-digit snowflake-ish id
+
+describe("extractPlainText", () => {
+  it("passes plain text through", () => {
+    expect(extractPlainText("  AI、科技、创业  ")).toBe("AI、科技、创业")
+  })
+
+  it("extracts text from a Lexical serialized EditorState", () => {
+    const lexicalJson = JSON.stringify({
+      root: {
+        children: [
+          {
+            children: [
+              { detail: 0, format: 0, type: "text", version: 1, text: "AI、科技、创业", style: "" },
+            ],
+            direction: "ltr",
+            format: "",
+            indent: 0,
+            type: "paragraph",
+            version: 1,
+          },
+        ],
+        direction: "ltr",
+        format: "",
+        indent: 0,
+        type: "root",
+        version: 1,
+      },
+    })
+    expect(extractPlainText(lexicalJson)).toBe("AI、科技、创业")
+  })
+
+  it("joins multiple Lexical text nodes", () => {
+    const lexicalJson = JSON.stringify({
+      root: {
+        children: [
+          {
+            children: [
+              { type: "text", version: 1, text: "AI" },
+              { type: "text", version: 1, text: "、科技" },
+            ],
+            type: "paragraph",
+            version: 1,
+          },
+        ],
+        type: "root",
+        version: 1,
+      },
+    })
+    expect(extractPlainText(lexicalJson)).toBe("AI 、科技")
+  })
+
+  it("returns empty for empty or whitespace input", () => {
+    expect(extractPlainText("")).toBe("")
+    expect(extractPlainText("   ")).toBe("")
+  })
+
+  it("passes through non-JSON values", () => {
+    expect(extractPlainText("不是 JSON")).toBe("不是 JSON")
+  })
+})
 
 describe("extractIdArray", () => {
   it("extracts a plain JSON array", () => {

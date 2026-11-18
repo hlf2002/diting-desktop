@@ -85,6 +85,36 @@ export const extractIdArray = (raw: string): string[] => {
 }
 
 /**
+ * Extract plain text from a stored prompt. Older builds stored the Lexical
+ * serialized EditorState JSON (see PersonalizePromptSection) instead of the
+ * user's words; this unwraps that shape so the AI always receives readable text.
+ */
+export const extractPlainText = (value: string): string => {
+  const trimmed = value.trim()
+  if (!trimmed) return ""
+  try {
+    const parsed = JSON.parse(trimmed)
+    if (parsed && typeof parsed === "object" && "root" in parsed && "children" in parsed.root) {
+      const parts: string[] = []
+      const walk = (nodes: unknown[]) => {
+        for (const node of nodes) {
+          if (node && typeof node === "object") {
+            const n = node as Record<string, unknown>
+            if (typeof n.text === "string" && n.text.length > 0) parts.push(n.text)
+            if (Array.isArray(n.children)) walk(n.children)
+          }
+        }
+      }
+      walk(parsed.root.children)
+      return parts.join(" ").trim()
+    }
+    return trimmed
+  } catch {
+    return trimmed
+  }
+}
+
+/**
  * Score a batch of new entries against the user's focus criteria using their
  * BYOK provider. Pure client-side: no server involvement.
  *
@@ -94,7 +124,7 @@ export const extractIdArray = (raw: string): string[] => {
 export const analyzeEntriesForFocus = async (
   candidates: FocusCandidate[],
 ): Promise<FocusAnalysisResult> => {
-  const criteria = getAISettings().personalizePrompt.trim()
+  const criteria = extractPlainText(getAISettings().personalizePrompt)
   if (!criteria) return { matchedIds: [], analyzedIds: [], skipped: true }
 
   const provider = pickProvider()

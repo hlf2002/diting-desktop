@@ -73,6 +73,21 @@ class FocusActions implements Hydratable, Resetable {
     })
     await FocusService.markAnalyzedKeepFocus(entryIds)
   }
+
+  /** Forget score results for entries so the scorer re-runs on them (retro backfill). */
+  async unmarkAnalyzed(entryIds: FocusEntryId[]) {
+    if (entryIds.length === 0) return
+    set((state) => {
+      const nextAnalyzed = new Set(state.analyzedEntryIds)
+      const nextFocus = new Set(state.focusEntryIds)
+      for (const id of entryIds) {
+        nextAnalyzed.delete(id)
+        nextFocus.delete(id)
+      }
+      return { analyzedEntryIds: nextAnalyzed, focusEntryIds: nextFocus }
+    })
+    await FocusService.deleteMany(entryIds)
+  }
 }
 
 export const focusActions = new FocusActions()
