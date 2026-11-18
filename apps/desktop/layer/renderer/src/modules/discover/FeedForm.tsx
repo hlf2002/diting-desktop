@@ -23,7 +23,10 @@ import { FeedViewType, UserRole } from "@follow/constants"
 import { useFeedByIdOrUrl } from "@follow/store/feed/hooks"
 import type { FeedModel } from "@follow/store/feed/types"
 import { useCategories, useSubscriptionByFeedId } from "@follow/store/subscription/hooks"
-import { subscriptionSyncService } from "@follow/store/subscription/store"
+import {
+  notifyLocalWorkerFetchNow,
+  subscriptionSyncService,
+} from "@follow/store/subscription/store"
 import { whoami } from "@follow/store/user/getters"
 import { useIsLoggedIn, useUserRole } from "@follow/store/user/hooks"
 import { tracker } from "@follow/tracker"
@@ -147,6 +150,30 @@ export const FeedForm: Component<{
       })
     }
   }, [feedQuery.data?.feed?.url, feedQuery.isError, feedQuery.isLoading, id, url])
+
+  // 服务器还没有该源的数据时（rsshub:// 新源首抓 202 queued，entries 为空），
+  // 进入预览页就触发桌面端本地抓取（B 通道，秒级），而不是等订阅完成后再抓。
+  // 本地抓取 + 服务端落库完成后延迟 refetch，预览页即可显示最近条目。
+  const previewFetchTriggeredUrlRef = useRef<string | null>(null)
+  const previewFetchRefetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    if (feedQuery.isLoading || feedQuery.isError) return
+    const previewFeedUrl = feedQuery.data?.feed?.url
+    const previewEntries = feedQuery.data?.entries
+    if (!previewFeedUrl || !previewFeedUrl.startsWith("rsshub://")) return
+    if (previewEntries && previewEntries.length > 0) return
+    if (previewFetchTriggeredUrlRef.current === previewFeedUrl) return
+
+    previewFetchTriggeredUrlRef.current = previewFeedUrl
+    void notifyLocalWorkerFetchNow(previewFeedUrl).then((ok) => {
+      if (!ok || previewFetchRefetchTimerRef.current) return
+      // 等服务端 refreshFeed 完成落库（feed-fetched 是 await 的），再延迟拉一次预览数据
+      previewFetchRefetchTimerRef.current = setTimeout(() => {
+        previewFetchRefetchTimerRef.current = null
+        feedQuery.refetch()
+      }, 3000)
+    })
+  }, [feedQuery.data?.entries, feedQuery.data?.feed?.url, feedQuery.isError, feedQuery.isLoading])
 
   return (
     <div

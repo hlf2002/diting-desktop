@@ -167,7 +167,7 @@ describe("FeedForm", () => {
       settle()
       await flush()
     })
-    expect(mocks.toast).toHaveBeenCalledWith("feed_form.followed", { duration: 1000 })
+    expect(mocks.toast).toHaveBeenCalledWith("feed_form.followed_fetching", { duration: 5000 })
     expect(mocks.onSuccess).toHaveBeenCalledTimes(1)
     // The form closes now, still reading as the follow it was
     expect(submitLabel()).toBe("feed_form.follow")

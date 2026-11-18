@@ -54,9 +54,10 @@ const catchUpBeforeRename = async () => {
  * 只走 Electron 桌面端（window.electron.ipcRenderer 存在）；web/mobile/无 IPC 静默跳过，
  * launchd worker 轮询（A 通道）与服务端巡检兜底。channel 由 electron-ipc-decorator
  * 按 `${groupName}.${methodName}` 生成，见 AuthService.groupName="auth"。
+ * 返回 {ok:true} 表示本地抓取 + 回传 + 服务端落库已完成（供预览页刷新数据）。
  */
-async function notifyLocalWorkerFetchNow(feedUrl?: string | null) {
-  if (!feedUrl || !feedUrl.startsWith("rsshub://")) return
+export async function notifyLocalWorkerFetchNow(feedUrl?: string | null): Promise<boolean> {
+  if (!feedUrl || !feedUrl.startsWith("rsshub://")) return false
   const route = `/${feedUrl.slice("rsshub://".length).replace(/^\/+/, "")}`
   try {
     // 只走 Electron 桌面端：web/mobile 渲染进程没有 window.electron（无需 IN_ELECTRON 宏，
@@ -70,10 +71,13 @@ async function notifyLocalWorkerFetchNow(feedUrl?: string | null) {
         }
       }
     ).window?.electron?.ipcRenderer
-    if (!ipc) return
-    await ipc.invoke("auth.fetchRSSHubRouteNow", route)
+    if (!ipc) return false
+    const result = (await ipc.invoke("auth.fetchRSSHubRouteNow", route)) as
+      { ok?: boolean; itemCount?: number } | undefined
+    return result?.ok ?? false
   } catch {
-    // IPC 失败不影响订阅主流程：静默，worker 兜底
+    // IPC 失败不影响主流程：静默，worker 兜底
+    return false
   }
 }
 

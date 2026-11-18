@@ -256,13 +256,14 @@ export class AuthService extends IpcService {
   }
 
   @IpcMethod()
-  async fetchRSSHubRouteNow(route: string): Promise<void> {
-    // 新订阅 rsshub:// 源后立即抓（B 通道，秒级）：renderer 订阅成功 → IPC → 本地抓 + 落库
+  async fetchRSSHubRouteNow(route: string): Promise<{ ok: boolean; itemCount?: number }> {
+    // 新订阅 rsshub:// 源后立即抓（B 通道，秒级）：renderer 订阅成功 → IPC → 本地抓 + 落库；
+    // 预览页也会在服务器无该源数据时触发（返回 ok 供预览页刷新条目）
     if (!this.sessionToken) {
       logger.warn("[rsshub-worker] 无 session token，跳过立即抓")
-      return
+      return { ok: false }
     }
-    await fetchRouteNow(route, this.sessionToken)
+    return fetchRouteNow(route, this.sessionToken)
   }
 
   @IpcMethod()
