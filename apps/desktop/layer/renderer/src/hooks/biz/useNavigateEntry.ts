@@ -56,7 +56,9 @@ type ParsedNavigateEntryOptions = {
   entryId: string
 }
 
-const parseNavigateEntryOptions = (options: NavigateEntryOptions): ParsedNavigateEntryOptions => {
+export const parseNavigateEntryOptions = (
+  options: NavigateEntryOptions,
+): ParsedNavigateEntryOptions => {
   const { entryId, feedId, view, folderName, inboxId, listId, timelineId } = options || {}
   const route = getReadonlyRoute()
   const { params } = route
@@ -87,7 +89,22 @@ const parseNavigateEntryOptions = (options: NavigateEntryOptions): ParsedNavigat
   // The focus timeline is a device-local view of its own; it must not be
   // hijacked into a regular feed view just because the current entry's feed
   // has a view (or the caller passed a numeric `view`).
-  if (finalView !== undefined && !timelineId && params.timelineId !== ROUTE_VIEW_FOCUS) {
+  //
+  // However, navigating to an actual content source (feed / folder / list /
+  // inbox) must leave the focus timeline: focus and a concrete source are
+  // mutually exclusive selections. Without this, clicking a feed while on the
+  // focus view yields `/timeline/focus/<feedId>/...` — both stay highlighted
+  // and the entry column keeps showing the focus list.
+  const isExplicitSourceNavigation =
+    ("feedId" in options && feedId !== null && feedId !== ROUTE_FEED_PENDING) ||
+    Boolean(folderName) ||
+    Boolean(listId) ||
+    Boolean(inboxId)
+  if (
+    finalView !== undefined &&
+    !timelineId &&
+    (params.timelineId !== ROUTE_VIEW_FOCUS || isExplicitSourceNavigation)
+  ) {
     finalTimelineId = getTimelineIdByView(finalView)
   }
 
