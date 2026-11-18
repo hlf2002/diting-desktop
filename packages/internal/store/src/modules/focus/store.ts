@@ -113,6 +113,24 @@ class FocusActions implements Hydratable, Resetable {
     })
     await FocusService.deleteMany(entryIds)
   }
+
+  /** Apply backfilled reasons for entries already flagged as focus (does not change match status). */
+  setReasonsInSession(reasons: Record<string, string>) {
+    set((state) => {
+      const nextReasons = { ...state.focusReasons }
+      for (const [id, reason] of Object.entries(reasons)) {
+        if (state.focusEntryIds.has(id)) nextReasons[id] = reason
+      }
+      return { focusReasons: nextReasons }
+    })
+  }
+
+  /** Persist backfilled reasons to the local database (keeps the focus flag). */
+  async persistReasons(reasons: Record<string, string>) {
+    const entries = Object.entries(reasons)
+    if (entries.length === 0) return
+    await FocusService.updateReasons(reasons)
+  }
 }
 
 export const focusActions = new FocusActions()

@@ -5,10 +5,13 @@ import { useCallback, useEffect, useRef } from "react"
 
 import { getAISettings } from "~/atoms/settings/ai"
 
-import { analyzeEntriesForFocus, extractPlainText } from "./focus-analyzer"
+import { analyzeEntriesForFocus, explainFocusMatches, extractPlainText } from "./focus-analyzer"
 
 /** Number of most-recent unscored entries to backfill when the criteria change. */
 const FOCUS_RETRO_LIMIT = 100
+
+/** Max focus entries to backfill reasons for per run (avoids one huge AI bill). */
+const FOCUS_REASON_BACKFILL_LIMIT = 100
 
 /** Bump to ask the analyzer to re-score the most recent entries (saved criteria). */
 export const focusRetroAnalyzeTriggerAtom = atom(0)
@@ -37,6 +40,7 @@ const getRecentEntryIds = (limit: number): string[] => {
  */
 export const useFocusAnalyzer = () => {
   const pendingRef = useRef<string[]>([])
+  const reasonPendingRef = useRef<string[]>([])
   const runningRef = useRef(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const retroTrigger = useAtomValue(focusRetroAnalyzeTriggerAtom)
@@ -45,51 +49,88 @@ export const useFocusAnalyzer = () => {
     if (runningRef.current) return
     runningRef.current = true
     try {
-      while (pendingRef.current.length > 0) {
-        const batch = pendingRef.current.splice(0, 50)
-        const analyzed = useFocusStore.getState().analyzedEntryIds
-        const unseen = batch.filter((id) => !analyzed.has(id))
-        if (unseen.length === 0) continue
+      while (pendingRef.current.length > 0 || reasonPendingRef.current.length > 0) {
+        if (pendingRef.current.length > 0) {
+          const batch = pendingRef.current.splice(0, 50)
+          const analyzed = useFocusStore.getState().analyzedEntryIds
+          const unseen = batch.filter((id) => !analyzed.has(id))
+          if (unseen.length === 0) continue
 
-        const data = useEntryStore.getState().data
-        const candidates = unseen
-          .map((id) => {
-            const entry = data[id]
-            return { id, title: entry?.title, description: entry?.description }
-          })
-          .filter((candidate) => Boolean(candidate.title || candidate.description))
-        const contentless = unseen.filter((id) => !data[id]?.title && !data[id]?.description)
-        if (contentless.length > 0) {
-          await focusActions.persistAnalyzed(contentless, [])
-        }
-        if (candidates.length === 0) continue
+          const data = useEntryStore.getState().data
+          const candidates = unseen
+            .map((id) => {
+              const entry = data[id]
+              return { id, title: entry?.title, description: entry?.description }
+            })
+            .filter((candidate) => Boolean(candidate.title || candidate.description))
+          const contentless = unseen.filter((id) => !data[id]?.title && !data[id]?.description)
+          if (contentless.length > 0) {
+            await focusActions.persistAnalyzed(contentless, [])
+          }
+          if (candidates.length === 0) continue
 
-        const result = await analyzeEntriesForFocus(candidates)
-        if (result.skipped) {
-          // Criteria or BYOK provider not ready yet: put the batch back and stop
-          // draining. A later enqueue (new entries) retries these too, so entries
-          // that arrived before the provider was configured are not lost.
-          pendingRef.current.unshift(...batch)
-          break
+          const result = await analyzeEntriesForFocus(candidates)
+          if (result.skipped) {
+            // Criteria or BYOK provider not ready yet: put the batch back and stop
+            // draining. A later enqueue (new entries) retries these too, so entries
+            // that arrived before the provider was configured are not lost.
+            pendingRef.current.unshift(...batch)
+            break
+          }
+          if (result.failedIds && result.failedIds.length > 0) {
+            // Provider/network errors: put the whole batch back and stop draining.
+            // It will be retried on the next enqueue; otherwise a single bad
+            // response would permanently drop the batch and the tab stays empty.
+            pendingRef.current.unshift(...batch)
+            break
+          }
+          if (result.analyzedIds.length > 0) {
+            focusActions.markAnalyzedInSession(
+              result.analyzedIds,
+              result.matchedIds,
+              result.matchedReasons,
+            )
+            await focusActions.persistAnalyzed(
+              result.analyzedIds,
+              result.matchedIds,
+              result.matchedReasons,
+            )
+          }
         }
-        if (result.failedIds && result.failedIds.length > 0) {
-          // Provider/network errors: put the whole batch back and stop draining.
-          // It will be retried on the next enqueue; otherwise a single bad
-          // response would permanently drop the batch and the tab stays empty.
-          pendingRef.current.unshift(...batch)
-          break
-        }
-        if (result.analyzedIds.length > 0) {
-          focusActions.markAnalyzedInSession(
-            result.analyzedIds,
-            result.matchedIds,
-            result.matchedReasons,
-          )
-          await focusActions.persistAnalyzed(
-            result.analyzedIds,
-            result.matchedIds,
-            result.matchedReasons,
-          )
+
+        // Backfill reasons for entries flagged as focus before reasons existed.
+        // This never re-judges the match — it only explains why it matches.
+        if (reasonPendingRef.current.length > 0) {
+          const reasonBatch = reasonPendingRef.current.splice(0, 20)
+          const { focusReasons } = useFocusStore.getState()
+          const stillMissing = reasonBatch.filter((id) => !focusReasons[id])
+          if (stillMissing.length === 0) continue
+          const data = useEntryStore.getState().data
+          const candidates = stillMissing
+            .map((id) => ({
+              id,
+              title: data[id]?.title,
+              description: data[id]?.description,
+            }))
+            .filter((candidate) => Boolean(candidate.title || candidate.description))
+          if (candidates.length === 0) continue
+
+          const result = await explainFocusMatches(candidates)
+          if (result.skipped) {
+            // No criteria / no provider: no request was made. Keep the batch for
+            // a later drain (configuring the provider later starts backfilling);
+            // the card fallback covers the entry until then.
+            reasonPendingRef.current.unshift(...reasonBatch)
+            break
+          }
+          if (result.failedIds && result.failedIds.length > 0) {
+            reasonPendingRef.current.unshift(...reasonBatch)
+            break
+          }
+          if (Object.keys(result.reasons).length > 0) {
+            focusActions.setReasonsInSession(result.reasons)
+            await focusActions.persistReasons(result.reasons)
+          }
         }
       }
     } finally {
@@ -134,6 +175,31 @@ export const useFocusAnalyzer = () => {
       if (newIds.length > 0) enqueue(newIds)
     })
   }, [enqueue])
+
+  // Backfill concrete reasons for focus entries scored before reasons existed
+  // (or where the AI returned none). Runs on mount (after the store hydrated)
+  // and whenever the focus set changes, so legacy marks get a specific reason
+  // on the card instead of the generic fallback.
+  useEffect(() => {
+    const enqueueMissingReasons = () => {
+      const { focusEntryIds, focusReasons } = useFocusStore.getState()
+      const alreadyQueued = new Set(reasonPendingRef.current)
+      const missing = [...focusEntryIds]
+        .filter((id) => !focusReasons[id] && !alreadyQueued.has(id))
+        .slice(0, FOCUS_REASON_BACKFILL_LIMIT)
+      if (missing.length > 0) {
+        reasonPendingRef.current.push(...missing)
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = setTimeout(() => void drain(), 2000)
+      }
+    }
+    void enqueueMissingReasons()
+    return useFocusStore.subscribe((state, prevState) => {
+      if (state.focusEntryIds.size !== prevState.focusEntryIds.size) {
+        void enqueueMissingReasons()
+      }
+    })
+  }, [drain])
 
   // When the user saves/changes their focus criteria, re-score the most recent
   // entries so the effect is visible immediately instead of waiting for new arrivals.

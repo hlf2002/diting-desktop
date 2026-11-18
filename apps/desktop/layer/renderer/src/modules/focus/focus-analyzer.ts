@@ -71,7 +71,7 @@ const buildMessages = (criteria: string, candidates: FocusCandidate[]) => {
 候选内容列表（JSON 数组，每条含 id/title/description）：
 ${listJson}
 
-请判断每条内容是否属于用户重点关注的范围，返回符合标准的条目的 id 和判断理由组成的 JSON 数组，格式为 [{"id":"id1","reason":"理由1"}]。理由要具体说明该内容与用户关注标准的对应关系，一句话即可。全部不符合则返回 []。`,
+请判断每条内容是否属于用户重点关注的范围，返回符合标准的条目的 id 和判断理由组成的 JSON 数组，格式为 [{"id":"id1","reason":"理由1"}]。判断为符合的条目必须给出具体理由：说明该内容与标准中哪一条/哪一方面的对应关系（引用标准原文或关键词），一句话即可；禁止使用「符合您设定的重点关注标准」这类不指明具体标准的笼统表述。全部不符合则返回 []。`,
     },
   ]
 }
@@ -234,4 +234,101 @@ export const analyzeEntriesForFocus = async (
   }
 
   return results
+}
+
+export interface FocusExplainResult {
+  /** entryId → concrete reason (from the AI). */
+  reasons: Record<string, string>
+  /** Ids that could not be explained (network/provider errors) — caller retries them. */
+  failedIds: string[]
+  /** True when the request was skipped (no criteria / no AI config), so the caller can decide. */
+  skipped: boolean
+}
+
+const buildReasonMessages = (criteria: string, candidates: FocusCandidate[]) => {
+  const listJson = JSON.stringify(
+    candidates.map((entry) => ({
+      id: entry.id,
+      title: truncate(entry.title, TITLE_LIMIT),
+      description: truncate(entry.description, DESCRIPTION_LIMIT),
+    })),
+  )
+  return [
+    {
+      role: "system",
+      content:
+        "你是内容筛选助手。以下内容已被确认属于用户的「重点关注内容」范围，请为每条内容生成具体的判断理由，说明该内容与用户重点关注标准的具体对应关系。只输出 JSON，不要输出任何其他文字或解释。",
+    },
+    {
+      role: "user",
+      content: `用户重点关注内容的标准：
+"""${criteria}"""
+
+候选内容列表（JSON 数组，每条含 id/title/description）：
+${listJson}
+
+请为每条内容生成判断理由，返回 JSON 数组，格式为 [{"id":"id1","reason":"理由1"}]。理由要具体说明该内容与用户重点关注标准中哪一条/哪一方面的对应关系（引用标准原文或关键词），一句话即可；禁止使用「符合您的重点关注标准」这类不指明具体标准的笼统表述。`,
+    },
+  ]
+}
+
+/**
+ * Backfill concrete reasons for entries already flagged as focus but scored
+ * before reasons existed (or where the AI returned none). This never re-judges
+ * whether an entry matches — it only explains why it matches.
+ */
+export const explainFocusMatches = async (
+  candidates: FocusCandidate[],
+): Promise<FocusExplainResult> => {
+  const criteria = extractPlainText(getAISettings().personalizePrompt)
+  if (!criteria) return { reasons: {}, failedIds: [], skipped: true }
+
+  const provider = pickProvider()
+  if (!provider) return { reasons: {}, failedIds: [], skipped: true }
+
+  const result: FocusExplainResult = { reasons: {}, failedIds: [], skipped: false }
+
+  for (let i = 0; i < candidates.length; i += BATCH_SIZE) {
+    const batch = candidates.slice(i, i + BATCH_SIZE)
+    try {
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+      try {
+        const response = await fetch(`${provider.baseURL}/chat/completions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${provider.apiKey}`,
+            ...(provider.headers ?? {}),
+          },
+          body: JSON.stringify({
+            model: provider.model,
+            temperature: 0,
+            messages: buildReasonMessages(criteria, batch),
+          }),
+          signal: controller.signal,
+        })
+        if (!response.ok) {
+          console.error("[focus-analyzer] reason request failed", response.status)
+          result.failedIds.push(...batch.map((entry) => entry.id))
+          continue
+        }
+        const data = (await response.json()) as {
+          choices?: Array<{ message?: { content?: string } }>
+        }
+        const content = data.choices?.[0]?.message?.content ?? ""
+        const matches = extractFocusResults(content)
+        for (const match of matches) {
+          if (match.reason) result.reasons[match.id] = match.reason
+        }
+      } finally {
+        clearTimeout(timeout)
+      }
+    } catch (error) {
+      console.error("[focus-analyzer] reason request failed", error)
+      result.failedIds.push(...batch.map((entry) => entry.id))
+    }
+  }
+
+  return result
 }

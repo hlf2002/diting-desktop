@@ -85,6 +85,18 @@ class FocusServiceStatic implements Resetable {
       })
   }
 
+  /** Backfill reasons for entries already flagged as focus (keeps their focus flag). */
+  async updateReasons(reasons: Record<string, string>) {
+    const entries = Object.entries(reasons)
+    if (entries.length === 0) return
+    for (const [entryId, reason] of entries) {
+      await db
+        .update(focusEntriesTable)
+        .set({ reason })
+        .where(eq(focusEntriesTable.entryId, entryId))
+    }
+  }
+
   async deleteMany(entryIds: string[]) {
     if (entryIds.length === 0) return
     await db.delete(focusEntriesTable).where(inArray(focusEntriesTable.entryId, entryIds))
