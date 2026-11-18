@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { extractIdArray, extractPlainText } from "./focus-analyzer"
+import { extractFocusResults, extractIdArray, extractPlainText } from "./focus-analyzer"
 
 const VALID_ID = "1721025600000" // 13-digit snowflake-ish id
 
@@ -91,5 +91,32 @@ describe("extractIdArray", () => {
 
   it("returns an empty array on malformed json", () => {
     expect(extractIdArray(`["${VALID_ID}",`)).toEqual([])
+  })
+})
+
+describe("extractFocusResults", () => {
+  it("extracts ids with reasons", () => {
+    expect(extractFocusResults(`[{"id":"${VALID_ID}","reason":"与 AI 相关"}]`)).toEqual([
+      { id: VALID_ID, reason: "与 AI 相关" },
+    ])
+  })
+
+  it("still accepts the legacy plain id array", () => {
+    expect(extractFocusResults(`["${VALID_ID}"]`)).toEqual([{ id: VALID_ID }])
+  })
+
+  it("drops entries without a valid snowflake id", () => {
+    expect(
+      extractFocusResults(`[{"id":"uuid-xxxx","reason":"x"},{"id":"${VALID_ID}","reason":"y"}]`),
+    ).toEqual([{ id: VALID_ID, reason: "y" }])
+  })
+
+  it("keeps a match without a reason", () => {
+    expect(extractFocusResults(`[{"id":"${VALID_ID}"}]`)).toEqual([{ id: VALID_ID }])
+  })
+
+  it("returns an empty array on malformed input", () => {
+    expect(extractFocusResults("nothing")).toEqual([])
+    expect(extractFocusResults(`[{"id":"${VALID_ID}",`)).toEqual([])
   })
 })

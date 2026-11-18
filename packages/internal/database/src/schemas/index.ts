@@ -246,4 +246,9 @@ export const focusEntriesTable = sqliteTable("focus_entries", (t) => ({
   entryId: t.text("entry_id").notNull().primaryKey(),
   isFocus: t.integer("is_focus", { mode: "boolean" }).notNull().default(false),
   analyzedAt: t.integer("analyzed_at", { mode: "timestamp_ms" }),
+  /**
+   * Why the entry matched the user's focus criteria, produced by the on-device
+   * AI at scoring time. Null for legacy rows scored before reasons existed.
+   */
+  reason: t.text("reason"),
 }))

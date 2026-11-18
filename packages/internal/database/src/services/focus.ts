@@ -1,4 +1,4 @@
-import { eq, inArray } from "drizzle-orm"
+import { eq, inArray, sql } from "drizzle-orm"
 
 import { db } from "../db"
 import { focusEntriesTable } from "../schemas"
@@ -25,7 +25,7 @@ class FocusServiceStatic implements Resetable {
 
   getFocusEntryIds() {
     return db.query.focusEntriesTable.findMany({
-      columns: { entryId: true },
+      columns: { entryId: true, reason: true },
       where: eq(focusEntriesTable.isFocus, true),
     })
   }
@@ -36,13 +36,20 @@ class FocusServiceStatic implements Resetable {
     })
   }
 
-  /** Mark entries as analyzed with their match result. */
-  async markAnalyzed(entryIds: string[], isFocus: boolean) {
+  /**
+   * Mark entries as analyzed with their match result.
+   *
+   * @param entryIds Entries that were scored.
+   * @param isFocus Whether they matched the focus criteria.
+   * @param reasons Per-entry match reason (only meaningful for `isFocus` rows).
+   */
+  async markAnalyzed(entryIds: string[], isFocus: boolean, reasons?: Record<string, string>) {
     if (entryIds.length === 0) return
     const rows = entryIds.map((entryId) => ({
       entryId,
       isFocus,
       analyzedAt: new Date(),
+      reason: reasons?.[entryId] ?? null,
     }))
     await db
       .insert(focusEntriesTable)
@@ -52,6 +59,8 @@ class FocusServiceStatic implements Resetable {
         set: {
           isFocus,
           analyzedAt: new Date(),
+          // Take the incoming row's reason (null when the entry was not matched).
+          reason: sql`excluded.reason`,
         },
       })
   }

@@ -28,6 +28,7 @@ import { EntryRenderError } from "../entry-content/EntryRenderError"
 import { ReadabilityNotice } from "../entry-content/ReadabilityNotice"
 import { EntryAttachments } from "../EntryAttachments"
 import { EntryTitle } from "../EntryTitle"
+import { FocusReasonCard } from "../FocusReasonCard"
 import { getArticleRendererContent } from "./content-selection"
 import { MediaTranscript, TranscriptToggle, useTranscription } from "./shared"
 import { ArticleAudioPlayer } from "./shared/AudioPlayer"
@@ -80,6 +81,7 @@ export const ArticleLayout: React.FC<EntryLayoutProps> = ({
       <WrappedElementProvider boundingDetection>
         <div className="mx-auto mb-32 mt-6 max-w-full cursor-auto text-[0.94rem]">
           {shouldShowAISummary && <AISummary entryId={entryId} />}
+          <FocusReasonCard entryId={entryId} />
           <ErrorBoundary fallback={EntryRenderError}>
             <ReadabilityNotice entryId={entryId} />
             {showTranscript ? (

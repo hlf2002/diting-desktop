@@ -221,6 +221,8 @@
   "entry_content.external_link.warning": "You are about to leave this site for an external page. Do you trust this URL and want to continue?",
   "entry_content.fetching_content": "Fetching original content and processing...",
   "entry_content.fetching_content_failed": "Readability: Failed to fetch original content, try again later or back to the RSS content.",
+  "entry_content.focus_reason": "Focus",
+  "entry_content.focus_reason_fallback": "This entry matches your focus criteria.",
   "entry_content.header.play_tts": "Play TTS",
   "entry_content.header.play_tts_description": "Select a TTS voice in settings and start TTS to convert to audio content",
   "entry_content.header.readability": "Readability",

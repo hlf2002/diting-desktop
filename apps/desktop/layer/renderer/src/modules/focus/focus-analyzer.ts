@@ -13,6 +13,8 @@ export interface FocusCandidate {
 export interface FocusAnalysisResult {
   /** Entry ids the AI matched against the user's focus criteria. */
   matchedIds: string[]
+  /** entryId → why it matched (short, from the AI). */
+  matchedReasons: Record<string, string>
   /** Every id that was actually scored (matched or not). */
   analyzedIds: string[]
   /** Ids that could not be scored (network/provider errors) — caller should retry them. */
@@ -59,7 +61,7 @@ const buildMessages = (criteria: string, candidates: FocusCandidate[]) => {
     {
       role: "system",
       content:
-        "你是内容筛选助手。根据用户设定的「重点关注内容」标准，判断候选内容是否属于用户重点关注范围。只输出 JSON，不要输出任何其他文字或解释。",
+        "你是内容筛选助手。根据用户设定的「重点关注内容」标准，判断候选内容是否属于用户重点关注范围，并给出判断理由。只输出 JSON，不要输出任何其他文字或解释。",
     },
     {
       role: "user",
@@ -69,7 +71,7 @@ const buildMessages = (criteria: string, candidates: FocusCandidate[]) => {
 候选内容列表（JSON 数组，每条含 id/title/description）：
 ${listJson}
 
-请判断每条内容是否属于用户重点关注的范围，只返回符合标准的条目的 id 组成的 JSON 数组，例如 ["id1","id3"]。全部不符合则返回 []。`,
+请判断每条内容是否属于用户重点关注的范围，返回符合标准的条目的 id 和判断理由组成的 JSON 数组，格式为 [{"id":"id1","reason":"理由1"}]。理由要具体说明该内容与用户关注标准的对应关系，一句话即可。全部不符合则返回 []。`,
     },
   ]
 }
@@ -81,6 +83,38 @@ export const extractIdArray = (raw: string): string[] => {
     const parsed = JSON.parse(match[0])
     if (!Array.isArray(parsed)) return []
     return parsed.filter((id): id is string => typeof id === "string" && isBizId(id))
+  } catch {
+    return []
+  }
+}
+
+export interface FocusMatchResult {
+  id: string
+  reason?: string
+}
+
+/**
+ * Parse the AI response: either the legacy plain array of ids or the current
+ * [{id, reason}] shape. Malformed/unknown ids are dropped.
+ */
+export const extractFocusResults = (raw: string): FocusMatchResult[] => {
+  const match = raw.match(/\[[\s\S]*\]/)
+  if (!match) return []
+  try {
+    const parsed = JSON.parse(match[0])
+    if (!Array.isArray(parsed)) return []
+    return parsed
+      .map((item): FocusMatchResult | null => {
+        if (typeof item === "string") return { id: item }
+        if (item && typeof item === "object" && typeof item.id === "string") {
+          return {
+            id: item.id,
+            reason: typeof item.reason === "string" ? item.reason : undefined,
+          }
+        }
+        return null
+      })
+      .filter((item): item is FocusMatchResult => Boolean(item && isBizId(item.id)))
   } catch {
     return []
   }
@@ -127,13 +161,16 @@ export const analyzeEntriesForFocus = async (
   candidates: FocusCandidate[],
 ): Promise<FocusAnalysisResult> => {
   const criteria = extractPlainText(getAISettings().personalizePrompt)
-  if (!criteria) return { matchedIds: [], analyzedIds: [], failedIds: [], skipped: true }
+  if (!criteria)
+    return { matchedIds: [], matchedReasons: {}, analyzedIds: [], failedIds: [], skipped: true }
 
   const provider = pickProvider()
-  if (!provider) return { matchedIds: [], analyzedIds: [], failedIds: [], skipped: true }
+  if (!provider)
+    return { matchedIds: [], matchedReasons: {}, analyzedIds: [], failedIds: [], skipped: true }
 
   const results: FocusAnalysisResult = {
     matchedIds: [],
+    matchedReasons: {},
     analyzedIds: [],
     failedIds: [],
     skipped: false,
@@ -143,6 +180,7 @@ export const analyzeEntriesForFocus = async (
     const batch = candidates.slice(i, i + BATCH_SIZE)
     const analyzedIds: string[] = []
     let matchedIds: string[] = []
+    const matchedReasons: Record<string, string> = {}
 
     try {
       const controller = new AbortController()
@@ -171,7 +209,11 @@ export const analyzeEntriesForFocus = async (
           choices?: Array<{ message?: { content?: string } }>
         }
         const content = data.choices?.[0]?.message?.content ?? ""
-        matchedIds = extractIdArray(content)
+        const matches = extractFocusResults(content)
+        matchedIds = matches.map((match) => match.id)
+        for (const match of matches) {
+          if (match.reason) matchedReasons[match.id] = match.reason
+        }
       } finally {
         clearTimeout(timeout)
       }
@@ -185,6 +227,9 @@ export const analyzeEntriesForFocus = async (
 
     analyzedIds.push(...batch.map((entry) => entry.id))
     results.matchedIds.push(...matchedIds)
+    for (const [id, reason] of Object.entries(matchedReasons)) {
+      results.matchedReasons[id] = reason
+    }
     results.analyzedIds.push(...analyzedIds)
   }
 

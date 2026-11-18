@@ -1,0 +1,1 @@
+ALTER TABLE `focus_entries` ADD `reason` text;

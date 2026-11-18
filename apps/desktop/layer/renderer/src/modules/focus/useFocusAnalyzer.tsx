@@ -80,8 +80,16 @@ export const useFocusAnalyzer = () => {
           break
         }
         if (result.analyzedIds.length > 0) {
-          focusActions.markAnalyzedInSession(result.analyzedIds, result.matchedIds)
-          await focusActions.persistAnalyzed(result.analyzedIds, result.matchedIds)
+          focusActions.markAnalyzedInSession(
+            result.analyzedIds,
+            result.matchedIds,
+            result.matchedReasons,
+          )
+          await focusActions.persistAnalyzed(
+            result.analyzedIds,
+            result.matchedIds,
+            result.matchedReasons,
+          )
         }
       }
     } finally {
