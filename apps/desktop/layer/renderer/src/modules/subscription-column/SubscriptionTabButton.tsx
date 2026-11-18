@@ -8,6 +8,7 @@ import type { FC } from "react"
 import { startTransition, useCallback } from "react"
 import { useTranslation } from "react-i18next"
 
+import focusIcon from "~/assets/focus-icon.svg"
 import { MenuItemText, useShowContextMenu } from "~/atoms/context-menu"
 import { setUISetting, useUISettingKey } from "~/atoms/settings/ui"
 import { FocusablePresets } from "~/components/common/Focusable"
@@ -180,7 +181,7 @@ const FocusSwitchButton: FC<{
         e.stopPropagation()
       }}
     >
-      <i className={cn("i-mgc-star-cute-fi", isActive ? "" : "opacity-80")} />
+      <img src={focusIcon} alt="" className={cn("size-5", !isActive && "opacity-80")} />
       {showSidebarUnreadCount ? (
         <div className="text-[0.625rem] font-medium leading-none">
           {focusCount > 99 ? <span className="-mr-0.5">99+</span> : focusCount}

@@ -2,6 +2,7 @@ import { cn } from "@follow/utils"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 
+import focusIcon from "~/assets/focus-icon.svg"
 import { ROUTE_VIEW_FOCUS } from "~/constants"
 import { useNavigateEntry } from "~/hooks/biz/useNavigateEntry"
 import { useRouteParamsSelector } from "~/hooks/biz/useRouteParams"
@@ -30,7 +31,7 @@ export const FocusItem = memo(() => {
         })
       }}
     >
-      <i className="i-mgc-flag-cute-fi size-4 -translate-y-px text-accent" />
+      <img src={focusIcon} alt="" className="size-4 -translate-y-px" />
       {t("sidebar.timeline_tabs.focus")}
     </div>
   )

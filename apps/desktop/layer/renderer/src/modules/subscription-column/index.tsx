@@ -1,5 +1,4 @@
 import { useGlobalFocusableScopeSelector } from "@follow/components/common/Focusable/hooks.js"
-import { Spring } from "@follow/components/constants/spring.js"
 import { ActionButton } from "@follow/components/ui/button/index.js"
 import { RootPortal } from "@follow/components/ui/portal/index.js"
 import { FeedViewType } from "@follow/constants"
@@ -13,20 +12,16 @@ import { EventBus } from "@follow/utils/event-bus"
 import { clamp, cn } from "@follow/utils/utils"
 import { useWheel } from "@use-gesture/react"
 import { Lethargy } from "lethargy"
-import { AnimatePresence, m } from "motion/react"
 import type { FC, PropsWithChildren } from "react"
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 
 import { useRootContainerElement } from "~/atoms/dom"
 import { useIsInMASReview } from "~/atoms/server-configs"
-import { useUISettingKey } from "~/atoms/settings/ui"
 import { setTimelineColumnShow, useSubscriptionColumnShow } from "~/atoms/sidebar"
 import { Focusable } from "~/components/common/Focusable"
 import { HotkeyScope } from "~/constants"
-import { ROUTE_VIEW_FOCUS } from "~/constants/app"
 import { useBackHome } from "~/hooks/biz/useNavigateEntry"
-import { useReduceMotion } from "~/hooks/biz/useReduceMotion"
 import { parseView, useRouteParamsSelector } from "~/hooks/biz/useRouteParams"
 import { useTimelineTabs } from "~/hooks/biz/useTimelineList"
 import { useSettingModal } from "~/modules/settings/modal/useSettingModal"
@@ -201,60 +196,23 @@ export function SubscriptionColumn({
 
 const SwipeWrapper: FC<{ active: string; children: React.JSX.Element[] }> = memo(
   ({ children, active }) => {
-    const reduceMotion = useReduceMotion()
     const timelineList = useTimelineTabs()
     const viewIndex = timelineList.indexOf(active)
-
-    const feedColumnWidth = useUISettingKey("feedColWidth")
 
     const orderIndex = timelineList.indexOf(active)
 
     const prevOrderIndexRef = useRef(-1)
-    const [isReady, setIsReady] = useState(false)
-
-    const [direction, setDirection] = useState<"left" | "right">("right")
     const [currentAnimtedActive, setCurrentAnimatedActive] = useState(viewIndex)
 
     useLayoutEffect(() => {
-      const prevOrderIndex = prevOrderIndexRef.current
-      if (prevOrderIndex !== orderIndex) {
-        if (prevOrderIndex < orderIndex) setDirection("right")
-        else setDirection("left")
-      }
-
+      prevOrderIndexRef.current = orderIndex
       setTimeout(() => {
         setCurrentAnimatedActive(viewIndex)
       }, 0)
-      if (prevOrderIndexRef.current !== -1) {
-        setIsReady(true)
-      }
-      prevOrderIndexRef.current = orderIndex
     }, [orderIndex, viewIndex])
 
-    // The focus timeline shows the same subscription list as the other tabs, so
-    // switching to it swaps the column without a slide animation.
-    const isFocus = active === ROUTE_VIEW_FOCUS
-
-    if (reduceMotion || isFocus) {
-      return <div>{children[currentAnimtedActive]}</div>
-    }
-
-    return (
-      <AnimatePresence mode="popLayout">
-        <m.div
-          className="grow"
-          key={currentAnimtedActive}
-          initial={
-            isReady ? { x: direction === "right" ? feedColumnWidth : -feedColumnWidth } : true
-          }
-          animate={{ x: 0 }}
-          exit={{ x: direction === "right" ? -feedColumnWidth : feedColumnWidth }}
-          transition={Spring.presets.snappy}
-        >
-          {children[currentAnimtedActive]}
-        </m.div>
-      </AnimatePresence>
-    )
+    // 产品要求：第一栏 tab 之间切换一律直接切换，不做左右滑动动画。
+    return <div>{children[currentAnimtedActive]}</div>
   },
 )
 

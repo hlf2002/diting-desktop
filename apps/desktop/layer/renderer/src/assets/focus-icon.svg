@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="focusGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF5C00"/>
+      <stop offset="1" stop-color="#FF6EA9"/>
+    </linearGradient>
+  </defs>
+  <!-- 细靶心圆环（重点/聚焦语义） -->
+  <circle cx="32" cy="32" r="26" fill="none" stroke="url(#focusGrad)" stroke-width="3" opacity="0.55"/>
+  <circle cx="32" cy="32" r="19" fill="none" stroke="url(#focusGrad)" stroke-width="2" opacity="0.3"/>
+  <!-- 四角星（burst） -->
+  <path d="M32 12
+           C 34.2 22.5, 36.5 27.5, 32 32
+           C 27.5 27.5, 29.8 22.5, 32 12 Z
+           M32 52
+           C 29.8 41.5, 27.5 36.5, 32 32
+           C 36.5 36.5, 34.2 41.5, 32 52 Z"
+        fill="url(#focusGrad)"/>
+  <path d="M12 32
+           C 22.5 29.8, 27.5 27.5, 32 32
+           C 27.5 36.5, 22.5 34.2, 12 32 Z
+           M52 32
+           C 41.5 34.2, 36.5 36.5, 32 32
+           C 36.5 27.5, 41.5 29.8, 52 32 Z"
+        fill="url(#focusGrad)"/>
+  <!-- 中心小圆点 -->
+  <circle cx="32" cy="32" r="4.5" fill="#fff" opacity="0.92"/>
+</svg>
