@@ -24,6 +24,7 @@ import { useUISettingKey } from "~/atoms/settings/ui"
 import { setTimelineColumnShow, useSubscriptionColumnShow } from "~/atoms/sidebar"
 import { Focusable } from "~/components/common/Focusable"
 import { HotkeyScope } from "~/constants"
+import { ROUTE_VIEW_FOCUS } from "~/constants/app"
 import { useBackHome } from "~/hooks/biz/useNavigateEntry"
 import { useReduceMotion } from "~/hooks/biz/useReduceMotion"
 import { parseView, useRouteParamsSelector } from "~/hooks/biz/useRouteParams"
@@ -230,7 +231,11 @@ const SwipeWrapper: FC<{ active: string; children: React.JSX.Element[] }> = memo
       prevOrderIndexRef.current = orderIndex
     }, [orderIndex, viewIndex])
 
-    if (reduceMotion) {
+    // The focus timeline shows the same subscription list as the other tabs, so
+    // switching to it swaps the column without a slide animation.
+    const isFocus = active === ROUTE_VIEW_FOCUS
+
+    if (reduceMotion || isFocus) {
       return <div>{children[currentAnimtedActive]}</div>
     }
 
