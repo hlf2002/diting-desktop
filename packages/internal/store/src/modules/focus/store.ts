@@ -29,7 +29,9 @@ class FocusActions implements Hydratable, Resetable {
       FocusService.getAnalyzedEntryIds(),
     ])
     set({
-      focusEntryIds: new Set(focusRows.map((row) => row.entryId)),
+      // Only entries with a concrete reason count as "重点关注": a focus mark
+      // without a reason would otherwise render a generic fallback card.
+      focusEntryIds: new Set(focusRows.filter((row) => row.reason).map((row) => row.entryId)),
       analyzedEntryIds: new Set(analyzedRows.map((row) => row.entryId)),
       focusReasons: Object.fromEntries(
         focusRows.filter((row) => row.reason).map((row) => [row.entryId, row.reason!]),
@@ -114,14 +116,17 @@ class FocusActions implements Hydratable, Resetable {
     await FocusService.deleteMany(entryIds)
   }
 
-  /** Apply backfilled reasons for entries already flagged as focus (does not change match status). */
-  setReasonsInSession(reasons: Record<string, string>) {
+  /** Apply backfilled reasons, promoting entries into the focus set. */
+  applyReasonsInSession(reasons: Record<string, string>) {
     set((state) => {
+      const nextFocus = new Set(state.focusEntryIds)
       const nextReasons = { ...state.focusReasons }
       for (const [id, reason] of Object.entries(reasons)) {
-        if (state.focusEntryIds.has(id)) nextReasons[id] = reason
+        if (!reason) continue
+        nextFocus.add(id)
+        nextReasons[id] = reason
       }
-      return { focusReasons: nextReasons }
+      return { focusEntryIds: nextFocus, focusReasons: nextReasons }
     })
   }
 
@@ -130,6 +135,21 @@ class FocusActions implements Hydratable, Resetable {
     const entries = Object.entries(reasons)
     if (entries.length === 0) return
     await FocusService.updateReasons(reasons)
+  }
+
+  /** Drop entries from the focus set (and their local rows) when no reason can be produced. */
+  async removeFocus(entryIds: FocusEntryId[]) {
+    if (entryIds.length === 0) return
+    set((state) => {
+      const nextFocus = new Set(state.focusEntryIds)
+      const nextReasons = { ...state.focusReasons }
+      for (const id of entryIds) {
+        nextFocus.delete(id)
+        delete nextReasons[id]
+      }
+      return { focusEntryIds: nextFocus, focusReasons: nextReasons }
+    })
+    await FocusService.deleteMany(entryIds)
   }
 }
 

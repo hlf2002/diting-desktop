@@ -222,8 +222,6 @@
   "entry_content.fetching_content": "元のコンテンツを取得し、処理中です...",
   "entry_content.fetching_content_failed": "Readability: 元のコンテンツの取得に失敗しました。後で再試行するか、RSS コンテンツに戻ってください。",
   "entry_content.focus_reason": "注目",
-  "entry_content.focus_reason_fallback": "このコンテンツは注目する内容の基準に一致しています：{{criteria}}",
-  "entry_content.focus_reason_fallback_generic": "このコンテンツは注目する内容の基準に一致しています。",
   "entry_content.header.play_tts": "TTS を再生",
   "entry_content.header.play_tts_description": "設定でTTS音声を選択し、TTSを開始して音声コンテンツに変換します",
   "entry_content.header.readability": "読みやすさ",

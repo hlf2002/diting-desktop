@@ -1,3 +1,4 @@
+import { FocusService } from "@follow/database/services/focus"
 import { useEntryStore } from "@follow/store/entry/store"
 import { focusActions, useFocusStore } from "@follow/store/focus/store"
 import { atom, useAtomValue } from "jotai"
@@ -99,37 +100,53 @@ export const useFocusAnalyzer = () => {
         }
 
         // Backfill reasons for entries flagged as focus before reasons existed.
-        // This never re-judges the match — it only explains why it matches.
+        // Entries that get a concrete reason stay in the focus set; entries the
+        // AI cannot explain are dropped (a focus mark without a reason is not a
+        // match — no generic fallback copy is ever shown).
         if (reasonPendingRef.current.length > 0) {
           const reasonBatch = reasonPendingRef.current.splice(0, 20)
           const { focusReasons } = useFocusStore.getState()
           const stillMissing = reasonBatch.filter((id) => !focusReasons[id])
           if (stillMissing.length === 0) continue
           const data = useEntryStore.getState().data
-          const candidates = stillMissing
-            .map((id) => ({
-              id,
-              title: data[id]?.title,
-              description: data[id]?.description,
-            }))
-            .filter((candidate) => Boolean(candidate.title || candidate.description))
-          if (candidates.length === 0) continue
+          const withContent = stillMissing.filter(
+            (id) => Boolean(data[id]?.title) || Boolean(data[id]?.description),
+          )
+          const contentless = stillMissing.filter(
+            (id) => !data[id]?.title && !data[id]?.description,
+          )
+          if (contentless.length > 0) {
+            // No title/description means the AI has nothing to explain against:
+            // drop these from the focus set.
+            await focusActions.removeFocus(contentless)
+          }
+          if (withContent.length === 0) continue
+          const candidates = withContent.map((id) => ({
+            id,
+            title: data[id]?.title,
+            description: data[id]?.description,
+          }))
 
           const result = await explainFocusMatches(candidates)
           if (result.skipped) {
             // No criteria / no provider: no request was made. Keep the batch for
-            // a later drain (configuring the provider later starts backfilling);
-            // the card fallback covers the entry until then.
-            reasonPendingRef.current.unshift(...reasonBatch)
+            // a later drain (configuring the provider later starts backfilling).
+            reasonPendingRef.current.unshift(...stillMissing)
             break
           }
           if (result.failedIds && result.failedIds.length > 0) {
-            reasonPendingRef.current.unshift(...reasonBatch)
+            reasonPendingRef.current.unshift(...stillMissing)
             break
           }
           if (Object.keys(result.reasons).length > 0) {
-            focusActions.setReasonsInSession(result.reasons)
+            focusActions.applyReasonsInSession(result.reasons)
             await focusActions.persistReasons(result.reasons)
+          }
+          const unexplained = withContent.filter((id) => !result.reasons[id])
+          if (unexplained.length > 0) {
+            // The AI matched the batch but gave no reason for these entries:
+            // treat them as not matching and drop them from the focus set.
+            await focusActions.removeFocus(unexplained)
           }
         }
       }
@@ -176,29 +193,33 @@ export const useFocusAnalyzer = () => {
     })
   }, [enqueue])
 
-  // Backfill concrete reasons for focus entries scored before reasons existed
-  // (or where the AI returned none). Runs on mount (after the store hydrated)
-  // and whenever the focus set changes, so legacy marks get a specific reason
-  // on the card instead of the generic fallback.
+  // Backfill concrete reasons for legacy focus marks scored before reasons
+  // existed. Entries that get a reason stay in the focus set; entries the AI
+  // cannot explain are dropped — no focus mark without a reason survives.
   useEffect(() => {
-    const enqueueMissingReasons = () => {
-      const { focusEntryIds, focusReasons } = useFocusStore.getState()
-      const alreadyQueued = new Set(reasonPendingRef.current)
-      const missing = [...focusEntryIds]
-        .filter((id) => !focusReasons[id] && !alreadyQueued.has(id))
-        .slice(0, FOCUS_REASON_BACKFILL_LIMIT)
-      if (missing.length > 0) {
-        reasonPendingRef.current.push(...missing)
-        clearTimeout(timeoutRef.current)
-        timeoutRef.current = setTimeout(() => void drain(), 2000)
+    let cancelled = false
+    const enqueueMissingReasons = async () => {
+      try {
+        const rows = await FocusService.getUnreasonedFocusEntryIds()
+        if (cancelled) return
+        const alreadyQueued = new Set(reasonPendingRef.current)
+        const missing = rows
+          .map((row) => row.entryId)
+          .filter((id) => !alreadyQueued.has(id))
+          .slice(0, FOCUS_REASON_BACKFILL_LIMIT)
+        if (missing.length > 0) {
+          reasonPendingRef.current.push(...missing)
+          clearTimeout(timeoutRef.current)
+          timeoutRef.current = setTimeout(() => void drain(), 2000)
+        }
+      } catch (error) {
+        console.error("[focus-analyzer] failed to load legacy focus marks", error)
       }
     }
     void enqueueMissingReasons()
-    return useFocusStore.subscribe((state, prevState) => {
-      if (state.focusEntryIds.size !== prevState.focusEntryIds.size) {
-        void enqueueMissingReasons()
-      }
-    })
+    return () => {
+      cancelled = true
+    }
   }, [drain])
 
   // When the user saves/changes their focus criteria, re-score the most recent

@@ -1,4 +1,4 @@
-import { eq, inArray, sql } from "drizzle-orm"
+import { and, eq, inArray, isNull, sql } from "drizzle-orm"
 
 import { db } from "../db"
 import { focusEntriesTable } from "../schemas"
@@ -27,6 +27,14 @@ class FocusServiceStatic implements Resetable {
     return db.query.focusEntriesTable.findMany({
       columns: { entryId: true, reason: true },
       where: eq(focusEntriesTable.isFocus, true),
+    })
+  }
+
+  /** Focus rows still missing a reason (legacy marks scored before reasons existed). */
+  getUnreasonedFocusEntryIds() {
+    return db.query.focusEntriesTable.findMany({
+      columns: { entryId: true },
+      where: and(eq(focusEntriesTable.isFocus, true), isNull(focusEntriesTable.reason)),
     })
   }
 

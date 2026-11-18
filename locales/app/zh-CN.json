@@ -222,8 +222,6 @@
   "entry_content.fetching_content": "正在获取原始内容并处理",
   "entry_content.fetching_content_failed": "获取原始内容失败",
   "entry_content.focus_reason": "重点关注",
-  "entry_content.focus_reason_fallback": "该内容符合您设定的重点关注内容：{{criteria}}",
-  "entry_content.focus_reason_fallback_generic": "该内容符合您设定的重点关注标准。",
   "entry_content.header.play_tts": "播放文本转语音",
   "entry_content.header.play_tts_description": "在设置中选择一个 TTS 语音，启动 TTS 转换为有声内容",
   "entry_content.header.readability": "阅读模式",

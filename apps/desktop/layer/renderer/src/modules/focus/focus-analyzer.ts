@@ -94,6 +94,14 @@ export interface FocusMatchResult {
 }
 
 /**
+ * Keep only matches that carry a concrete reason. An entry matched by the AI
+ * without a reason is treated as not matching — the "重点关注" mark requires a
+ * specific why, so the reader card never falls back to generic copy.
+ */
+export const filterReasonedMatches = (matches: FocusMatchResult[]): FocusMatchResult[] =>
+  matches.filter((match) => Boolean(match.reason))
+
+/**
  * Parse the AI response: either the legacy plain array of ids or the current
  * [{id, reason}] shape. Malformed/unknown ids are dropped.
  */
@@ -209,7 +217,7 @@ export const analyzeEntriesForFocus = async (
           choices?: Array<{ message?: { content?: string } }>
         }
         const content = data.choices?.[0]?.message?.content ?? ""
-        const matches = extractFocusResults(content)
+        const matches = filterReasonedMatches(extractFocusResults(content))
         matchedIds = matches.map((match) => match.id)
         for (const match of matches) {
           if (match.reason) matchedReasons[match.id] = match.reason

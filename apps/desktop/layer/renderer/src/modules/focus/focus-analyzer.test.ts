@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest"
 
-import { extractFocusResults, extractIdArray, extractPlainText } from "./focus-analyzer"
+import {
+  extractFocusResults,
+  extractIdArray,
+  extractPlainText,
+  filterReasonedMatches,
+} from "./focus-analyzer"
 
 const VALID_ID = "1721025600000" // 13-digit snowflake-ish id
 
@@ -118,5 +123,21 @@ describe("extractFocusResults", () => {
   it("returns an empty array on malformed input", () => {
     expect(extractFocusResults("nothing")).toEqual([])
     expect(extractFocusResults(`[{"id":"${VALID_ID}",`)).toEqual([])
+  })
+})
+
+describe("filterReasonedMatches", () => {
+  it("keeps only matches that carry a concrete reason", () => {
+    expect(
+      filterReasonedMatches([
+        { id: VALID_ID, reason: "与 AI 相关" },
+        { id: "1721025600001" },
+        { id: "1721025600002", reason: "" },
+      ]),
+    ).toEqual([{ id: VALID_ID, reason: "与 AI 相关" }])
+  })
+
+  it("returns empty when no match has a reason", () => {
+    expect(filterReasonedMatches([{ id: VALID_ID }, { id: "1721025600001" }])).toEqual([])
   })
 })
