@@ -18,6 +18,7 @@ import {
   ROUTE_FEED_IN_INBOX,
   ROUTE_FEED_IN_LIST,
   ROUTE_FEED_PENDING,
+  ROUTE_VIEW_FOCUS,
 } from "~/constants"
 
 import { getTimelineIdByView, useRouteParamsSelector } from "./useRouteParams"
@@ -83,7 +84,10 @@ const parseNavigateEntryOptions = (options: NavigateEntryOptions): ParsedNavigat
 
   finalFeedId = encodeURIComponent(finalFeedId)
 
-  if (finalView !== undefined && !timelineId) {
+  // The focus timeline is a device-local view of its own; it must not be
+  // hijacked into a regular feed view just because the current entry's feed
+  // has a view (or the caller passed a numeric `view`).
+  if (finalView !== undefined && !timelineId && params.timelineId !== ROUTE_VIEW_FOCUS) {
     finalTimelineId = getTimelineIdByView(finalView)
   }
 
