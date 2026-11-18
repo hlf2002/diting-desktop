@@ -2,7 +2,7 @@ import { cn } from "@follow/utils"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
 
-import focusIcon from "~/assets/focus-icon.svg"
+import focusIcon from "~/assets/focus-icon.png"
 import { ROUTE_VIEW_FOCUS } from "~/constants"
 import { useNavigateEntry } from "~/hooks/biz/useNavigateEntry"
 import { useRouteParamsSelector } from "~/hooks/biz/useRouteParams"

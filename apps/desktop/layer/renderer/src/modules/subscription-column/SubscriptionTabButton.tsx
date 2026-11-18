@@ -8,7 +8,7 @@ import type { FC } from "react"
 import { startTransition, useCallback } from "react"
 import { useTranslation } from "react-i18next"
 
-import focusIcon from "~/assets/focus-icon.svg"
+import focusIcon from "~/assets/focus-icon.png"
 import { MenuItemText, useShowContextMenu } from "~/atoms/context-menu"
 import { setUISetting, useUISettingKey } from "~/atoms/settings/ui"
 import { FocusablePresets } from "~/components/common/Focusable"
