@@ -1,11 +1,14 @@
+import { env } from "@follow/shared/env.desktop"
 import { BYOK_PROVIDERS } from "@follow/shared/settings/byok-providers"
 import type { UserByokProviderConfig } from "@follow/shared/settings/interface"
 import { isBizId } from "@follow/utils/utils"
 
 import { getAISettings } from "~/atoms/settings/ai"
+import { apiFetch } from "~/lib/api-client"
 
 export interface FocusCandidate {
   id: string
+  feedId?: string | null
   title?: string | null
   description?: string | null
 }
@@ -28,6 +31,79 @@ const REQUEST_TIMEOUT_MS = 60_000
 const TITLE_LIMIT = 200
 const DESCRIPTION_LIMIT = 300
 
+/** 服务端建立的主体档案（个人/机构/媒体，AI + 联网搜索）。 */
+export interface FocusProfile {
+  feedId: string
+  entityType: string
+  name: string | null
+  summary: string | null
+}
+
+/**
+ * 批量拉取候选条目所在数据源的档案（POST /api/feeds/profiles）。
+ * 失败时返回空 map——档案只是判断的辅助信息，缺失不应阻断分析主流程。
+ */
+const fetchProfiles = async (
+  feedIds: Array<string | null | undefined>,
+): Promise<Record<string, FocusProfile>> => {
+  const unique = [...new Set(feedIds.filter((id): id is string => Boolean(id)))]
+  if (unique.length === 0) return {}
+  try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 15_000)
+    try {
+      const response = await apiFetch(
+        new Request(`${env.VITE_API_URL}/api/feeds/profiles`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ feedIds: unique }),
+          credentials: "include",
+          signal: controller.signal,
+        }),
+      )
+      if (!response.ok) {
+        console.error("[focus-analyzer] profile fetch failed", response.status)
+        return {}
+      }
+      const data = (await response.json()) as { data?: { profiles?: Record<string, FocusProfile> } }
+      return data.data?.profiles ?? {}
+    } finally {
+      clearTimeout(timeout)
+    }
+  } catch (error) {
+    console.error("[focus-analyzer] profile fetch failed", error)
+    return {}
+  }
+}
+
+/** 把数据源档案拼成 prompt 段落：告诉 AI 这条内容来自谁（个人/机构/媒体），避免把主体旗下公司的动态当成机构动态。 */
+const buildProfileSection = (
+  candidates: FocusCandidate[],
+  profiles: Record<string, FocusProfile>,
+): string => {
+  const seen = new Set<string>()
+  const lines: string[] = []
+  for (const candidate of candidates) {
+    if (!candidate.feedId || seen.has(candidate.feedId)) continue
+    seen.add(candidate.feedId)
+    const profile = profiles[candidate.feedId]
+    if (!profile || !profile.name) continue
+    const typeLabel =
+      profile.entityType === "person"
+        ? "个人"
+        : profile.entityType === "org"
+          ? "机构/组织"
+          : profile.entityType === "other"
+            ? "其他主体"
+            : "未知"
+    lines.push(
+      `- 数据源 ${profile.feedId}：${profile.name}（${typeLabel}）。${profile.summary ?? ""}`.trim(),
+    )
+  }
+  if (lines.length === 0) return ""
+  return `\n候选内容所属数据源档案（用于识别数据源是谁：个人/机构/媒体。判断「数据源」相关标准时以此为准，不要把个人账号旗下公司/产品的动态当成机构本身）：\n${lines.join("\n")}`
+}
+
 const pickProvider = (): (UserByokProviderConfig & { baseURL: string; model: string }) | null => {
   const byok = getAISettings().byok
   if (!byok?.enabled) return null
@@ -49,7 +125,7 @@ const truncate = (text: string | null | undefined, limit: number) => {
   return trimmed.length > limit ? `${trimmed.slice(0, limit)}…` : trimmed
 }
 
-const buildMessages = (criteria: string, candidates: FocusCandidate[]) => {
+const buildMessages = (criteria: string, candidates: FocusCandidate[], profileSection: string) => {
   const listJson = JSON.stringify(
     candidates.map((entry) => ({
       id: entry.id,
@@ -67,7 +143,7 @@ const buildMessages = (criteria: string, candidates: FocusCandidate[]) => {
       role: "user",
       content: `用户重点关注内容的标准：
 """${criteria}"""
-
+${profileSection}
 候选内容列表（JSON 数组，每条含 id/title/description）：
 ${listJson}
 
@@ -176,6 +252,10 @@ export const analyzeEntriesForFocus = async (
   if (!provider)
     return { matchedIds: [], matchedReasons: {}, analyzedIds: [], failedIds: [], skipped: true }
 
+  // 批量拉数据源档案（个人/机构/媒体），失败不影响主流程
+  const profiles = await fetchProfiles(candidates.map((entry) => entry.feedId))
+  const profileSection = buildProfileSection(candidates, profiles)
+
   const results: FocusAnalysisResult = {
     matchedIds: [],
     matchedReasons: {},
@@ -204,7 +284,7 @@ export const analyzeEntriesForFocus = async (
           body: JSON.stringify({
             model: provider.model,
             temperature: 0,
-            messages: buildMessages(criteria, batch),
+            messages: buildMessages(criteria, batch, profileSection),
           }),
           signal: controller.signal,
         })
@@ -253,7 +333,11 @@ export interface FocusExplainResult {
   skipped: boolean
 }
 
-const buildReasonMessages = (criteria: string, candidates: FocusCandidate[]) => {
+const buildReasonMessages = (
+  criteria: string,
+  candidates: FocusCandidate[],
+  profileSection: string,
+) => {
   const listJson = JSON.stringify(
     candidates.map((entry) => ({
       id: entry.id,
@@ -271,7 +355,7 @@ const buildReasonMessages = (criteria: string, candidates: FocusCandidate[]) => 
       role: "user",
       content: `用户重点关注内容的标准：
 """${criteria}"""
-
+${profileSection}
 候选内容列表（JSON 数组，每条含 id/title/description）：
 ${listJson}
 
@@ -294,6 +378,10 @@ export const explainFocusMatches = async (
   const provider = pickProvider()
   if (!provider) return { reasons: {}, failedIds: [], skipped: true }
 
+  // 批量拉数据源档案（个人/机构/媒体），失败不影响主流程
+  const profiles = await fetchProfiles(candidates.map((entry) => entry.feedId))
+  const profileSection = buildProfileSection(candidates, profiles)
+
   const result: FocusExplainResult = { reasons: {}, failedIds: [], skipped: false }
 
   for (let i = 0; i < candidates.length; i += BATCH_SIZE) {
@@ -312,7 +400,7 @@ export const explainFocusMatches = async (
           body: JSON.stringify({
             model: provider.model,
             temperature: 0,
-            messages: buildReasonMessages(criteria, batch),
+            messages: buildReasonMessages(criteria, batch, profileSection),
           }),
           signal: controller.signal,
         })

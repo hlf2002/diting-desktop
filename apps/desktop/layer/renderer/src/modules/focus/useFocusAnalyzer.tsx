@@ -61,7 +61,12 @@ export const useFocusAnalyzer = () => {
           const candidates = unseen
             .map((id) => {
               const entry = data[id]
-              return { id, title: entry?.title, description: entry?.description }
+              return {
+                id,
+                feedId: entry?.feedId,
+                title: entry?.title,
+                description: entry?.description,
+              }
             })
             .filter((candidate) => Boolean(candidate.title || candidate.description))
           const contentless = unseen.filter((id) => !data[id]?.title && !data[id]?.description)
@@ -123,6 +128,7 @@ export const useFocusAnalyzer = () => {
           if (withContent.length === 0) continue
           const candidates = withContent.map((id) => ({
             id,
+            feedId: data[id]?.feedId,
             title: data[id]?.title,
             description: data[id]?.description,
           }))

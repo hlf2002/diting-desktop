@@ -56,6 +56,7 @@ import { useSettingModal } from "~/modules/settings/modal/useSettingModal"
 import { feed as feedQuery, useFeedQuery } from "~/queries/feed"
 
 import { ViewSelectorRadioGroup } from "../shared/ViewSelectorRadioGroup"
+import { FeedProfileCard } from "./FeedProfileCard"
 import { FeedSummary } from "./FeedSummary"
 
 const formSchema = z.object({
@@ -437,6 +438,7 @@ const FeedInnerForm = ({
   return (
     <div className="flex flex-1 flex-col gap-y-4">
       <FeedSummary isLoading={isLoading} feed={feed} analytics={analytics} showAnalytics />
+      {feed.id && <FeedProfileCard feedId={feed.id} />}
       {needLogin && (
         <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-600 dark:text-amber-400">
           <i className="i-mgc-lock-cute-re mt-0.5 shrink-0" />
