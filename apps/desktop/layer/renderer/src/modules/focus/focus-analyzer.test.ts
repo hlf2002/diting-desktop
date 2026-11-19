@@ -176,6 +176,19 @@ describe("buildProfileSection", () => {
     expect(section).not.toContain("t4")
   })
 
+  it("labels media entity type as 媒体", () => {
+    const profiles = {
+      "1721025600010": {
+        feedId: "1721025600010",
+        entityType: "media",
+        name: "钛媒体",
+        summary: "科技媒体。",
+      },
+    }
+    const section = buildProfileSection(candidates, profiles)
+    expect(section).toContain("钛媒体（媒体）")
+  })
+
   it("returns empty string when no profile has a name", () => {
     const profiles = {
       "1721025600010": { feedId: "1721025600010", entityType: "person", name: null, summary: null },

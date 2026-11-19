@@ -42,7 +42,8 @@ const fetchProfile = async (feedId: string): Promise<FeedProfileData | null> => 
 
 const entityTypeLabel = (entityType: string): string => {
   if (entityType === "person") return "个人"
-  if (entityType === "org") return "机构/媒体"
+  if (entityType === "media") return "媒体"
+  if (entityType === "org") return "机构/组织"
   if (entityType === "other") return "其他主体"
   return "未知"
 }
