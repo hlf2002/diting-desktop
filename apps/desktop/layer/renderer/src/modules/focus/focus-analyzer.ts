@@ -77,7 +77,7 @@ const fetchProfiles = async (
 }
 
 /** 把数据源档案拼成 prompt 段落：告诉 AI 这条内容来自谁（个人/机构/媒体），避免把主体旗下公司的动态当成机构动态。 */
-const buildProfileSection = (
+export const buildProfileSection = (
   candidates: FocusCandidate[],
   profiles: Record<string, FocusProfile>,
 ): string => {

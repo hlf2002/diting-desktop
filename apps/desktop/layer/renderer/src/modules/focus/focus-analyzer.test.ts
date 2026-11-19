@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import {
+  buildProfileSection,
   extractFocusResults,
   extractIdArray,
   extractPlainText,
@@ -139,5 +140,49 @@ describe("filterReasonedMatches", () => {
 
   it("returns empty when no match has a reason", () => {
     expect(filterReasonedMatches([{ id: VALID_ID }, { id: "1721025600001" }])).toEqual([])
+  })
+})
+
+describe("buildProfileSection", () => {
+  const candidates = [
+    { id: "1721025600000", feedId: "1721025600010", title: "t1", description: "d1" },
+    { id: "1721025600001", feedId: "1721025600010", title: "t2", description: "d2" },
+    { id: "1721025600002", feedId: "1721025600011", title: "t3", description: "d3" },
+    { id: "1721025600003", feedId: null, title: "t4", description: "d4" },
+  ]
+
+  it("lists each distinct data source with its entity type and summary", () => {
+    const profiles = {
+      "1721025600010": {
+        feedId: "1721025600010",
+        entityType: "person",
+        name: "埃隆·马斯克",
+        summary: "特斯拉、SpaceX 的 CEO。",
+      },
+      "1721025600011": {
+        feedId: "1721025600011",
+        entityType: "org",
+        name: "Starlink",
+        summary: "SpaceX 旗下卫星互联网公司。",
+      },
+    }
+    const section = buildProfileSection(candidates, profiles)
+    expect(section).toContain("埃隆·马斯克（个人）")
+    expect(section).toContain("Starlink（机构/组织）")
+    // 同一 feed 的多条候选只出现一次（每行以「- 数据源 」开头）
+    expect(section.match(/^- 数据源 /gm)).toHaveLength(2)
+    // 无档案的候选不产生行
+    expect(section).not.toContain("t4")
+  })
+
+  it("returns empty string when no profile has a name", () => {
+    const profiles = {
+      "1721025600010": { feedId: "1721025600010", entityType: "person", name: null, summary: null },
+    }
+    expect(buildProfileSection(candidates, profiles)).toBe("")
+  })
+
+  it("returns empty string when there are no profiles at all", () => {
+    expect(buildProfileSection(candidates, {})).toBe("")
   })
 })
