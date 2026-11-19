@@ -12,11 +12,13 @@ export function ErrorTooltip({
   errorMessage,
   children,
   showWhenError = false,
+  side = "top",
 }: {
   errorMessage?: string | null
   errorAt?: string | null
   children: React.ReactNode
   showWhenError?: boolean
+  side?: React.ComponentProps<typeof TooltipContent>["side"]
 }) {
   const { t } = useTranslation()
   if (!errorAt || !errorMessage) {
@@ -26,7 +28,7 @@ export function ErrorTooltip({
     <Tooltip delayDuration={300}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
       <TooltipPortal>
-        <TooltipContent>
+        <TooltipContent side={side}>
           <div className="flex items-center gap-1">
             <i className="i-mgc-time-cute-re" />
             {t("feed_item.error_since")}{" "}

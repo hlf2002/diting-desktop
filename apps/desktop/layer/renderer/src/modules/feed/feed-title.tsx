@@ -14,12 +14,14 @@ export const FeedTitle = ({
   titleClassName,
   title,
   style,
+  tooltipSide,
 }: {
   feed?: FeedModel | ListModel | InboxModel | null
   className?: string
   titleClassName?: string
   title?: string | null
   style?: React.CSSProperties
+  tooltipSide?: React.ComponentProps<typeof EllipsisHorizontalTextWithTooltip>["side"]
 }) => {
   const hideExtraBadge = useUISettingKey("hideExtraBadge")
 
@@ -27,7 +29,10 @@ export const FeedTitle = ({
 
   return (
     <div className={cn("flex select-none items-center truncate", className)} style={style}>
-      <EllipsisHorizontalTextWithTooltip className={cn("truncate", titleClassName)}>
+      <EllipsisHorizontalTextWithTooltip
+        className={cn("truncate", titleClassName)}
+        side={tooltipSide}
+      >
         {title || getPreferredTitle(feed)}
       </EllipsisHorizontalTextWithTooltip>
       {!hideExtraBadge && feed.type !== "inbox" && <FeedCertification feed={feed} />}

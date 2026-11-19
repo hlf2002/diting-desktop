@@ -262,9 +262,9 @@ const FeedItemImpl = ({ view, feedId, className, isPreview }: FeedItemProps) => 
     >
       <div className={cn("flex min-w-0 items-center", showFeedErrorIndicator && "text-red")}>
         <FeedIcon fallback target={feed} size={16} />
-        <FeedTitle feed={feed} />
+        <FeedTitle feed={feed} tooltipSide="right" />
         {showFeedErrorIndicator && (
-          <ErrorTooltip errorAt={feed.errorAt} errorMessage={feed.errorMessage}>
+          <ErrorTooltip errorAt={feed.errorAt} errorMessage={feed.errorMessage} side="right">
             <i className="i-mingcute-close-circle-fill ml-1 shrink-0 text-base" />
           </ErrorTooltip>
         )}
@@ -274,7 +274,7 @@ const FeedItemImpl = ({ view, feedId, className, isPreview }: FeedItemProps) => 
               <OouiUserAnonymous className="ml-1 shrink-0 text-base" />
             </TooltipTrigger>
             <TooltipPortal>
-              <TooltipContent>{t("feed_item.not_publicly_visible")}</TooltipContent>
+              <TooltipContent side="right">{t("feed_item.not_publicly_visible")}</TooltipContent>
             </TooltipPortal>
           </Tooltip>
         )}
@@ -285,7 +285,7 @@ const FeedItemImpl = ({ view, feedId, className, isPreview }: FeedItemProps) => 
             <i className="i-mingcute-sparkles-line shrink-0 text-base text-text-tertiary" />
           </TooltipTrigger>
           <TooltipPortal>
-            <TooltipContent>{t("feed_item.onboarding_feed")}</TooltipContent>
+            <TooltipContent side="right">{t("feed_item.onboarding_feed")}</TooltipContent>
           </TooltipPortal>
         </Tooltip>
       )}
@@ -404,7 +404,7 @@ const ListItemImpl: Component<ListItemProps> = ({
     >
       <div className="flex min-w-0 flex-1 items-center">
         <FeedIcon fallback target={list} size={iconSize} className="mask-squircle mask" />
-        <EllipsisHorizontalTextWithTooltip className="truncate">
+        <EllipsisHorizontalTextWithTooltip className="truncate" side="right">
           {getPreferredTitle(list)}
         </EllipsisHorizontalTextWithTooltip>
 
@@ -414,7 +414,7 @@ const ListItemImpl: Component<ListItemProps> = ({
               <OouiUserAnonymous className="ml-1 shrink-0 text-base" />
             </TooltipTrigger>
             <TooltipPortal>
-              <TooltipContent>{t("feed_item.not_publicly_visible")}</TooltipContent>
+              <TooltipContent side="right">{t("feed_item.not_publicly_visible")}</TooltipContent>
             </TooltipPortal>
           </Tooltip>
         )}
@@ -519,7 +519,7 @@ const InboxItemImpl: Component<InboxItemProps> = ({ view, inboxId, className, ic
     >
       <div className={"flex min-w-0 items-center"}>
         <FeedIcon fallback target={inbox} size={iconSize} />
-        <EllipsisHorizontalTextWithTooltip className="truncate">
+        <EllipsisHorizontalTextWithTooltip className="truncate" side="right">
           {getPreferredTitle(inbox)}
         </EllipsisHorizontalTextWithTooltip>
       </div>

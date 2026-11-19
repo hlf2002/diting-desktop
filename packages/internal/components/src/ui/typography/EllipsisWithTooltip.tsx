@@ -17,10 +17,11 @@ type EllipsisProps = PropsWithChildren<{
   className?: string
   disabled?: boolean
   dir?: "h" | "v"
+  side?: React.ComponentProps<typeof TooltipContent>["side"]
 }>
 
 export const EllipsisTextWithTooltip = (props: EllipsisProps) => {
-  const { children, className, width, disabled, dir = "v" } = props
+  const { children, className, width, disabled, dir = "v", side = "top" } = props
 
   const [textElRef, setTextElRef] = useState<HTMLSpanElement | null>()
   const [isOverflowed, setIsOverflowed] = useState(false)
@@ -68,7 +69,7 @@ export const EllipsisTextWithTooltip = (props: EllipsisProps) => {
       <TooltipTrigger asChild>{Content}</TooltipTrigger>
 
       <TooltipPortal>
-        <TooltipContent>
+        <TooltipContent side={side}>
           <span className="whitespace-pre-line break-all" onClick={(e) => e.stopPropagation()}>
             {children}
           </span>
