@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import {
   buildProfileSection,
+  enrichCandidateFeedIds,
   extractFocusResults,
   extractIdArray,
   extractPlainText,
@@ -184,5 +185,29 @@ describe("buildProfileSection", () => {
 
   it("returns empty string when there are no profiles at all", () => {
     expect(buildProfileSection(candidates, {})).toBe("")
+  })
+})
+
+describe("enrichCandidateFeedIds", () => {
+  it("keeps known feedIds and fills missing ones from the fetch fixes", () => {
+    const candidates = [
+      { id: "1721025600000", feedId: "1721025600010", title: "t1", description: "d1" },
+      { id: "1721025600001", feedId: null, title: "t2", description: "d2" },
+      { id: "1721025600002", feedId: undefined, title: "t3", description: "d3" },
+    ]
+    const fixes = {
+      "1721025600001": "1721025600011",
+      "1721025600002": "1721025600012",
+    }
+    const enriched = enrichCandidateFeedIds(candidates, fixes)
+    expect(enriched[0]?.feedId).toBe("1721025600010")
+    expect(enriched[1]?.feedId).toBe("1721025600011")
+    expect(enriched[2]?.feedId).toBe("1721025600012")
+  })
+
+  it("leaves a missing feedId null when the fetch returned nothing for it", () => {
+    const candidates = [{ id: "1721025600000", feedId: null, title: "t", description: "d" }]
+    const enriched = enrichCandidateFeedIds(candidates, {})
+    expect(enriched[0]?.feedId).toBeNull()
   })
 })

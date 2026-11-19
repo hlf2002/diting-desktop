@@ -76,6 +76,55 @@ const fetchProfiles = async (
   }
 }
 
+/**
+ * 候选条目来自 entry store，其 feedId 可能为 null（服务端 serializeEntry 不返回 feedId，
+ * 客户端列表 morph 的 feedId 依赖响应里的 feeds 对象，缺失时档案段拼不上、AI 只能猜数据源）。
+ * 对 feedId 缺失的候选逐个 GET /entries?id=（详情响应带 feeds.id）补拉。
+ * 失败静默返回 null——补拉只是让档案更可靠，不应阻断分析主流程。
+ */
+export const fetchMissingFeedIds = async (
+  candidates: FocusCandidate[],
+): Promise<Record<string, string | null>> => {
+  const missing = candidates.filter((c) => !c.feedId && Boolean(c.id)).map((c) => c.id)
+  if (missing.length === 0) return {}
+  const result: Record<string, string | null> = {}
+  for (let i = 0; i < missing.length; i += 5) {
+    const chunk = missing.slice(i, i + 5)
+    await Promise.all(
+      chunk.map(async (id) => {
+        try {
+          const controller = new AbortController()
+          const timeout = setTimeout(() => controller.abort(), 15_000)
+          try {
+            const response = await apiFetch(
+              new Request(`${env.VITE_API_URL}/api/entries?id=${id}`, {
+                credentials: "include",
+                signal: controller.signal,
+              }),
+            )
+            if (!response.ok) return
+            const data = (await response.json()) as { data?: { feeds?: { id?: string } } }
+            result[id] = data.data?.feeds?.id ?? null
+          } finally {
+            clearTimeout(timeout)
+          }
+        } catch (error) {
+          console.error("[focus-analyzer] entry feedId fetch failed", id, error)
+          result[id] = null
+        }
+      }),
+    )
+  }
+  return result
+}
+
+/** 用补拉结果补齐候选的 feedId（无缺失时原样返回）。 */
+export const enrichCandidateFeedIds = (
+  candidates: FocusCandidate[],
+  fixes: Record<string, string | null>,
+): FocusCandidate[] =>
+  candidates.map((c) => (c.feedId || !fixes[c.id] ? c : { ...c, feedId: fixes[c.id] }))
+
 /** 把数据源档案拼成 prompt 段落：告诉 AI 这条内容来自谁（个人/机构/媒体），避免把主体旗下公司的动态当成机构动态。 */
 export const buildProfileSection = (
   candidates: FocusCandidate[],
@@ -252,9 +301,13 @@ export const analyzeEntriesForFocus = async (
   if (!provider)
     return { matchedIds: [], matchedReasons: {}, analyzedIds: [], failedIds: [], skipped: true }
 
-  // 批量拉数据源档案（个人/机构/媒体），失败不影响主流程
-  const profiles = await fetchProfiles(candidates.map((entry) => entry.feedId))
-  const profileSection = buildProfileSection(candidates, profiles)
+  // 批量拉数据源档案（个人/机构/媒体），失败不影响主流程。
+  // entry store 的 feedId 可能缺失（serializeEntry 不返回 feedId），先补拉再取档案，
+  // 否则档案段为空、AI 只能从标题猜数据源（把文章主角当成数据源，2026-11-19 实锤）。
+  const feedIdFixes = await fetchMissingFeedIds(candidates)
+  const enrichedCandidates = enrichCandidateFeedIds(candidates, feedIdFixes)
+  const profiles = await fetchProfiles(enrichedCandidates.map((entry) => entry.feedId))
+  const profileSection = buildProfileSection(enrichedCandidates, profiles)
 
   const results: FocusAnalysisResult = {
     matchedIds: [],
@@ -378,9 +431,12 @@ export const explainFocusMatches = async (
   const provider = pickProvider()
   if (!provider) return { reasons: {}, failedIds: [], skipped: true }
 
-  // 批量拉数据源档案（个人/机构/媒体），失败不影响主流程
-  const profiles = await fetchProfiles(candidates.map((entry) => entry.feedId))
-  const profileSection = buildProfileSection(candidates, profiles)
+  // 批量拉数据源档案（个人/机构/媒体），失败不影响主流程。
+  // 同 analyzeEntriesForFocus：entry store 的 feedId 可能缺失，先补拉再取档案。
+  const feedIdFixes = await fetchMissingFeedIds(candidates)
+  const enrichedCandidates = enrichCandidateFeedIds(candidates, feedIdFixes)
+  const profiles = await fetchProfiles(enrichedCandidates.map((entry) => entry.feedId))
+  const profileSection = buildProfileSection(enrichedCandidates, profiles)
 
   const result: FocusExplainResult = { reasons: {}, failedIds: [], skipped: false }
 
