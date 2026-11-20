@@ -200,7 +200,7 @@ ${listJson}
 
 请判断每条内容是否属于用户重点关注的范围，返回符合标准的条目的 id 和判断理由组成的 JSON 数组，格式为 [{"id":"id1","reason":"理由1"}]。判断为符合的条目必须给出具体理由：说明该内容与标准中哪一条/哪一方面的对应关系（引用标准原文或关键词），一句话即可；禁止使用「符合您设定的重点关注标准」这类不指明具体标准的笼统表述。全部不符合则返回 []。
 
-特别注意（当标准按数据源类型分支时）：标准可能按「数据源是一个人/一个机构/一个媒体」分三条规则。你必须先用数据源档案确定该内容来自哪类主体，再套用对应那条规则；若对应规则还限定了公司名单（如「媒体，我只想看以下公司的新闻：A、B、C」），必须把名单里的公司逐一与内容标题/描述比对，内容中完全不涉及名单中任何一家公司的一律判不符合——即使内容属于该媒体且话题相关，也不能算匹配。`,
+特别注意（当标准按数据源类型分支时）：标准可能按「数据源是一个人/一个机构/一个媒体」分三条规则。你必须先用数据源档案确定该内容来自哪类主体，再套用对应那条规则；若对应规则还限定了公司名单（如「媒体，我只想看以下公司的新闻：A、B、C」），必须把名单里的公司逐一与内容标题/描述比对，内容中完全不涉及名单中任何一家公司的一律判不符合——即使内容属于该媒体且话题相关，也不能算匹配。判断为不符合的条目，绝对不要出现在返回的 JSON 数组中（不得把不符合的条目以任何形式返回，包括带否定性理由的形式）；返回数组中的每条 id 都代表该内容符合标准。`,
     },
   ]
 }
@@ -223,12 +223,24 @@ export interface FocusMatchResult {
 }
 
 /**
- * Keep only matches that carry a concrete reason. An entry matched by the AI
- * without a reason is treated as not matching — the "重点关注" mark requires a
- * specific why, so the reader card never falls back to generic copy.
+ * Detect a reason that actually says the entry does NOT match (e.g. the AI
+ * phrasing a whitelist miss as "内容未涉及标准中限定的特定公司名单"). Such a
+ * reason is a negative verdict, not a "why it matched" — treating it as a match
+ * reason promotes non-matching entries into the focus set (2026-11-20 实锤).
+ */
+export const isNegativeReason = (reason: string): boolean =>
+  /不涉及|未涉及|不符合|不属于|未命中|未提到|无关|不在名单|不包含|不匹配|无法匹配|并非|并不是|没有涉及|没有提到|没有提及/.test(
+    reason,
+  )
+
+/**
+ * Keep only matches that carry a concrete, affirmative reason. An entry matched
+ * by the AI without a reason — or with a negative reason — is treated as not
+ * matching: the "重点关注" mark requires a specific why, and a negative why is
+ * no why at all (no generic fallback copy is ever shown).
  */
 export const filterReasonedMatches = (matches: FocusMatchResult[]): FocusMatchResult[] =>
-  matches.filter((match) => Boolean(match.reason))
+  matches.filter((match) => Boolean(match.reason) && !isNegativeReason(match.reason!))
 
 /**
  * Parse the AI response: either the legacy plain array of ids or the current
@@ -406,7 +418,7 @@ const buildReasonMessages = (
     {
       role: "system",
       content:
-        "你是内容筛选助手。以下内容已被确认属于用户的「重点关注内容」范围，请为每条内容生成具体的判断理由，说明该内容与用户重点关注标准的具体对应关系。只输出 JSON，不要输出任何其他文字或解释。",
+        "你是内容筛选助手。以下内容曾被标记为属于用户的「重点关注内容」范围，请复核每条内容，并为复核后仍属于重点关注范围的内容生成具体的判断理由，说明该内容与用户重点关注标准的具体对应关系。只输出 JSON，不要输出任何其他文字或解释。",
     },
     {
       role: "user",
@@ -418,7 +430,7 @@ ${listJson}
 
 请为每条内容生成判断理由，返回 JSON 数组，格式为 [{"id":"id1","reason":"理由1"}]。理由要具体说明该内容与用户重点关注标准中哪一条/哪一方面的对应关系（引用标准原文或关键词），一句话即可；禁止使用「符合您的重点关注标准」这类不指明具体标准的笼统表述。
 
-特别注意（当标准按数据源类型分支时）：标准可能按「数据源是一个人/一个机构/一个媒体」分三条规则。生成理由时先用数据源档案确定主体类型，再套用对应那条规则；若对应规则限定了公司名单（如「媒体，我只想看以下公司的新闻：A、B、C」），理由必须说明内容涉及名单中哪家公司；内容不涉及名单中任何一家公司的条目，直接返回不匹配（不生成理由）。`,
+特别注意（当标准按数据源类型分支时）：标准可能按「数据源是一个人/一个机构/一个媒体」分三条规则。生成理由时先用数据源档案确定主体类型，再套用对应那条规则；若对应规则限定了公司名单（如「媒体，我只想看以下公司的新闻：A、B、C」），理由必须说明内容涉及名单中哪家公司；复核后发现内容不涉及名单中任何一家公司（或不符合同样明确的限定）的条目，判定为不符合——不符合的条目不要生成理由，也绝对不要出现在返回的 JSON 数组中。`,
     },
   ]
 }
@@ -477,7 +489,13 @@ export const explainFocusMatches = async (
         const content = data.choices?.[0]?.message?.content ?? ""
         const matches = extractFocusResults(content)
         for (const match of matches) {
-          if (match.reason) result.reasons[match.id] = match.reason
+          // A negative reason ("内容未涉及标准中限定的特定公司名单") is the AI
+          // saying the entry does NOT match — it must not be stored as a reason
+          // (which would promote the entry into the focus set). The caller's
+          // "unexplained" branch drops such entries from the focus set instead.
+          if (match.reason && !isNegativeReason(match.reason)) {
+            result.reasons[match.id] = match.reason
+          }
         }
       } finally {
         clearTimeout(timeout)

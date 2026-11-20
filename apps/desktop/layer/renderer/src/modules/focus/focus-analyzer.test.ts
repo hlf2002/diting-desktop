@@ -7,6 +7,7 @@ import {
   extractIdArray,
   extractPlainText,
   filterReasonedMatches,
+  isNegativeReason,
 } from "./focus-analyzer"
 
 const VALID_ID = "1721025600000" // 13-digit snowflake-ish id
@@ -128,6 +129,19 @@ describe("extractFocusResults", () => {
   })
 })
 
+describe("isNegativeReason", () => {
+  it("flags whitelist-miss phrasings", () => {
+    expect(isNegativeReason("内容未涉及标准中限定的特定公司名单")).toBe(true)
+    expect(isNegativeReason("该内容不涉及名单中的任何公司")).toBe(true)
+    expect(isNegativeReason("内容与重点关注标准无关")).toBe(true)
+  })
+
+  it("does not flag affirmative reasons", () => {
+    expect(isNegativeReason("报道了名单中的宁德时代")).toBe(false)
+    expect(isNegativeReason("与 AI 相关")).toBe(false)
+  })
+})
+
 describe("filterReasonedMatches", () => {
   it("keeps only matches that carry a concrete reason", () => {
     expect(
@@ -137,6 +151,15 @@ describe("filterReasonedMatches", () => {
         { id: "1721025600002", reason: "" },
       ]),
     ).toEqual([{ id: VALID_ID, reason: "与 AI 相关" }])
+  })
+
+  it("drops matches whose reason says the entry does NOT match", () => {
+    expect(
+      filterReasonedMatches([
+        { id: VALID_ID, reason: "内容未涉及标准中限定的特定公司名单" },
+        { id: "1721025600001", reason: "不涉及名单中的任何一家公司" },
+      ]),
+    ).toEqual([])
   })
 
   it("returns empty when no match has a reason", () => {
