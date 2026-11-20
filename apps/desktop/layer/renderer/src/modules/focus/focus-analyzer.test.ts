@@ -222,11 +222,13 @@ describe("buildDecisionReason", () => {
     expect(buildDecisionReason(entry, WHITELIST_CRITERIA, companies, 0.98, "媒体")).toContain(
       "字节跳动",
     )
+    expect(buildDecisionReason(entry, WHITELIST_CRITERIA, companies, 0.98, "媒体")).toContain("98%")
   })
 
   it("uses the profile type branch when no company hits", () => {
     const entry = { id: VALID_ID, title: "一位创业者的自述", description: "" }
     expect(buildDecisionReason(entry, WHITELIST_CRITERIA, [], 0.95, "个人")).toContain("品质与思想")
+    expect(buildDecisionReason(entry, WHITELIST_CRITERIA, [], 0.95, "个人")).toContain("95%")
     expect(buildDecisionReason(entry, WHITELIST_CRITERIA, [], 0.95, "机构/组织")).toContain(
       "最新动态",
     )

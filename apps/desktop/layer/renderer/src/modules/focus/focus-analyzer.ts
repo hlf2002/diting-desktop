@@ -311,7 +311,7 @@ export const buildDecisionReason = (
 ): string => {
   const titleDesc = `${entry.title ?? ""} ${entry.description ?? ""}`
   const hit = findWhitelistHit(titleDesc, companies)
-  const prob = `（决策判定概率 ${p.toFixed(2)}）`
+  const prob = `（决策判定概率 ${Math.round(p * 100)}%）`
   if (hit) return `数据源为媒体，内容涉及重点关注名单中的公司：${hit}${prob}`
   if (profileType === "个人" || profileType === "person") {
     return `数据源为个人，内容反映人物的品质与思想光芒${prob}`

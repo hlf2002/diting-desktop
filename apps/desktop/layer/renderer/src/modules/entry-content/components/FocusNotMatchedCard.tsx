@@ -21,7 +21,7 @@ export function FocusNotMatchedCard({ entryId }: { entryId: string }) {
 
   const content =
     score != null
-      ? t("entry_content.focus_score", { score: score.toFixed(2) })
+      ? t("entry_content.focus_score", { score: Math.round(score * 100) })
       : t("entry_content.focus_no_score")
   return (
     <AISummaryCardBase

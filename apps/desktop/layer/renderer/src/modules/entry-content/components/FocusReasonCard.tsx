@@ -21,7 +21,7 @@ export function FocusReasonCard({ entryId }: { entryId: string }) {
   if (!isFocus || !reason) return null
 
   const scoreLine =
-    score != null ? `${t("entry_content.focus_score", { score: score.toFixed(2) })}\n` : ""
+    score != null ? `${t("entry_content.focus_score", { score: Math.round(score * 100) })}\n` : ""
   return (
     <AISummaryCardBase
       className="my-8"
