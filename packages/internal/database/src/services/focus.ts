@@ -25,7 +25,7 @@ class FocusServiceStatic implements Resetable {
 
   getFocusEntryIds() {
     return db.query.focusEntriesTable.findMany({
-      columns: { entryId: true, reason: true },
+      columns: { entryId: true, reason: true, score: true },
       where: eq(focusEntriesTable.isFocus, true),
     })
   }
@@ -40,7 +40,7 @@ class FocusServiceStatic implements Resetable {
 
   getAnalyzedEntryIds() {
     return db.query.focusEntriesTable.findMany({
-      columns: { entryId: true },
+      columns: { entryId: true, score: true },
     })
   }
 
@@ -50,14 +50,23 @@ class FocusServiceStatic implements Resetable {
    * @param entryIds Entries that were scored.
    * @param isFocus Whether they matched the focus criteria.
    * @param reasons Per-entry match reason (only meaningful for `isFocus` rows).
+   * @param scores Per-entry decision-model score (noul probability 0~1; optional,
+   *   null for chat-model fallback rows). Kept for both focus and non-focus rows
+   *   so the reader can show "未进入重点关注" cards with the decision score.
    */
-  async markAnalyzed(entryIds: string[], isFocus: boolean, reasons?: Record<string, string>) {
+  async markAnalyzed(
+    entryIds: string[],
+    isFocus: boolean,
+    reasons?: Record<string, string>,
+    scores?: Record<string, number | null>,
+  ) {
     if (entryIds.length === 0) return
     const rows = entryIds.map((entryId) => ({
       entryId,
       isFocus,
       analyzedAt: new Date(),
       reason: reasons?.[entryId] ?? null,
+      score: scores?.[entryId] ?? null,
     }))
     await db
       .insert(focusEntriesTable)
@@ -69,6 +78,8 @@ class FocusServiceStatic implements Resetable {
           analyzedAt: new Date(),
           // Take the incoming row's reason (null when the entry was not matched).
           reason: sql`excluded.reason`,
+          // Take the incoming row's score (null when the scoring had none).
+          score: sql`excluded.score`,
         },
       })
   }

@@ -240,7 +240,7 @@ describe("parseDecisionAnswers", () => {
   ]
 
   it("keeps entries above the threshold with a reason, drops the rest", () => {
-    const matches = parseDecisionAnswers(
+    const result = parseDecisionAnswers(
       {
         [`q_${VALID_ID}`]: { type: "noul", noul: 0.98 },
         q_1721025600001: { type: "noul", noul: 0.01 },
@@ -249,22 +249,39 @@ describe("parseDecisionAnswers", () => {
       WHITELIST_CRITERIA,
       "",
     )
-    expect(matches.map((match) => match.id)).toEqual([VALID_ID])
-    expect(matches[0]?.reason).toContain("字节跳动")
+    expect(result.matches.map((match) => match.id)).toEqual([VALID_ID])
+    expect(result.matches[0]?.reason).toContain("字节跳动")
+  })
+
+  it("keeps scores for matched and unmatched entries alike", () => {
+    const result = parseDecisionAnswers(
+      {
+        [`q_${VALID_ID}`]: { type: "noul", noul: 0.98 },
+        q_1721025600001: { type: "noul", noul: 0.01 },
+      },
+      candidates,
+      WHITELIST_CRITERIA,
+      "",
+    )
+    expect(result.scores[VALID_ID]).toBe(0.98)
+    expect(result.scores["1721025600001"]).toBe(0.01)
   })
 
   it("drops entries below the threshold", () => {
-    const matches = parseDecisionAnswers(
+    const result = parseDecisionAnswers(
       { [`q_${VALID_ID}`]: { type: "noul", noul: 0.79 } },
       candidates,
       WHITELIST_CRITERIA,
       "",
     )
-    expect(matches).toEqual([])
+    expect(result.matches).toEqual([])
+    expect(result.scores[VALID_ID]).toBe(0.79)
   })
 
-  it("treats missing answers as non-matches", () => {
-    expect(parseDecisionAnswers(undefined, candidates, WHITELIST_CRITERIA, "")).toEqual([])
+  it("treats missing answers as non-matches with a zero score", () => {
+    const result = parseDecisionAnswers(undefined, candidates, WHITELIST_CRITERIA, "")
+    expect(result.matches).toEqual([])
+    expect(result.scores[VALID_ID]).toBe(0)
   })
 })
 

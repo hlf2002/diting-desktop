@@ -43,6 +43,7 @@ import m0039 from "./0039_sync_meta.sql"
 import m0040 from "./0040_sync_transaction_owner.sql"
 import m0041 from "./0041_odd_lenny_balinger.sql"
 import m0042 from "./0042_familiar_wild_pack.sql"
+import m0043 from "./0043_cute_loners.sql"
 import journal from "./meta/_journal.json"
 
 export default {
@@ -91,5 +92,6 @@ export default {
     m0040,
     m0041,
     m0042,
+    m0043,
   },
 }

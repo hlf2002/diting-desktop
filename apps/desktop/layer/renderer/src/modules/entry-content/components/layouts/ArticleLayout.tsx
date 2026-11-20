@@ -28,6 +28,7 @@ import { EntryRenderError } from "../entry-content/EntryRenderError"
 import { ReadabilityNotice } from "../entry-content/ReadabilityNotice"
 import { EntryAttachments } from "../EntryAttachments"
 import { EntryTitle } from "../EntryTitle"
+import { FocusNotMatchedCard } from "../FocusNotMatchedCard"
 import { FocusReasonCard } from "../FocusReasonCard"
 import { getArticleRendererContent } from "./content-selection"
 import { MediaTranscript, TranscriptToggle, useTranscription } from "./shared"
@@ -105,6 +106,8 @@ export const ArticleLayout: React.FC<EntryLayoutProps> = ({
                 />
               </ShadowDOM>
             )}
+            {/* 未进入重点关注的判定结果卡片，放在正文末尾（正文渲染完之后、附件之前）。 */}
+            <FocusNotMatchedCard entryId={entryId} />
           </ErrorBoundary>
         </div>
       </WrappedElementProvider>

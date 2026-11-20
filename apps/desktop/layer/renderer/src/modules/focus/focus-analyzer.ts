@@ -20,6 +20,8 @@ export interface FocusAnalysisResult {
   matchedReasons: Record<string, string>
   /** Every id that was actually scored (matched or not). */
   analyzedIds: string[]
+  /** entryId → decision-model score (noul probability 0~1) at scoring time. */
+  scores: Record<string, number>
   /** Ids that could not be scored (network/provider errors) — caller should retry them. */
   failedIds: string[]
   /** True when the analysis was skipped (no criteria / no AI config), so the caller can decide. */
@@ -323,28 +325,36 @@ export const buildDecisionReason = (
   return `内容符合用户重点关注标准${prob}`
 }
 
-/** 决策模型响应里 answers 的字段（System One 的 noul 题返回 `noul: 概率`）。 */
 export interface DecisionAnswer {
   type?: string
   noul?: number
+}
+
+/** 决策模型批量判定的原始输出：匹配项 + 全部候选的 noul 概率评分（未匹配的也保留，供「未进入重点关注」卡片展示）。 */
+export interface DecisionBatchResult {
+  matches: FocusMatchResult[]
+  scores: Record<string, number>
 }
 
 /**
  * 把 systemone 响应解析成匹配结果：q_{entryId} → noul 概率，>= 阈值判匹配。
  * 阈值以下的条目（包括 0.8 边界以下）一律不匹配——决策模型本身是概率判定，
  * 不会像 LLM 那样输出否定性理由，所以这里不需要 isNegativeReason 兜底。
+ * 同时收集全部候选的评分（未匹配的也要，供「未进入重点关注」卡片展示）。
  */
 export const parseDecisionAnswers = (
   answers: Record<string, DecisionAnswer> | undefined,
   candidates: FocusCandidate[],
   criteria: string,
   profileSection: string,
-): FocusMatchResult[] => {
+): DecisionBatchResult => {
   const companies = extractWhitelistCompanies(criteria)
   const matches: FocusMatchResult[] = []
+  const scores: Record<string, number> = {}
   for (const entry of candidates) {
     const answer = answers?.[`q_${entry.id}`]
     const p = answer?.noul ?? 0
+    scores[entry.id] = p
     if (p >= FOCUS_DECISION_THRESHOLD) {
       const profileType = profileTypeOf(profileSection, entry)
       matches.push({
@@ -353,7 +363,7 @@ export const parseDecisionAnswers = (
       })
     }
   }
-  return matches
+  return { matches, scores }
 }
 
 /** 构造 System One 请求：state 放标准/档案/候选，questions 每条候选一个 noul（必须引用 id，否则模型无法区分）。 */
@@ -386,7 +396,7 @@ export const buildDecisionRequest = (
   return { model, state, questions }
 }
 
-/** 决策模型批量判定：走 `POST {baseURL}/systemone`，返回匹配的候选（id + 模板 reason）。 */
+/** 决策模型批量判定：走 `POST {baseURL}/systemone`，返回匹配的候选（id + 模板 reason）及全部候选评分。 */
 export const analyzeBatchWithDecision = async (
   provider: {
     baseURL: string
@@ -397,7 +407,7 @@ export const analyzeBatchWithDecision = async (
   criteria: string,
   batch: FocusCandidate[],
   profileSection: string,
-): Promise<FocusMatchResult[]> => {
+): Promise<DecisionBatchResult> => {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
   try {
@@ -491,11 +501,25 @@ export const analyzeEntriesForFocus = async (
 ): Promise<FocusAnalysisResult> => {
   const criteria = extractPlainText(getAISettings().personalizePrompt)
   if (!criteria)
-    return { matchedIds: [], matchedReasons: {}, analyzedIds: [], failedIds: [], skipped: true }
+    return {
+      matchedIds: [],
+      matchedReasons: {},
+      analyzedIds: [],
+      scores: {},
+      failedIds: [],
+      skipped: true,
+    }
 
   const provider = pickProvider()
   if (!provider)
-    return { matchedIds: [], matchedReasons: {}, analyzedIds: [], failedIds: [], skipped: true }
+    return {
+      matchedIds: [],
+      matchedReasons: {},
+      analyzedIds: [],
+      scores: {},
+      failedIds: [],
+      skipped: true,
+    }
 
   // 决策模型（System One）只做判断、不生成文本，走独立的 /systemone 协议。
   const decisionMode = isDecisionProvider(provider)
@@ -512,6 +536,7 @@ export const analyzeEntriesForFocus = async (
     matchedIds: [],
     matchedReasons: {},
     analyzedIds: [],
+    scores: {},
     failedIds: [],
     skipped: false,
   }
@@ -521,13 +546,22 @@ export const analyzeEntriesForFocus = async (
     const analyzedIds: string[] = []
     let matchedIds: string[] = []
     const matchedReasons: Record<string, string> = {}
+    const scores: Record<string, number> = {}
 
     try {
       if (decisionMode) {
-        const matches = await analyzeBatchWithDecision(provider, criteria, batch, profileSection)
-        matchedIds = matches.map((match) => match.id)
-        for (const match of matches) {
+        const decisionResult = await analyzeBatchWithDecision(
+          provider,
+          criteria,
+          batch,
+          profileSection,
+        )
+        matchedIds = decisionResult.matches.map((match) => match.id)
+        for (const match of decisionResult.matches) {
           if (match.reason) matchedReasons[match.id] = match.reason
+        }
+        for (const [id, score] of Object.entries(decisionResult.scores)) {
+          scores[id] = score
         }
       } else {
         const controller = new AbortController()
@@ -577,6 +611,9 @@ export const analyzeEntriesForFocus = async (
     results.matchedIds.push(...matchedIds)
     for (const [id, reason] of Object.entries(matchedReasons)) {
       results.matchedReasons[id] = reason
+    }
+    for (const [id, score] of Object.entries(scores)) {
+      results.scores[id] = score
     }
     results.analyzedIds.push(...analyzedIds)
   }
@@ -658,8 +695,13 @@ export const explainFocusMatches = async (
       if (decisionMode) {
         // 复核：决策模型判匹配的补上模板 reason；判不匹配的不写 reason，
         // 调用方按 unexplained 分支把该条移出重点集合。
-        const matches = await analyzeBatchWithDecision(provider, criteria, batch, profileSection)
-        for (const match of matches) {
+        const decisionResult = await analyzeBatchWithDecision(
+          provider,
+          criteria,
+          batch,
+          profileSection,
+        )
+        for (const match of decisionResult.matches) {
           if (match.reason) result.reasons[match.id] = match.reason
         }
       } else {

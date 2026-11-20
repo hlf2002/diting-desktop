@@ -95,11 +95,13 @@ export const useFocusAnalyzer = () => {
               result.analyzedIds,
               result.matchedIds,
               result.matchedReasons,
+              result.scores,
             )
             await focusActions.persistAnalyzed(
               result.analyzedIds,
               result.matchedIds,
               result.matchedReasons,
+              result.scores,
             )
           }
         }

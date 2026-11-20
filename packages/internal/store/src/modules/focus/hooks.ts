@@ -9,3 +9,7 @@ export const useAnalyzedEntryIds = () => useFocusStore((state) => state.analyzed
 /** Why an entry matched the focus criteria (empty string when not available). */
 export const useFocusReason = (entryId: string) =>
   useFocusStore((state) => state.focusReasons[entryId] ?? "")
+
+/** Decision-model score (noul probability 0~1) for an entry, null when unavailable. */
+export const useFocusScore = (entryId: string) =>
+  useFocusStore((state) => state.focusScores[entryId] ?? null)

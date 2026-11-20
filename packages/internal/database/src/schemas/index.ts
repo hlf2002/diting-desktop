@@ -251,4 +251,11 @@ export const focusEntriesTable = sqliteTable("focus_entries", (t) => ({
    * AI at scoring time. Null for legacy rows scored before reasons existed.
    */
   reason: t.text("reason"),
+  /**
+   * Decision-model score (noul probability 0~1) at scoring time. Null when the
+   * scoring ran through the chat-model fallback (no numeric score exists) or on
+   * legacy rows. Non-focus rows keep their score so the reader can show
+   * "未进入重点关注" cards with the decision score.
+   */
+  score: t.real("score"),
 }))

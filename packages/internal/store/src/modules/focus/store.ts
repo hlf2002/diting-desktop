@@ -10,12 +10,15 @@ interface FocusState {
   analyzedEntryIds: Set<FocusEntryId>
   /** entryId → why it matched the focus criteria (from the on-device AI). */
   focusReasons: Record<string, string>
+  /** entryId → decision-model score (noul probability 0~1) at scoring time. */
+  focusScores: Record<string, number>
 }
 
 const defaultState: FocusState = {
   focusEntryIds: new Set(),
   analyzedEntryIds: new Set(),
   focusReasons: {},
+  focusScores: {},
 }
 
 export const useFocusStore = createZustandStore<FocusState>("focus")(() => defaultState)
@@ -36,6 +39,9 @@ class FocusActions implements Hydratable, Resetable {
       focusReasons: Object.fromEntries(
         focusRows.filter((row) => row.reason).map((row) => [row.entryId, row.reason!]),
       ),
+      focusScores: Object.fromEntries(
+        analyzedRows.filter((row) => row.score != null).map((row) => [row.entryId, row.score!]),
+      ),
     })
   }
 
@@ -49,14 +55,17 @@ class FocusActions implements Hydratable, Resetable {
     entryIds: FocusEntryId[],
     focusIds: FocusEntryId[],
     focusReasons: Record<string, string> = {},
+    focusScores: Record<string, number> = {},
   ) {
     set((state) => {
       const nextAnalyzed = new Set(state.analyzedEntryIds)
       const nextFocus = new Set(state.focusEntryIds)
       const nextReasons = { ...state.focusReasons }
+      const nextScores = { ...state.focusScores }
       for (const id of entryIds) nextAnalyzed.add(id)
       for (const id of focusIds) nextFocus.add(id)
       for (const id of entryIds) {
+        if (focusScores[id] != null) nextScores[id] = focusScores[id]
         if (nextFocus.has(id)) {
           if (focusReasons[id]) nextReasons[id] = focusReasons[id]
         } else {
@@ -67,6 +76,7 @@ class FocusActions implements Hydratable, Resetable {
         analyzedEntryIds: nextAnalyzed,
         focusEntryIds: nextFocus,
         focusReasons: nextReasons,
+        focusScores: nextScores,
       }
     })
   }
@@ -76,15 +86,16 @@ class FocusActions implements Hydratable, Resetable {
     entryIds: FocusEntryId[],
     focusIds: FocusEntryId[],
     focusReasons: Record<string, string> = {},
+    focusScores: Record<string, number> = {},
   ) {
     if (entryIds.length === 0) return
     const focusSet = new Set(focusIds)
     const nonFocusIds = entryIds.filter((id) => !focusSet.has(id))
     if (nonFocusIds.length > 0) {
-      await FocusService.markAnalyzed(nonFocusIds, false)
+      await FocusService.markAnalyzed(nonFocusIds, false, {}, focusScores)
     }
     if (focusIds.length > 0) {
-      await FocusService.markAnalyzed(focusIds, true, focusReasons)
+      await FocusService.markAnalyzed(focusIds, true, focusReasons, focusScores)
     }
   }
 
@@ -106,12 +117,19 @@ class FocusActions implements Hydratable, Resetable {
       const nextAnalyzed = new Set(state.analyzedEntryIds)
       const nextFocus = new Set(state.focusEntryIds)
       const nextReasons = { ...state.focusReasons }
+      const nextScores = { ...state.focusScores }
       for (const id of entryIds) {
         nextAnalyzed.delete(id)
         nextFocus.delete(id)
         delete nextReasons[id]
+        delete nextScores[id]
       }
-      return { analyzedEntryIds: nextAnalyzed, focusEntryIds: nextFocus, focusReasons: nextReasons }
+      return {
+        analyzedEntryIds: nextAnalyzed,
+        focusEntryIds: nextFocus,
+        focusReasons: nextReasons,
+        focusScores: nextScores,
+      }
     })
     await FocusService.deleteMany(entryIds)
   }
