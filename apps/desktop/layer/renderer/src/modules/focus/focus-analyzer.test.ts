@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest"
+import type { UserByokProviderConfig } from "@follow/shared/settings/interface"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import {
   buildDecisionReason,
@@ -14,7 +15,17 @@ import {
   isDecisionProvider,
   isNegativeReason,
   parseDecisionAnswers,
+  pickProvider,
 } from "./focus-analyzer"
+
+const mockAISettings: {
+  personalizePrompt: string
+  byok: { enabled: boolean; providers: UserByokProviderConfig[] }
+} = { personalizePrompt: "", byok: { enabled: false, providers: [] } }
+
+vi.mock("~/atoms/settings/ai", () => ({
+  getAISettings: vi.fn(() => mockAISettings),
+}))
 
 const VALID_ID = "1721025600000" // 13-digit snowflake-ish id
 
@@ -261,6 +272,46 @@ describe("isDecisionProvider", () => {
   it("flags the bailian decision provider", () => {
     expect(isDecisionProvider({ provider: "alibaba-decision" })).toBe(true)
     expect(isDecisionProvider({ provider: "deepseek" })).toBe(false)
+  })
+})
+
+describe("pickProvider", () => {
+  const zai: UserByokProviderConfig = {
+    provider: "zai",
+    apiKey: "zai-key",
+    baseURL: "https://open.bigmodel.cn/api/paas/v4",
+    model: "GLM-4-FlashX-250414",
+  }
+  const decision: UserByokProviderConfig = {
+    provider: "alibaba-decision",
+    apiKey: "sk-ws-key",
+    baseURL: "https://trial.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+    model: "decision-model-preview",
+  }
+
+  beforeEach(() => {
+    mockAISettings.byok = { enabled: true, providers: [] }
+  })
+
+  it("prefers the decision provider even when a chat provider is listed first", () => {
+    mockAISettings.byok.providers = [zai, decision]
+    const picked = pickProvider()
+    expect(picked?.provider).toBe("alibaba-decision")
+  })
+
+  it("falls back to the chat provider when no decision provider is configured", () => {
+    mockAISettings.byok.providers = [zai]
+    expect(pickProvider()?.provider).toBe("zai")
+  })
+
+  it("skips a decision provider without a key and uses the chat one", () => {
+    mockAISettings.byok.providers = [{ ...decision, apiKey: null }, zai]
+    expect(pickProvider()?.provider).toBe("zai")
+  })
+
+  it("returns null when disabled", () => {
+    mockAISettings.byok.enabled = false
+    expect(pickProvider()).toBeNull()
   })
 })
 

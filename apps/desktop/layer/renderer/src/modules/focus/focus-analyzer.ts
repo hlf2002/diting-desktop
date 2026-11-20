@@ -155,17 +155,33 @@ export const buildProfileSection = (
   return `\n候选内容所属数据源档案（用于识别数据源是谁：个人/机构/媒体。判断「数据源」相关标准时以此为准，不要把个人账号旗下公司/产品的动态当成机构本身；媒体/机构类数据源若有特定公司名单限定，必须核对名单后再下结论）：\n${lines.join("\n")}`
 }
 
-const pickProvider = (): (UserByokProviderConfig & { baseURL: string; model: string }) | null => {
+export const pickProvider = ():
+  (UserByokProviderConfig & { baseURL: string; model: string }) | null => {
   const byok = getAISettings().byok
   if (!byok?.enabled) return null
 
-  for (const provider of byok.providers ?? []) {
-    if (!provider.apiKey) continue
+  const resolve = (provider: UserByokProviderConfig) => {
+    if (!provider.apiKey) return null
     const meta = BYOK_PROVIDERS.find((item) => item.value === provider.provider)
     const baseURL = (provider.baseURL || meta?.defaultBaseURL || "").replace(/\/$/, "")
     const model = provider.model || meta?.defaultModel || ""
-    if (!baseURL || !model) continue
+    if (!baseURL || !model) return null
     return { ...provider, baseURL, model }
+  }
+
+  // 决策模型（System One）优先：重点关注判定是高频结构化判断，配置了决策模型
+  // 就优先用它；LLM（chat）只在没配决策模型时兜底。providers 数组顺序不代表
+  // 优先级——用户可能把 zai 等 chat 厂商排前面，按顺序挑会绕过决策模型
+  // （2026-11-20 实锤：GLM 排第一导致判定仍在走 LLM）。
+  for (const provider of byok.providers ?? []) {
+    if (!isDecisionProvider(provider)) continue
+    const resolved = resolve(provider)
+    if (resolved) return resolved
+  }
+  for (const provider of byok.providers ?? []) {
+    if (isDecisionProvider(provider)) continue
+    const resolved = resolve(provider)
+    if (resolved) return resolved
   }
   return null
 }
