@@ -10,7 +10,10 @@ import { toast } from "sonner"
 import { setAISetting, useAISettingValue } from "~/atoms/settings/ai"
 import { m } from "~/components/common/Motion"
 import { MentionPlugin } from "~/modules/ai-chat/editor"
-import { focusRetroAnalyzeTriggerAtom } from "~/modules/focus/useFocusAnalyzer"
+import {
+  focusFullReanalyzeTriggerAtom,
+  focusRetroAnalyzeTriggerAtom,
+} from "~/modules/focus/useFocusAnalyzer"
 
 import { SettingDescription } from "../../control"
 import { SettingModalContentPortal } from "../../modal/layout"
@@ -23,6 +26,7 @@ export const PersonalizePromptSection = () => {
   const { t } = useTranslation("ai")
   const aiSettings = useAISettingValue()
   const setRetroTrigger = useSetAtom(focusRetroAnalyzeTriggerAtom)
+  const setFullReanalyzeTrigger = useSetAtom(focusFullReanalyzeTriggerAtom)
   const [initialValue] = useState(() => unsavedDraft ?? aiSettings.personalizePrompt)
   const promptRef = useRef(unsavedDraft ?? "")
   const [isSaving, setIsSaving] = useState(false)
@@ -72,6 +76,11 @@ export const PersonalizePromptSection = () => {
     }
   }
 
+  const handleReanalyzeAll = () => {
+    setFullReanalyzeTrigger((v) => v + 1)
+    toast.success(t("personalize.reanalyze_all_started"))
+  }
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -108,6 +117,12 @@ export const PersonalizePromptSection = () => {
             </span>
           )}
         </SettingDescription>
+        <div className="flex items-center justify-between gap-3">
+          <SettingDescription>{t("personalize.reanalyze_all_hint")}</SettingDescription>
+          <Button size="sm" onClick={handleReanalyzeAll}>
+            {t("personalize.reanalyze_all_button")}
+          </Button>
+        </div>
       </div>
 
       <AnimatePresence>

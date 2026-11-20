@@ -224,7 +224,7 @@
   "entry_content.focus_no_score": "言語モデル判定、判定スコアなし",
   "entry_content.focus_not_matched": "注目対象外",
   "entry_content.focus_reason": "注目",
-  "entry_content.focus_score": "判定スコア：{{score}}",
+  "entry_content.focus_score": "判定モデル合致確率：{{score}}%",
   "entry_content.header.play_tts": "TTS を再生",
   "entry_content.header.play_tts_description": "設定でTTS音声を選択し、TTSを開始して音声コンテンツに変換します",
   "entry_content.header.readability": "読みやすさ",

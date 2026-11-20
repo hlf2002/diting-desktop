@@ -224,7 +224,7 @@
   "entry_content.focus_no_score": "語言模型判定，無決策評分",
   "entry_content.focus_not_matched": "未進入重點關注",
   "entry_content.focus_reason": "重點關注",
-  "entry_content.focus_score": "決策評分：{{score}}",
+  "entry_content.focus_score": "決策模型判斷符合機率：{{score}}%",
   "entry_content.header.play_tts": "播放文字轉語音",
   "entry_content.header.play_tts_description": "在設定中選擇一個 TTS 語音，啟動 TTS 轉換為有聲內容",
   "entry_content.header.readability": "可讀模式",

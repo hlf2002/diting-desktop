@@ -17,6 +17,9 @@ const FOCUS_REASON_BACKFILL_LIMIT = 100
 /** Bump to ask the analyzer to re-score the most recent entries (saved criteria). */
 export const focusRetroAnalyzeTriggerAtom = atom(0)
 
+/** Bump to ask the analyzer to re-score EVERY entry in the store (full re-analysis). */
+export const focusFullReanalyzeTriggerAtom = atom(0)
+
 /** The most recent entry ids still present in the entry store, newest first. */
 const getRecentEntryIds = (limit: number): string[] => {
   const data = useEntryStore.getState().data
@@ -45,6 +48,7 @@ export const useFocusAnalyzer = () => {
   const runningRef = useRef(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const retroTrigger = useAtomValue(focusRetroAnalyzeTriggerAtom)
+  const fullReanalyzeTrigger = useAtomValue(focusFullReanalyzeTriggerAtom)
 
   const drain = useCallback(async () => {
     if (runningRef.current) return
@@ -241,6 +245,20 @@ export const useFocusAnalyzer = () => {
       enqueue(recentIds)
     })()
   }, [enqueue, retroTrigger])
+
+  // Full re-analysis: the user explicitly asked to re-score EVERY article in the
+  // store with the current model (e.g. after switching to the decision engine).
+  // Unmarking everything re-runs the whole drain loop, so a large library can
+  // take a while — that is the point of the action.
+  useEffect(() => {
+    if (fullReanalyzeTrigger === 0) return
+    void (async () => {
+      const allIds = [...useEntryStore.getState().entryIdSet]
+      if (allIds.length === 0) return
+      await focusActions.unmarkAnalyzed(allIds)
+      enqueue(allIds)
+    })()
+  }, [enqueue, fullReanalyzeTrigger])
 
   useEffect(
     () => () => {

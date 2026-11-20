@@ -224,7 +224,7 @@
   "entry_content.focus_no_score": "Judged by language model, no decision score",
   "entry_content.focus_not_matched": "Not in Focus",
   "entry_content.focus_reason": "Focus",
-  "entry_content.focus_score": "Decision score: {{score}}",
+  "entry_content.focus_score": "Decision model match probability: {{score}}%",
   "entry_content.header.play_tts": "Play TTS",
   "entry_content.header.play_tts_description": "Select a TTS voice in settings and start TTS to convert to audio content",
   "entry_content.header.readability": "Readability",
