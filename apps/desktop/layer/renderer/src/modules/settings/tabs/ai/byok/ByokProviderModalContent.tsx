@@ -18,6 +18,8 @@ import { PROVIDER_OPTIONS } from "./constants"
 interface ByokProviderModalContentProps {
   provider: UserByokProviderConfig | null
   configuredProviders?: ByokProviderName[]
+  /** 添加弹窗只展示该组提供商：decision=决策模型（重点判定），chat=语言模型（翻译/AI 功能） */
+  group: "decision" | "chat"
   onSave: (provider: UserByokProviderConfig) => void
   onCancel: () => void
 }
@@ -27,14 +29,17 @@ const EMPTY_CONFIGURED_PROVIDERS: ByokProviderName[] = []
 export const ByokProviderModalContent = ({
   provider,
   configuredProviders = EMPTY_CONFIGURED_PROVIDERS,
+  group,
   onSave,
   onCancel,
 }: ByokProviderModalContentProps) => {
   const { t } = useTranslation("ai")
 
-  // Filter out already configured providers, but keep the current one if editing
+  // 按组过滤提供商（决策模型 / 语言模型），已配置的仍可编辑当前项
   const availableProviders = PROVIDER_OPTIONS.filter(
-    (option) => !configuredProviders.includes(option.value) || option.value === provider?.provider,
+    (option) =>
+      (group === "decision" ? option.protocol === "decision" : option.protocol !== "decision") &&
+      (!configuredProviders.includes(option.value) || option.value === provider?.provider),
   )
 
   // Get the first available provider or fallback to the current one

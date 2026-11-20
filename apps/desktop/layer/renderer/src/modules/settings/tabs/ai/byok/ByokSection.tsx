@@ -14,7 +14,7 @@ import { useSetSettingTab } from "~/modules/settings/modal/context"
 
 import { ByokProviderItem } from "./ByokProviderItem"
 import { ByokProviderModalContent } from "./ByokProviderModalContent"
-import { PROVIDER_OPTIONS } from "./constants"
+import { isDecisionProviderConfig } from "./constants"
 
 /** Whether the user's plan includes BYOK, or undefined while the plan is unknown */
 const usePlanIncludesByok = () => {
@@ -44,7 +44,7 @@ export const ByokSection = () => {
     })
   }
 
-  const handleAddProvider = () => {
+  const handleAddProvider = (group: "decision" | "chat") => {
     const currentByok = getAISettings().byok ?? { enabled: false, providers: [] }
     const configuredProviders = currentByok.providers.map((p) => p.provider)
 
@@ -54,6 +54,7 @@ export const ByokSection = () => {
         <ByokProviderModalContent
           provider={null}
           configuredProviders={configuredProviders}
+          group={group}
           onSave={(provider) => {
             const updatedByok = getAISettings().byok ?? { enabled: false, providers: [] }
             setAISetting("byok", {
@@ -69,8 +70,15 @@ export const ByokSection = () => {
     })
   }
 
-  const handleEditProvider = (index: number, provider: UserByokProviderConfig) => {
+  const handleEditProvider = (provider: UserByokProviderConfig) => {
     const currentByok = getAISettings().byok ?? { enabled: false, providers: [] }
+    const index = currentByok.providers.findIndex(
+      (p) =>
+        p.provider === provider.provider &&
+        p.baseURL === provider.baseURL &&
+        p.model === provider.model,
+    )
+    if (index < 0) return
     // Exclude the current provider being edited from configured list
     const configuredProviders = currentByok.providers
       .filter((_, i) => i !== index)
@@ -82,6 +90,7 @@ export const ByokSection = () => {
         <ByokProviderModalContent
           provider={provider}
           configuredProviders={configuredProviders}
+          group={isDecisionProviderConfig(provider) ? "decision" : "chat"}
           onSave={(updatedProvider) => {
             const updatedByok = getAISettings().byok ?? { enabled: false, providers: [] }
             const updatedProviders = [...updatedByok.providers]
@@ -99,7 +108,7 @@ export const ByokSection = () => {
     })
   }
 
-  const handleDeleteProvider = async (index: number) => {
+  const handleDeleteProvider = async (provider: UserByokProviderConfig) => {
     const confirmed = await ask({
       title: t("byok.providers.delete_title"),
       message: t("byok.providers.delete_message"),
@@ -110,6 +119,13 @@ export const ByokSection = () => {
 
     if (confirmed) {
       const currentByok = getAISettings().byok ?? { enabled: false, providers: [] }
+      const index = currentByok.providers.findIndex(
+        (p) =>
+          p.provider === provider.provider &&
+          p.baseURL === provider.baseURL &&
+          p.model === provider.model,
+      )
+      if (index < 0) return
       const updatedProviders = currentByok.providers.filter((_, i) => i !== index)
       setAISetting("byok", {
         ...currentByok,
@@ -118,6 +134,9 @@ export const ByokSection = () => {
       toast.success(t("byok.providers.deleted"))
     }
   }
+
+  const decisionProviders = byok.providers.filter(isDecisionProviderConfig)
+  const chatProviders = byok.providers.filter((provider) => !isDecisionProviderConfig(provider))
 
   return (
     <div className="space-y-4">
@@ -156,37 +175,78 @@ export const ByokSection = () => {
 
       {(byok.enabled || (isNotInPlan && byok.providers.length > 0)) && (
         <>
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium text-text">{t("byok.providers.title")}</Label>
-            {!isNotInPlan && byok.providers.length < PROVIDER_OPTIONS.length && (
-              <Button variant="outline" size="sm" onClick={handleAddProvider}>
-                <i className="i-mgc-add-cute-re mr-2 size-4" />
-                {t("byok.providers.add")}
-              </Button>
+          {/* 决策模型组：进「重点关注」的内容用决策模型判定 */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label className="text-sm font-medium text-text">
+                  {t("byok.groups.decision.title")}
+                </Label>
+                <div className="text-xs text-text-secondary">
+                  {t("byok.groups.decision.description")}
+                </div>
+              </div>
+              {!isNotInPlan && (
+                <Button variant="outline" size="sm" onClick={() => handleAddProvider("decision")}>
+                  <i className="i-mgc-add-cute-re mr-2 size-4" />
+                  {t("byok.providers.add")}
+                </Button>
+              )}
+            </div>
+
+            {decisionProviders.length === 0 && !isNotInPlan && (
+              <div className="rounded-lg border border-dashed border-border px-4 py-4 text-center text-xs text-text-tertiary">
+                {t("byok.groups.decision.empty")}
+              </div>
             )}
+
+            <div className="!mt-2 space-y-4">
+              {decisionProviders.map((provider) => (
+                <ByokProviderItem
+                  key={`${provider.provider}-${provider.baseURL ?? ""}-${provider.model ?? ""}`}
+                  provider={provider}
+                  onDelete={() => handleDeleteProvider(provider)}
+                  onEdit={isNotInPlan ? undefined : () => handleEditProvider(provider)}
+                />
+              ))}
+            </div>
           </div>
 
-          {byok.providers.length === 0 && !isNotInPlan && (
-            <div className="py-8 text-center">
-              <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-fill-secondary">
-                <i className="i-mgc-key-2-cute-re size-6 text-text" />
+          {/* 语言模型组：翻译、摘要等生成式 AI 功能 */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label className="text-sm font-medium text-text">
+                  {t("byok.groups.chat.title")}
+                </Label>
+                <div className="text-xs text-text-secondary">
+                  {t("byok.groups.chat.description")}
+                </div>
               </div>
-              <h4 className="mb-1 text-sm font-medium text-text">
-                {t("byok.providers.empty.title")}
-              </h4>
-              <p className="text-xs text-text-secondary">{t("byok.providers.empty.description")}</p>
+              {!isNotInPlan && (
+                <Button variant="outline" size="sm" onClick={() => handleAddProvider("chat")}>
+                  <i className="i-mgc-add-cute-re mr-2 size-4" />
+                  {t("byok.providers.add")}
+                </Button>
+              )}
             </div>
-          )}
 
-          <div className="!mt-2 space-y-4">
-            {byok.providers.map((provider, index) => (
-              <ByokProviderItem
-                key={index}
-                provider={provider}
-                onDelete={() => handleDeleteProvider(index)}
-                onEdit={isNotInPlan ? undefined : () => handleEditProvider(index, provider)}
-              />
-            ))}
+            {chatProviders.length === 0 && !isNotInPlan && (
+              <div className="rounded-lg border border-dashed border-border px-4 py-4 text-center text-xs text-text-tertiary">
+                {t("byok.groups.chat.empty")}
+              </div>
+            )}
+
+            <div className="!mt-2 space-y-4">
+              {chatProviders.map((provider) => (
+                <ByokProviderItem
+                  key={`${provider.provider}-${provider.baseURL ?? ""}-${provider.model ?? ""}`}
+                  provider={provider}
+                  onDelete={() => handleDeleteProvider(provider)}
+                  onEdit={isNotInPlan ? undefined : () => handleEditProvider(provider)}
+                />
+              ))}
+            </div>
           </div>
         </>
       )}
