@@ -229,6 +229,7 @@ export interface AISettings {
 export type ByokProviderName =
   | "deepseek"
   | "alibaba"
+  | "alibaba-decision"
   | "zai"
   | "kimi-cn"
   | "minimax-cn"

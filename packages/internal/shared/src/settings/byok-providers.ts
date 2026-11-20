@@ -11,6 +11,14 @@ import type { ByokProviderName } from "./interface"
  */
 export type ByokProviderGroup = "cn" | "global" | "custom"
 
+/**
+ * BYOK 协议类型：
+ * - chat：OpenAI 兼容 `POST {baseURL}/chat/completions`（默认）
+ * - decision：System One 决策模型 `POST {baseURL}/systemone`（state + typed questions，
+ *   返回概率/评分，不生成文本）——用于重点关注判定这类高频结构化判断。
+ */
+export type ByokProviderProtocol = "chat" | "decision"
+
 export type ByokProviderMeta = {
   value: ByokProviderName
   /** 展示名（品牌名，跨语言不翻译） */
@@ -20,6 +28,8 @@ export type ByokProviderMeta = {
   /** 选中后自动填入的默认模型；custom 为 null（必须自己填） */
   defaultModel: string | null
   group: ByokProviderGroup
+  /** chat 为 OpenAI 兼容 /chat/completions；decision 走 System One /systemone */
+  protocol?: ByokProviderProtocol
   /** 选中时显示在表单里的额外提示 */
   hint?: string
 }
@@ -39,6 +49,15 @@ export const BYOK_PROVIDERS: ByokProviderMeta[] = [
     defaultBaseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
     defaultModel: "qwen-plus",
     group: "cn",
+  },
+  {
+    value: "alibaba-decision",
+    label: "阿里云百炼（决策模型）",
+    defaultBaseURL: "https://trial.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+    defaultModel: "decision-model-preview",
+    group: "cn",
+    protocol: "decision",
+    hint: "决策模型（System One）：只返回概率/评分，不生成文本，用于重点关注判定；正式环境可把 baseURL 换成 {业务空间ID}.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
   },
   {
     value: "zai",

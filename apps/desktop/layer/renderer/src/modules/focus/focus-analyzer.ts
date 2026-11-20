@@ -242,6 +242,170 @@ export const isNegativeReason = (reason: string): boolean =>
 export const filterReasonedMatches = (matches: FocusMatchResult[]): FocusMatchResult[] =>
   matches.filter((match) => Boolean(match.reason) && !isNegativeReason(match.reason!))
 
+// ---------------------------------------------------------------------------
+// 决策模型（System One）判定：provider.protocol === "decision"
+// 用 noul（是非题）逐条判断，返回概率而非文本；匹配与否按阈值切分。
+// ---------------------------------------------------------------------------
+
+/** 决策模型判定阈值：noul 概率 >= 该值才算匹配（2026-11-20 实测匹配 0.97-1.0、不匹配 0.01，0.8 分离安全）。 */
+export const FOCUS_DECISION_THRESHOLD = 0.8
+
+export const isDecisionProvider = (provider: { provider: string }): boolean =>
+  BYOK_PROVIDERS.find((item) => item.value === provider.provider)?.protocol === "decision"
+
+/** 从标准里提取媒体分支的公司名单（如「媒体，我只想看以下公司的新闻：字节跳动，阿里巴巴，腾讯」→ 公司数组）。 */
+export const extractWhitelistCompanies = (criteria: string): string[] => {
+  const match = criteria.match(/(?:以下公司|公司名单|这些公司)[^：:\n]*[：:]\s*([^。\n；]+)/)
+  if (!match) return []
+  const list = match[1]
+  if (!list) return []
+  return list
+    .split(/[,，、\s]+/)
+    .map((name) => name.trim())
+    .filter((name) => name.length >= 2)
+}
+
+/** 本地名单命中检测：标题/描述包含名单公司名（公司名可能在标题里变形，做包含匹配，≥2 字才参与）。 */
+export const findWhitelistHit = (text: string, companies: string[]): string | null => {
+  const normalized = text ?? ""
+  for (const company of companies) {
+    if (normalized.includes(company)) return company
+  }
+  return null
+}
+
+/** 从 profileSection 文本里取某候选数据源的类型标签（个人/媒体/机构/其他主体/未知）。 */
+export const profileTypeOf = (profileSection: string, entry: FocusCandidate): string | null => {
+  if (!entry.feedId) return null
+  const line = profileSection.split("\n").find((line) => line.includes(`数据源 ${entry.feedId}`))
+  if (!line) return null
+  const m = line.match(/（([^）]+)）/)
+  return m?.[1] ?? null
+}
+
+/** 决策模型不生成文本，reason 由确定性模板生成：名单命中时精确到公司名。 */
+export const buildDecisionReason = (
+  entry: FocusCandidate,
+  criteria: string,
+  companies: string[],
+  p: number,
+  profileType: string | null,
+): string => {
+  const titleDesc = `${entry.title ?? ""} ${entry.description ?? ""}`
+  const hit = findWhitelistHit(titleDesc, companies)
+  const prob = `（决策判定概率 ${p.toFixed(2)}）`
+  if (hit) return `数据源为媒体，内容涉及重点关注名单中的公司：${hit}${prob}`
+  if (profileType === "个人" || profileType === "person") {
+    return `数据源为个人，内容反映人物的品质与思想光芒${prob}`
+  }
+  if (profileType === "机构/组织" || profileType === "org") {
+    return `数据源为机构，内容为该机构的最新动态${prob}`
+  }
+  if (profileType === "媒体" || profileType === "media") {
+    return `数据源为媒体，内容涉及重点关注名单中的公司${prob}`
+  }
+  return `内容符合用户重点关注标准${prob}`
+}
+
+/** 决策模型响应里 answers 的字段（System One 的 noul 题返回 `noul: 概率`）。 */
+export interface DecisionAnswer {
+  type?: string
+  noul?: number
+}
+
+/**
+ * 把 systemone 响应解析成匹配结果：q_{entryId} → noul 概率，>= 阈值判匹配。
+ * 阈值以下的条目（包括 0.8 边界以下）一律不匹配——决策模型本身是概率判定，
+ * 不会像 LLM 那样输出否定性理由，所以这里不需要 isNegativeReason 兜底。
+ */
+export const parseDecisionAnswers = (
+  answers: Record<string, DecisionAnswer> | undefined,
+  candidates: FocusCandidate[],
+  criteria: string,
+  profileSection: string,
+): FocusMatchResult[] => {
+  const companies = extractWhitelistCompanies(criteria)
+  const matches: FocusMatchResult[] = []
+  for (const entry of candidates) {
+    const answer = answers?.[`q_${entry.id}`]
+    const p = answer?.noul ?? 0
+    if (p >= FOCUS_DECISION_THRESHOLD) {
+      const profileType = profileTypeOf(profileSection, entry)
+      matches.push({
+        id: entry.id,
+        reason: buildDecisionReason(entry, criteria, companies, p, profileType),
+      })
+    }
+  }
+  return matches
+}
+
+/** 构造 System One 请求：state 放标准/档案/候选，questions 每条候选一个 noul（必须引用 id，否则模型无法区分）。 */
+export const buildDecisionRequest = (
+  criteria: string,
+  candidates: FocusCandidate[],
+  profileSection: string,
+  model: string,
+): { model: string; state: Record<string, unknown>; questions: Record<string, unknown> } => {
+  const state = {
+    criteria,
+    profile: profileSection || "无档案",
+    candidates: candidates.map((entry) => ({
+      id: entry.id,
+      title: truncate(entry.title, TITLE_LIMIT),
+      description: truncate(entry.description, DESCRIPTION_LIMIT),
+    })),
+  }
+  const questions: Record<string, unknown> = {}
+  for (const entry of candidates) {
+    questions[`q_${entry.id}`] = {
+      type: "noul",
+      instructions:
+        `请判断 state.candidates 中 id 为 ${entry.id} 的内容（标题：${truncate(entry.title, 80)}）是否属于用户重点关注范围。` +
+        `判定规则：先看该内容数据源的类型（state.profile 中该条的数据源档案，判断数据源是谁以档案为准，不要把文章主角当成数据源），再套用 state.criteria 中对应类型的那条规则；` +
+        `若数据源是媒体且标准限定了公司名单，只有内容标题/描述涉及名单中的公司才算符合；数据源是个人则看内容是否反映其品质与思想光芒；数据源是机构则看内容是否为其最新动态。`,
+      criteria: { true: "属于重点关注范围", false: "不属于重点关注范围" },
+    }
+  }
+  return { model, state, questions }
+}
+
+/** 决策模型批量判定：走 `POST {baseURL}/systemone`，返回匹配的候选（id + 模板 reason）。 */
+export const analyzeBatchWithDecision = async (
+  provider: {
+    baseURL: string
+    model: string
+    apiKey?: string | null
+    headers?: Record<string, string>
+  },
+  criteria: string,
+  batch: FocusCandidate[],
+  profileSection: string,
+): Promise<FocusMatchResult[]> => {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+  try {
+    const response = await fetch(`${provider.baseURL}/systemone`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${provider.apiKey}`,
+        ...(provider.headers ?? {}),
+      },
+      body: JSON.stringify(buildDecisionRequest(criteria, batch, profileSection, provider.model)),
+      signal: controller.signal,
+    })
+    if (!response.ok) {
+      console.error("[focus-analyzer] decision request failed", response.status)
+      throw new Error(`decision_status_${response.status}`)
+    }
+    const data = (await response.json()) as { answers?: Record<string, DecisionAnswer> }
+    return parseDecisionAnswers(data.answers, batch, criteria, profileSection)
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
 /**
  * Parse the AI response: either the legacy plain array of ids or the current
  * [{id, reason}] shape. Malformed/unknown ids are dropped.
@@ -317,6 +481,9 @@ export const analyzeEntriesForFocus = async (
   if (!provider)
     return { matchedIds: [], matchedReasons: {}, analyzedIds: [], failedIds: [], skipped: true }
 
+  // 决策模型（System One）只做判断、不生成文本，走独立的 /systemone 协议。
+  const decisionMode = isDecisionProvider(provider)
+
   // 批量拉数据源档案（个人/机构/媒体），失败不影响主流程。
   // entry store 的 feedId 可能缺失（serializeEntry 不返回 feedId），先补拉再取档案，
   // 否则档案段为空、AI 只能从标题猜数据源（把文章主角当成数据源，2026-11-19 实锤）。
@@ -340,39 +507,47 @@ export const analyzeEntriesForFocus = async (
     const matchedReasons: Record<string, string> = {}
 
     try {
-      const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
-      try {
-        const response = await fetch(`${provider.baseURL}/chat/completions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${provider.apiKey}`,
-            ...(provider.headers ?? {}),
-          },
-          body: JSON.stringify({
-            model: provider.model,
-            temperature: 0,
-            messages: buildMessages(criteria, batch, profileSection),
-          }),
-          signal: controller.signal,
-        })
-        if (!response.ok) {
-          console.error("[focus-analyzer] provider request failed", response.status)
-          results.failedIds.push(...batch.map((entry) => entry.id))
-          continue
-        }
-        const data = (await response.json()) as {
-          choices?: Array<{ message?: { content?: string } }>
-        }
-        const content = data.choices?.[0]?.message?.content ?? ""
-        const matches = filterReasonedMatches(extractFocusResults(content))
+      if (decisionMode) {
+        const matches = await analyzeBatchWithDecision(provider, criteria, batch, profileSection)
         matchedIds = matches.map((match) => match.id)
         for (const match of matches) {
           if (match.reason) matchedReasons[match.id] = match.reason
         }
-      } finally {
-        clearTimeout(timeout)
+      } else {
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+        try {
+          const response = await fetch(`${provider.baseURL}/chat/completions`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${provider.apiKey}`,
+              ...(provider.headers ?? {}),
+            },
+            body: JSON.stringify({
+              model: provider.model,
+              temperature: 0,
+              messages: buildMessages(criteria, batch, profileSection),
+            }),
+            signal: controller.signal,
+          })
+          if (!response.ok) {
+            console.error("[focus-analyzer] provider request failed", response.status)
+            results.failedIds.push(...batch.map((entry) => entry.id))
+            continue
+          }
+          const data = (await response.json()) as {
+            choices?: Array<{ message?: { content?: string } }>
+          }
+          const content = data.choices?.[0]?.message?.content ?? ""
+          const matches = filterReasonedMatches(extractFocusResults(content))
+          matchedIds = matches.map((match) => match.id)
+          for (const match of matches) {
+            if (match.reason) matchedReasons[match.id] = match.reason
+          }
+        } finally {
+          clearTimeout(timeout)
+        }
       }
     } catch (error) {
       // Transient network/provider errors: report the batch as failed so the
@@ -458,47 +633,59 @@ export const explainFocusMatches = async (
 
   const result: FocusExplainResult = { reasons: {}, failedIds: [], skipped: false }
 
+  // 决策模型（System One）只做判断、不生成文本，走独立的 /systemone 协议。
+  const decisionMode = isDecisionProvider(provider)
+
   for (let i = 0; i < candidates.length; i += BATCH_SIZE) {
     const batch = candidates.slice(i, i + BATCH_SIZE)
     try {
-      const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
-      try {
-        const response = await fetch(`${provider.baseURL}/chat/completions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${provider.apiKey}`,
-            ...(provider.headers ?? {}),
-          },
-          body: JSON.stringify({
-            model: provider.model,
-            temperature: 0,
-            messages: buildReasonMessages(criteria, batch, profileSection),
-          }),
-          signal: controller.signal,
-        })
-        if (!response.ok) {
-          console.error("[focus-analyzer] reason request failed", response.status)
-          result.failedIds.push(...batch.map((entry) => entry.id))
-          continue
-        }
-        const data = (await response.json()) as {
-          choices?: Array<{ message?: { content?: string } }>
-        }
-        const content = data.choices?.[0]?.message?.content ?? ""
-        const matches = extractFocusResults(content)
+      if (decisionMode) {
+        // 复核：决策模型判匹配的补上模板 reason；判不匹配的不写 reason，
+        // 调用方按 unexplained 分支把该条移出重点集合。
+        const matches = await analyzeBatchWithDecision(provider, criteria, batch, profileSection)
         for (const match of matches) {
-          // A negative reason ("内容未涉及标准中限定的特定公司名单") is the AI
-          // saying the entry does NOT match — it must not be stored as a reason
-          // (which would promote the entry into the focus set). The caller's
-          // "unexplained" branch drops such entries from the focus set instead.
-          if (match.reason && !isNegativeReason(match.reason)) {
-            result.reasons[match.id] = match.reason
-          }
+          if (match.reason) result.reasons[match.id] = match.reason
         }
-      } finally {
-        clearTimeout(timeout)
+      } else {
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+        try {
+          const response = await fetch(`${provider.baseURL}/chat/completions`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${provider.apiKey}`,
+              ...(provider.headers ?? {}),
+            },
+            body: JSON.stringify({
+              model: provider.model,
+              temperature: 0,
+              messages: buildReasonMessages(criteria, batch, profileSection),
+            }),
+            signal: controller.signal,
+          })
+          if (!response.ok) {
+            console.error("[focus-analyzer] reason request failed", response.status)
+            result.failedIds.push(...batch.map((entry) => entry.id))
+            continue
+          }
+          const data = (await response.json()) as {
+            choices?: Array<{ message?: { content?: string } }>
+          }
+          const content = data.choices?.[0]?.message?.content ?? ""
+          const matches = extractFocusResults(content)
+          for (const match of matches) {
+            // A negative reason ("内容未涉及标准中限定的特定公司名单") is the AI
+            // saying the entry does NOT match — it must not be stored as a reason
+            // (which would promote the entry into the focus set). The caller's
+            // "unexplained" branch drops such entries from the focus set instead.
+            if (match.reason && !isNegativeReason(match.reason)) {
+              result.reasons[match.id] = match.reason
+            }
+          }
+        } finally {
+          clearTimeout(timeout)
+        }
       }
     } catch (error) {
       console.error("[focus-analyzer] reason request failed", error)

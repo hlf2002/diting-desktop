@@ -1,13 +1,19 @@
 import { describe, expect, it } from "vitest"
 
 import {
+  buildDecisionReason,
+  buildDecisionRequest,
   buildProfileSection,
   enrichCandidateFeedIds,
   extractFocusResults,
   extractIdArray,
   extractPlainText,
+  extractWhitelistCompanies,
   filterReasonedMatches,
+  findWhitelistHit,
+  isDecisionProvider,
   isNegativeReason,
+  parseDecisionAnswers,
 } from "./focus-analyzer"
 
 const VALID_ID = "1721025600000" // 13-digit snowflake-ish id
@@ -164,6 +170,118 @@ describe("filterReasonedMatches", () => {
 
   it("returns empty when no match has a reason", () => {
     expect(filterReasonedMatches([{ id: VALID_ID }, { id: "1721025600001" }])).toEqual([])
+  })
+})
+
+const WHITELIST_CRITERIA =
+  "如果数据源是一个人，我只想看能反应一个人背后品质，思想光芒的内容；如果数据源是一个媒体，我只想看以下公司的新闻：字节跳动，阿里巴巴，腾讯，金蝶，用友，亿企赢，税友"
+
+describe("extractWhitelistCompanies", () => {
+  it("extracts the company list from the media branch", () => {
+    expect(extractWhitelistCompanies(WHITELIST_CRITERIA)).toEqual([
+      "字节跳动",
+      "阿里巴巴",
+      "腾讯",
+      "金蝶",
+      "用友",
+      "亿企赢",
+      "税友",
+    ])
+  })
+
+  it("returns empty when no whitelist is mentioned", () => {
+    expect(extractWhitelistCompanies("如果数据源是一个人，只看品质")).toEqual([])
+  })
+})
+
+describe("findWhitelistHit", () => {
+  it("finds a company name in the text", () => {
+    expect(findWhitelistHit("字节跳动发布豆包新版本", ["字节跳动", "腾讯"])).toBe("字节跳动")
+  })
+
+  it("returns null when no company appears", () => {
+    expect(findWhitelistHit("山东富豪向上市公司赠送资产", ["字节跳动", "腾讯"])).toBeNull()
+  })
+})
+
+describe("buildDecisionReason", () => {
+  it("names the hit company when the whitelist matches", () => {
+    const entry = { id: VALID_ID, title: "字节跳动发布豆包新版本", description: "" }
+    const companies = ["字节跳动", "腾讯"]
+    expect(buildDecisionReason(entry, WHITELIST_CRITERIA, companies, 0.98, "媒体")).toContain(
+      "字节跳动",
+    )
+  })
+
+  it("uses the profile type branch when no company hits", () => {
+    const entry = { id: VALID_ID, title: "一位创业者的自述", description: "" }
+    expect(buildDecisionReason(entry, WHITELIST_CRITERIA, [], 0.95, "个人")).toContain("品质与思想")
+    expect(buildDecisionReason(entry, WHITELIST_CRITERIA, [], 0.95, "机构/组织")).toContain(
+      "最新动态",
+    )
+  })
+})
+
+describe("parseDecisionAnswers", () => {
+  const candidates = [
+    { id: VALID_ID, title: "字节跳动发布豆包新版本", description: "" },
+    { id: "1721025600001", title: "55亿山东富豪尽显豪气", description: "" },
+  ]
+
+  it("keeps entries above the threshold with a reason, drops the rest", () => {
+    const matches = parseDecisionAnswers(
+      {
+        [`q_${VALID_ID}`]: { type: "noul", noul: 0.98 },
+        q_1721025600001: { type: "noul", noul: 0.01 },
+      },
+      candidates,
+      WHITELIST_CRITERIA,
+      "",
+    )
+    expect(matches.map((match) => match.id)).toEqual([VALID_ID])
+    expect(matches[0]?.reason).toContain("字节跳动")
+  })
+
+  it("drops entries below the threshold", () => {
+    const matches = parseDecisionAnswers(
+      { [`q_${VALID_ID}`]: { type: "noul", noul: 0.79 } },
+      candidates,
+      WHITELIST_CRITERIA,
+      "",
+    )
+    expect(matches).toEqual([])
+  })
+
+  it("treats missing answers as non-matches", () => {
+    expect(parseDecisionAnswers(undefined, candidates, WHITELIST_CRITERIA, "")).toEqual([])
+  })
+})
+
+describe("isDecisionProvider", () => {
+  it("flags the bailian decision provider", () => {
+    expect(isDecisionProvider({ provider: "alibaba-decision" })).toBe(true)
+    expect(isDecisionProvider({ provider: "deepseek" })).toBe(false)
+  })
+})
+
+describe("buildDecisionRequest", () => {
+  it("builds one noul question per candidate, referencing its id", () => {
+    const candidates = [
+      { id: VALID_ID, title: "字节跳动发布豆包新版本", description: "" },
+      { id: "1721025600001", title: "山东富豪赠礼", description: "" },
+    ]
+    const request = buildDecisionRequest(
+      WHITELIST_CRITERIA,
+      candidates,
+      "",
+      "decision-model-preview",
+    )
+    expect(request.model).toBe("decision-model-preview")
+    expect(Object.keys(request.questions)).toEqual([`q_${VALID_ID}`, "q_1721025600001"])
+    expect((request.questions[`q_${VALID_ID}`] as { instructions: string }).instructions).toContain(
+      VALID_ID,
+    )
+    expect(request.state.candidates).toHaveLength(2)
   })
 })
 
