@@ -16,9 +16,10 @@
 import { execFileSync } from "node:child_process"
 import { existsSync } from "node:fs"
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises"
-import { arch, homedir, platform } from "node:os"
+import { arch, homedir, platform, tmpdir } from "node:os"
 import { fileURLToPath } from "node:url"
 
+import fg from "fast-glob"
 import { dirname, join } from "pathe"
 
 const scriptDir = dirname(fileURLToPath(import.meta.url))
@@ -79,20 +80,40 @@ async function main() {
   for (const name of EXCLUDED_DEPENDENCIES) {
     delete dependencies[name]
   }
+  console.log(
+    "[prepare-rsshub-runtime] installing production dependencies (pnpm, outside the workspace) …",
+  )
+  // Install in a temp dir **outside** the pnpm workspace: `pnpm install` under the workspace tree
+  // retargets every workspace project and prunes the parent app's devDependencies. npm never
+  // retargets, but its flat tree pulls ~90 extra packages (~219MB) that pnpm's production closure
+  // does not ship, so pnpm is worth the extra copy step.
+  const depDir = join(tmpdir(), `diting-rsshub-deps-${process.pid}`)
+  await rm(depDir, { recursive: true, force: true })
+  await mkdir(depDir, { recursive: true })
+  await writeFile(
+    join(depDir, "package.json"),
+    `${JSON.stringify({ name: "diting-rsshub-deps", version: "1.0.0", private: true, type: "module", dependencies }, null, 2)}\n`,
+  )
+  // RSSHub depends on `difflib` via a git URL; pnpm's security default rejects exotic subdeps.
+  // pnpm 12 reads settings from pnpm-workspace.yaml, not .npmrc, so declare a standalone workspace.
+  await writeFile(join(depDir, "pnpm-workspace.yaml"), "packages: []\nblockExoticSubdeps: false\n")
+  execFileSync(
+    "pnpm",
+    ["install", "--prod", "--node-linker=hoisted", "--ignore-scripts", "--no-frozen-lockfile"],
+    {
+      cwd: depDir,
+      stdio: "inherit",
+      env: { ...process.env, CI: "1" },
+    },
+  )
+  console.log("[prepare-rsshub-runtime] copying node_modules …")
+  await cp(join(depDir, "node_modules"), join(runtimeDir, "node_modules"), { recursive: true })
+  await rm(depDir, { recursive: true, force: true })
+
   await writeFile(
     join(runtimeDir, "package.json"),
     `${JSON.stringify({ name: "diting-rsshub-runtime", version: "1.0.0", private: true, type: "module", dependencies }, null, 2)}\n`,
   )
-
-  console.log("[prepare-rsshub-runtime] installing production dependencies (npm, isolated) …")
-  // npm, not pnpm: this directory lives inside the pnpm workspace, and `pnpm install` there
-  // retargets the whole workspace (`Scope: all N workspace projects`), which prunes the parent
-  // project's devDependencies. npm treats the directory as a standalone package.
-  execFileSync("npm", ["install", "--omit=dev", "--ignore-scripts", "--no-audit", "--no-fund"], {
-    cwd: runtimeDir,
-    stdio: "inherit",
-    env: { ...process.env, CI: "1" },
-  })
 
   for (const pkg of DROP_PACKAGES) {
     const target = join(runtimeDir, "node_modules", pkg)
@@ -101,6 +122,33 @@ async function main() {
       await rm(target, { recursive: true, force: true })
     }
   }
+
+  // Runtime-only payload: type declarations, source maps and test/doc fixtures never execute.
+  // Everything here is derived data, so dropping it cannot change runtime behaviour.
+  console.log("[prepare-rsshub-runtime] pruning non-runtime files …")
+  const nodeModulesDir = join(runtimeDir, "node_modules")
+  const prunePatterns = [
+    "**/*.d.ts",
+    "**/*.d.mts",
+    "**/*.d.cts",
+    "**/*.map",
+    "**/test/**",
+    "**/tests/**",
+    "**/__tests__/**",
+    "**/docs/**",
+    "**/example/**",
+    "**/examples/**",
+  ]
+  const victims = await fg(prunePatterns, {
+    cwd: nodeModulesDir,
+    absolute: true,
+    onlyFiles: false,
+    dot: false,
+  })
+  for (const victim of victims) {
+    await rm(victim, { recursive: true, force: true })
+  }
+  console.log(`[prepare-rsshub-runtime] pruned ${victims.length} entries`)
 
   const obscura = obscuraCandidates().find((candidate) => existsSync(candidate))
   if (!obscura) {

@@ -178,6 +178,15 @@ const config: ForgeConfig = {
       ITSAppUsesNonExemptEncryption: false,
     },
     osxSign: {
+      // Only sign binaries/executables inside the vendored RSSHub runtime: codesign runs once per
+      // file, and signing thousands of .js chunks there dominates packaging time.
+      ignore: (filePath: string) =>
+        filePath.includes("rsshub-runtime") &&
+        !/(?:\.node|\.dylib)$|\/bin\/obscura$/.test(filePath),
+      // Apple's timestamp server is unreachable from this network and codesign blocks on it per
+      // file, which is what made local packaging hang for minutes. Local builds therefore sign
+      // ad-hoc (`identity: "-"`), which skips the timestamp service; release builds pass a real
+      // identity via OSX_SIGN_IDENTITY.
       optionsForFile:
         platform === "mas"
           ? (filePath) => {
@@ -193,7 +202,7 @@ const config: ForgeConfig = {
               entitlements: "build/entitlements.mac.plist",
             }),
       keychain: process.env.OSX_SIGN_KEYCHAIN_PATH,
-      identity: process.env.OSX_SIGN_IDENTITY,
+      identity: process.env.OSX_SIGN_IDENTITY ?? "-",
       provisioningProfile: process.env.OSX_SIGN_PROVISIONING_PROFILE_PATH,
     },
     ...(process.env.APPLE_ID &&
