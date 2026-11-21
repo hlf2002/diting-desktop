@@ -5,6 +5,7 @@ import { setAISetting, useAISettingValue } from "~/atoms/settings/ai"
 
 import { createDefineSettingItem } from "../helper/builder"
 import { createSettingBuilder } from "../helper/setting-builder"
+import { SettingSectionTitle } from "../section"
 import { ByokSection } from "./ai/byok"
 import { MCPServicesSection } from "./ai/mcp/MCPServicesSection"
 import { PanelStyleSection } from "./ai/PanelStyleSection"
@@ -43,10 +44,11 @@ export const SettingAI = () => {
             description: t("settings.autoScrollWhenStreaming.description"),
           }),
 
-          {
-            type: "title",
-            value: t("personalize.title"),
-          },
+          <SettingSectionTitle
+            key="personalize-title"
+            title={t("personalize.title")}
+            className="text-lg text-text"
+          />,
 
           PersonalizePromptSection,
 
