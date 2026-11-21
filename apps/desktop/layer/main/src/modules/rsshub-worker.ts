@@ -18,6 +18,8 @@
 import { env } from "@follow/shared/env.desktop"
 import { powerMonitor } from "electron"
 
+import { fetchRouteXml, isRSSHubEngineReady } from "./rsshub-engine"
+
 const SERVER_URL = "https://rsshub.7373.com.cn"
 const LOCAL_RSSHUB_URL = "http://127.0.0.1:1200"
 
@@ -84,8 +86,18 @@ async function claimTask(): Promise<string | null> {
   }
 }
 
-/** 调本地 RSSHub 抓取一个路由 */
+/** 抓取一个路由：优先内置 RSSHub 引擎，回退到用户自启的外部 RSSHub（127.0.0.1:1200）。 */
 async function fetchLocalRSSHub(route: string): Promise<{ xml: string; itemCount: number } | null> {
+  if (isRSSHubEngineReady()) {
+    try {
+      const xml = await fetchRouteXml(route)
+      const itemCount = (xml.match(/<item>/g) || []).length
+      return { xml, itemCount }
+    } catch (error) {
+      console.warn(`[rsshub-worker] 内置引擎抓取失败，尝试外部 RSSHub: ${route}`, error)
+    }
+  }
+
   try {
     const res = await fetch(`${LOCAL_RSSHUB_URL}${route}`, {
       signal: AbortSignal.timeout(60_000),

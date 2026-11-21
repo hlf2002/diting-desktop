@@ -26,6 +26,7 @@ import {
 } from "../../lib/cli-session-sync"
 import { deleteNotificationsToken, updateNotificationsToken } from "../../lib/user"
 import { logger } from "../../logger"
+import { startRSSHubEngine, stopRSSHubEngine } from "../../modules/rsshub-engine"
 import { fetchRouteNow, startRSSHubWorker, stopRSSHubWorker } from "../../modules/rsshub-worker"
 
 export class AuthService extends IpcService {
@@ -243,6 +244,10 @@ export class AuthService extends IpcService {
     // Q助理登录成功 → 启动 RSSHub P2P 抓取 worker
     if (preferredToken) {
       startRSSHubWorker()
+      // 内置 RSSHub 引擎异步启动；失败只影响本地抓取，不阻塞登录流程
+      void startRSSHubEngine().catch((error) => {
+        logger.warn("[rsshub-engine] 启动失败:", error)
+      })
     }
 
     // Sync the current desktop session to the npm CLI login, once the user connected the CLI.
@@ -269,8 +274,9 @@ export class AuthService extends IpcService {
   @IpcMethod()
   async signOut(): Promise<void> {
     this.sessionToken = null
-    // 登出 → 停止 RSSHub P2P 抓取 worker
+    // 登出 → 停止 RSSHub P2P 抓取 worker 与内置引擎
     stopRSSHubWorker()
+    void stopRSSHubEngine()
 
     try {
       await deleteNotificationsToken()
