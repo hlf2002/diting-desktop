@@ -75,7 +75,8 @@ const keepModules = new Set([
 const keepLanguages = new Set(["en", "en_GB", "en-US", "en_US"])
 
 // remove folders & files not to be included in the app
-async function cleanSources(buildPath, _electronVersion, platform, _arch, callback) {
+// packager 20+ passes a single options object to lifecycle hooks (previously positional args).
+async function cleanSources({ buildPath, platform }: { buildPath: string; platform: string }) {
   // folders & files to be included in the app
   const appItems = new Set(["dist", "node_modules", "package.json", "resources"])
 
@@ -122,11 +123,9 @@ async function cleanSources(buildPath, _electronVersion, platform, _arch, callba
       )
     }),
   )
-
-  callback()
 }
 
-const noopAfterCopy = (_buildPath, _electronVersion, _platform, _arch, callback) => callback()
+const noopAfterCopy = async () => {}
 
 const keepModulePattern = [...keepModules]
   .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
@@ -169,7 +168,9 @@ const config: ForgeConfig = {
     afterCopy: [
       cleanSources,
       process.platform !== "win32" ? noopAfterCopy : setLanguages([...keepLanguages.values()]),
-    ],
+      // packager 20 calls hooks with a single options object; forge 8's own type still declares
+      // the legacy positional signature, so the cast is required until that type catches up.
+    ] as unknown as import("@electron/packager").HookFunction[],
     asar: true,
     ignore: [ignorePattern],
 
@@ -189,7 +190,7 @@ const config: ForgeConfig = {
       // identity via OSX_SIGN_IDENTITY.
       optionsForFile:
         platform === "mas"
-          ? (filePath) => {
+          ? (filePath: string) => {
               const entitlements = filePath.includes(".app/")
                 ? "build/entitlements.mas.child.plist"
                 : "build/entitlements.mas.plist"
