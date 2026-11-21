@@ -2,6 +2,7 @@ import { useFocusEntryIds, useFocusReason, useFocusScore } from "@follow/store/f
 import { useTranslation } from "react-i18next"
 
 import { AISummaryCardBase } from "~/components/ui/ai-summary-card"
+import { useSettingModal } from "~/modules/settings/modal/useSettingModal"
 
 /**
  * "重点关注" card rendered above the AI summary in the reader: shows why the
@@ -17,6 +18,7 @@ export function FocusReasonCard({ entryId }: { entryId: string }) {
   const isFocus = useFocusEntryIds().has(entryId)
   const reason = useFocusReason(entryId)
   const score = useFocusScore(entryId)
+  const openSettings = useSettingModal()
 
   if (!isFocus || !reason) return null
 
@@ -28,6 +30,16 @@ export function FocusReasonCard({ entryId }: { entryId: string }) {
       title={t("entry_content.focus_reason")}
       content={`${scoreLine}${reason}`}
       showCopyButton={false}
+      footerContent={
+        <button
+          type="button"
+          onClick={() => openSettings("ai")}
+          className="mt-3 flex items-center gap-1 text-xs font-medium text-purple-600 dark:text-purple-400"
+        >
+          <i className="i-mgc-settings-7-cute-re text-base" />
+          <span>{t("entry_content.focus_settings_cta")}</span>
+        </button>
+      }
     />
   )
 }

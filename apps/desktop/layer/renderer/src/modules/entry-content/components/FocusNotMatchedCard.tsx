@@ -2,6 +2,7 @@ import { useAnalyzedEntryIds, useFocusEntryIds, useFocusScore } from "@follow/st
 import { useTranslation } from "react-i18next"
 
 import { AISummaryCardBase } from "~/components/ui/ai-summary-card"
+import { useSettingModal } from "~/modules/settings/modal/useSettingModal"
 
 /**
  * "未进入重点关注" card rendered at the END of the article body: shows the
@@ -16,6 +17,7 @@ export function FocusNotMatchedCard({ entryId }: { entryId: string }) {
   const analyzed = useAnalyzedEntryIds().has(entryId)
   const isFocus = useFocusEntryIds().has(entryId)
   const score = useFocusScore(entryId)
+  const openSettings = useSettingModal()
 
   if (!analyzed || isFocus) return null
 
@@ -29,6 +31,16 @@ export function FocusNotMatchedCard({ entryId }: { entryId: string }) {
       title={t("entry_content.focus_not_matched")}
       content={content}
       showCopyButton={false}
+      footerContent={
+        <button
+          type="button"
+          onClick={() => openSettings("ai")}
+          className="mt-3 flex items-center gap-1 text-xs font-medium text-purple-600 dark:text-purple-400"
+        >
+          <i className="i-mgc-settings-7-cute-re text-base" />
+          <span>{t("entry_content.focus_settings_cta")}</span>
+        </button>
+      }
     />
   )
 }

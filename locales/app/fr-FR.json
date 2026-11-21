@@ -225,6 +225,7 @@
   "entry_content.focus_not_matched": "Hors centre d'intérêt",
   "entry_content.focus_reason": "Centre d'intérêt",
   "entry_content.focus_score": "Probabilité de correspondance du modèle de décision : {{score}}%",
+  "entry_content.focus_settings_cta": "Ajuster les critères",
   "entry_content.focus_unjudged": "Non évalué (critères/modèle non configuré)",
   "entry_content.focus_unjudged_cta": "Ouvrir les réglages",
   "entry_content.focus_unjudged_hint": "Cet article n'a pas encore été évalué selon vos critères. Configurez des critères et un fournisseur IA dans les réglages IA — l'enregistrement ré-évaluera automatiquement tous les articles.",

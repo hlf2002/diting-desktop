@@ -225,6 +225,7 @@
   "entry_content.focus_not_matched": "注目対象外",
   "entry_content.focus_reason": "注目",
   "entry_content.focus_score": "判定モデル合致確率：{{score}}%",
+  "entry_content.focus_settings_cta": "判定基準を調整",
   "entry_content.focus_unjudged": "未判定（判定基準/モデル未設定）",
   "entry_content.focus_unjudged_cta": "設定を開く",
   "entry_content.focus_unjudged_hint": "この記事はまだ重点注目の対象か判定されていません。AI 設定で注目基準と AI プロバイダーを設定してください。保存後、すべての記事が自動的に再判定されます。",
