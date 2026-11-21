@@ -84,14 +84,23 @@ export const PersonalizePromptSection = () => {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <SettingDescription className="w-full">
-          {t("personalize.prompt.help")}
-          {isOverLimit && (
-            <span className="mt-1 block text-red">
-              {t("prompt_editor.over_limit", { max: MAX_CHARACTERS })}
-            </span>
-          )}
-        </SettingDescription>
+        <div className="flex items-start justify-between gap-3">
+          <SettingDescription className="w-full flex-1">
+            {t("personalize.prompt.help")}
+            {isOverLimit && (
+              <span className="mt-1 block text-red">
+                {t("prompt_editor.over_limit", { max: MAX_CHARACTERS })}
+              </span>
+            )}
+          </SettingDescription>
+          <Button
+            size="sm"
+            buttonClassName="shrink-0 whitespace-nowrap"
+            onClick={handleReanalyzeAll}
+          >
+            {t("personalize.reanalyze_all_button")}
+          </Button>
+        </div>
         <div className="relative -ml-3">
           <LexicalRichEditorTextArea
             initialValue={initialValue}
@@ -101,17 +110,10 @@ export const PersonalizePromptSection = () => {
             plugins={[MentionPlugin]}
             namespace="PersonalizePromptEditor"
             placeholder={t("personalize.prompt.placeholder")}
-            className={`min-h-[80px] resize-none pr-32 text-sm ${
+            className={`min-h-[80px] resize-none text-sm ${
               isOverLimit ? "border-red focus:border-red" : ""
             }`}
           />
-          <Button
-            size="sm"
-            buttonClassName="absolute right-2 top-2 z-10 whitespace-nowrap shadow-sm"
-            onClick={handleReanalyzeAll}
-          >
-            {t("personalize.reanalyze_all_button")}
-          </Button>
           <div
             className={`absolute bottom-2 right-2 text-xs ${
               isOverLimit
