@@ -1,7 +1,7 @@
 import { Spring } from "@follow/components/constants/spring.js"
 import { Button } from "@follow/components/ui/button/index.js"
 import { LexicalRichEditorTextArea } from "@follow/components/ui/lexical-rich-editor/index.js"
-import { useSetAtom } from "jotai"
+import { useAtomValue, useSetAtom } from "jotai"
 import { AnimatePresence } from "motion/react"
 import { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -12,6 +12,7 @@ import { m } from "~/components/common/Motion"
 import { MentionPlugin } from "~/modules/ai-chat/editor"
 import {
   focusFullReanalyzeTriggerAtom,
+  focusReanalyzeProgressAtom,
   focusRetroAnalyzeTriggerAtom,
 } from "~/modules/focus/useFocusAnalyzer"
 
@@ -27,6 +28,7 @@ export const PersonalizePromptSection = () => {
   const aiSettings = useAISettingValue()
   const setRetroTrigger = useSetAtom(focusRetroAnalyzeTriggerAtom)
   const setFullReanalyzeTrigger = useSetAtom(focusFullReanalyzeTriggerAtom)
+  const reanalyzeProgress = useAtomValue(focusReanalyzeProgressAtom)
   const [initialValue] = useState(() => unsavedDraft ?? aiSettings.personalizePrompt)
   const promptRef = useRef(unsavedDraft ?? "")
   const [isSaving, setIsSaving] = useState(false)
@@ -77,9 +79,15 @@ export const PersonalizePromptSection = () => {
   }
 
   const handleReanalyzeAll = () => {
+    if (reanalyzeProgress.running) return
     setFullReanalyzeTrigger((v) => v + 1)
     toast.success(t("personalize.reanalyze_all_started"))
   }
+
+  const reanalyzePercent =
+    reanalyzeProgress.total > 0
+      ? Math.min(100, Math.round((reanalyzeProgress.done / reanalyzeProgress.total) * 100))
+      : 0
 
   return (
     <div className="space-y-4">
@@ -96,6 +104,7 @@ export const PersonalizePromptSection = () => {
           <Button
             size="sm"
             buttonClassName="shrink-0 whitespace-nowrap"
+            disabled={reanalyzeProgress.running}
             onClick={handleReanalyzeAll}
           >
             {t("personalize.reanalyze_all_button")}
@@ -126,6 +135,36 @@ export const PersonalizePromptSection = () => {
             {currentLength}/{MAX_CHARACTERS}
           </div>
         </div>
+        {reanalyzeProgress.total > 0 && (
+          <div className="space-y-1 pt-1">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-fill-secondary">
+              <div
+                className={`h-full rounded-full transition-[width] duration-300 ease-out ${
+                  reanalyzeProgress.running ? "bg-accent" : "bg-green"
+                }`}
+                style={{ width: `${reanalyzePercent}%` }}
+              />
+            </div>
+            <div className="flex items-center justify-between text-xs text-text-tertiary">
+              <span>
+                {reanalyzeProgress.running
+                  ? t("personalize.reanalyze_progress", {
+                      done: reanalyzeProgress.done.toLocaleString(),
+                      total: reanalyzeProgress.total.toLocaleString(),
+                    })
+                  : t("personalize.reanalyze_done", {
+                      done: reanalyzeProgress.done.toLocaleString(),
+                      total: reanalyzeProgress.total.toLocaleString(),
+                    })}
+              </span>
+              <span>
+                {reanalyzePercent}%
+                {reanalyzeProgress.failed > 0 &&
+                  ` · ${t("personalize.reanalyze_failed", { count: reanalyzeProgress.failed })}`}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       <AnimatePresence>

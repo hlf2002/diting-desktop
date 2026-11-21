@@ -1,7 +1,7 @@
 import { FocusService } from "@follow/database/services/focus"
 import { useEntryStore } from "@follow/store/entry/store"
 import { focusActions, useFocusStore } from "@follow/store/focus/store"
-import { atom, useAtomValue } from "jotai"
+import { atom, useAtomValue, useSetAtom } from "jotai"
 import { useCallback, useEffect, useRef } from "react"
 
 import { getAISettings } from "~/atoms/settings/ai"
@@ -14,11 +14,33 @@ const FOCUS_RETRO_LIMIT = 100
 /** Max focus entries to backfill reasons for per run (avoids one huge AI bill). */
 const FOCUS_REASON_BACKFILL_LIMIT = 100
 
+/** Entries scored per batch during the explicit full re-analysis. */
+const FULL_REANALYZE_BATCH = 50
+
 /** Bump to ask the analyzer to re-score the most recent entries (saved criteria). */
 export const focusRetroAnalyzeTriggerAtom = atom(0)
 
 /** Bump to ask the analyzer to re-score EVERY entry in the store (full re-analysis). */
 export const focusFullReanalyzeTriggerAtom = atom(0)
+
+export interface FocusReanalyzeProgress {
+  /** Entries the current full re-analysis will score. */
+  total: number
+  /** Entries already scored by the current run. */
+  done: number
+  /** True while a full re-analysis is in flight. */
+  running: boolean
+  /** Entries the provider rejected (retried by the next run). */
+  failed: number
+}
+
+/** Progress of the explicit full re-analysis — drives the settings progress bar. */
+export const focusReanalyzeProgressAtom = atom<FocusReanalyzeProgress>({
+  total: 0,
+  done: 0,
+  running: false,
+  failed: 0,
+})
 
 /** The most recent entry ids still present in the entry store, newest first. */
 const getRecentEntryIds = (limit: number): string[] => {
@@ -46,12 +68,16 @@ export const useFocusAnalyzer = () => {
   const pendingRef = useRef<string[]>([])
   const reasonPendingRef = useRef<string[]>([])
   const runningRef = useRef(false)
+  /** Set while the explicit full re-analysis owns the AI provider. */
+  const fullRunningRef = useRef(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const retroTrigger = useAtomValue(focusRetroAnalyzeTriggerAtom)
   const fullReanalyzeTrigger = useAtomValue(focusFullReanalyzeTriggerAtom)
+  const setProgress = useSetAtom(focusReanalyzeProgressAtom)
 
   const drain = useCallback(async () => {
-    if (runningRef.current) return
+    // The full re-analysis drives its own loop; don't let both hammer the provider.
+    if (runningRef.current || fullRunningRef.current) return
     runningRef.current = true
     try {
       while (pendingRef.current.length > 0 || reasonPendingRef.current.length > 0) {
@@ -249,20 +275,94 @@ export const useFocusAnalyzer = () => {
     })()
   }, [enqueue, retroTrigger])
 
-  // Full re-analysis: the user explicitly asked to re-score EVERY article in the
-  // store with the current model (e.g. after switching to the decision engine).
-  // Unmarking everything re-runs the whole drain loop, so a large library can
-  // take a while — that is the point of the action.
+  // Full re-analysis: the user explicitly asked to re-score EVERY article stored
+  // on this device with the current model (e.g. after switching to the decision
+  // engine). The entry store only holds what the timeline has loaded, so the
+  // library is read from the local database; progress is reported batch by batch
+  // through focusReanalyzeProgressAtom (the settings section renders the bar).
   useEffect(() => {
     if (fullReanalyzeTrigger === 0) return
     void (async () => {
-      const allIds = [...useEntryStore.getState().entryIdSet]
-      if (allIds.length === 0) return
-      await focusActions.unmarkAnalyzed(allIds)
-      focusActions.unmarkUnjudged(allIds)
-      enqueue(allIds)
+      const rows = await FocusService.getReanalyzeCandidates()
+      if (rows.length === 0) {
+        setProgress({ total: 0, done: 0, running: false, failed: 0 })
+        return
+      }
+
+      const allIds = rows.map((row) => row.id)
+      fullRunningRef.current = true
+      setProgress({ total: rows.length, done: 0, running: true, failed: 0 })
+      let done = 0
+      let failed = 0
+      try {
+        await focusActions.unmarkAnalyzed(allIds)
+        focusActions.unmarkUnjudged(allIds)
+
+        // Report at most ~100 progress updates: a large library means thousands
+        // of small batches and every atom write re-renders the settings page.
+        const reportEvery = Math.max(FULL_REANALYZE_BATCH, Math.ceil(rows.length / 100))
+        let reportedDone = 0
+        for (let i = 0; i < rows.length; i += FULL_REANALYZE_BATCH) {
+          const batch = rows.slice(i, i + FULL_REANALYZE_BATCH)
+          const contentless = batch.filter((row) => !row.title && !row.description)
+          if (contentless.length > 0) {
+            // Nothing for the AI to judge: mark them scored so they drop out of
+            // the queue, exactly like the incremental drain does.
+            const ids = contentless.map((row) => row.id)
+            await focusActions.persistAnalyzed(ids, [])
+            done += ids.length
+          }
+
+          const candidates = batch
+            .filter((row) => Boolean(row.title || row.description))
+            .map((row) => ({
+              id: row.id,
+              feedId: row.feedId,
+              title: row.title,
+              description: row.description,
+            }))
+
+          if (candidates.length > 0) {
+            const result = await analyzeEntriesForFocus(candidates)
+            if (result.skipped) {
+              // No criteria / no usable provider: stop the run instead of
+              // burning through the library with nothing to score against.
+              setProgress({ total: rows.length, done, running: false, failed })
+              return
+            }
+            if (result.analyzedIds.length > 0) {
+              focusActions.markAnalyzedInSession(
+                result.analyzedIds,
+                result.matchedIds,
+                result.matchedReasons,
+                result.scores,
+              )
+              await focusActions.persistAnalyzed(
+                result.analyzedIds,
+                result.matchedIds,
+                result.matchedReasons,
+                result.scores,
+              )
+            }
+            done += result.analyzedIds.length
+            failed += result.failedIds.length
+            // Failed ids stay unscored (no DB write) so the next full run picks
+            // them up again; pushing them into the incremental drain would let
+            // the drain mark them "contentless" for entries not in the store.
+          }
+
+          if (done - reportedDone >= reportEvery) {
+            reportedDone = done
+            setProgress({ total: rows.length, done, running: true, failed })
+          }
+        }
+      } finally {
+        fullRunningRef.current = false
+        setProgress({ total: rows.length, done, running: false, failed })
+        if (pendingRef.current.length > 0) void drain()
+      }
     })()
-  }, [enqueue, fullReanalyzeTrigger])
+  }, [drain, fullReanalyzeTrigger, setProgress])
 
   useEffect(
     () => () => {

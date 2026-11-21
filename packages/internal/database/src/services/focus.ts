@@ -45,6 +45,19 @@ class FocusServiceStatic implements Resetable {
   }
 
   /**
+   * Every entry stored on this device, in the shape the focus analyzer needs.
+   * Used by the explicit "重新分析全部文章" action: the entry store only holds
+   * what the timeline currently has loaded, so a full re-analysis must read the
+   * library from the local database instead.
+   */
+  getReanalyzeCandidates() {
+    return db.query.entriesTable.findMany({
+      columns: { id: true, title: true, description: true, feedId: true },
+      orderBy: (t, { desc }) => desc(t.publishedAt),
+    })
+  }
+
+  /**
    * Mark entries as analyzed with their match result.
    *
    * @param entryIds Entries that were scored.
@@ -118,7 +131,14 @@ class FocusServiceStatic implements Resetable {
 
   async deleteMany(entryIds: string[]) {
     if (entryIds.length === 0) return
-    await db.delete(focusEntriesTable).where(inArray(focusEntriesTable.entryId, entryIds))
+    // Chunk the IN list: a full re-analysis passes the whole library and SQLite
+    // rejects statements with too many bound variables.
+    const CHUNK_SIZE = 500
+    for (let i = 0; i < entryIds.length; i += CHUNK_SIZE) {
+      await db
+        .delete(focusEntriesTable)
+        .where(inArray(focusEntriesTable.entryId, entryIds.slice(i, i + CHUNK_SIZE)))
+    }
   }
 
   async deleteAll() {
