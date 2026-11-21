@@ -5,6 +5,7 @@ import {
   buildDecisionReason,
   buildDecisionRequest,
   buildProfileSection,
+  describeFocusError,
   enrichCandidateFeedIds,
   extractFocusResults,
   extractIdArray,
@@ -433,5 +434,24 @@ describe("enrichCandidateFeedIds", () => {
     const candidates = [{ id: "1721025600000", feedId: null, title: "t", description: "d" }]
     const enriched = enrichCandidateFeedIds(candidates, {})
     expect(enriched[0]?.feedId).toBeNull()
+  })
+})
+
+describe("describeFocusError", () => {
+  it("maps an aborted request to a timeout label", () => {
+    const abort = new DOMException("The operation was aborted.", "AbortError")
+    expect(describeFocusError(abort)).toBe("Timeout 60s")
+  })
+
+  it("maps a decision-status error to its HTTP status", () => {
+    expect(describeFocusError(new Error("decision_status_429"))).toBe("HTTP 429")
+  })
+
+  it("maps fetch failures to a network label", () => {
+    expect(describeFocusError(new TypeError("Failed to fetch"))).toBe("Network error")
+  })
+
+  it("falls back to the raw message", () => {
+    expect(describeFocusError(new Error("boom"))).toBe("boom")
   })
 })

@@ -24,6 +24,8 @@ export interface FocusAnalysisResult {
   scores: Record<string, number>
   /** Ids that could not be scored (network/provider errors) — caller should retry them. */
   failedIds: string[]
+  /** Human-readable reason of the last failure (HTTP status / timeout), for the UI. */
+  lastError?: string
   /** True when the analysis was skipped (no criteria / no AI config), so the caller can decide. */
   skipped: boolean
 }
@@ -195,6 +197,18 @@ const truncate = (text: string | null | undefined, limit: number) => {
   if (!text) return ""
   const trimmed = text.trim()
   return trimmed.length > limit ? `${trimmed.slice(0, limit)}…` : trimmed
+}
+
+/** Turn a provider/network error into a short, user-facing reason (surfaced in the settings UI). */
+export const describeFocusError = (error: unknown): string => {
+  if (error instanceof DOMException && error.name === "AbortError") {
+    return `Timeout ${REQUEST_TIMEOUT_MS / 1000}s`
+  }
+  const message = error instanceof Error ? error.message : String(error)
+  const status = message.match(/decision_status_(\d+)/)
+  if (status) return `HTTP ${status[1]}`
+  if (/failed to fetch|network|ERR_/i.test(message)) return "Network error"
+  return message.slice(0, 60) || "Unknown error"
 }
 
 const buildMessages = (criteria: string, candidates: FocusCandidate[], profileSection: string) => {
@@ -586,6 +600,7 @@ export const analyzeEntriesForFocus = async (
           })
           if (!response.ok) {
             console.error("[focus-analyzer] provider request failed", response.status)
+            results.lastError = `HTTP ${response.status}`
             results.failedIds.push(...batch.map((entry) => entry.id))
             continue
           }
@@ -606,6 +621,7 @@ export const analyzeEntriesForFocus = async (
       // Transient network/provider errors: report the batch as failed so the
       // caller can put it back on the queue and retry on the next trigger.
       console.error("[focus-analyzer] request failed", error)
+      results.lastError = describeFocusError(error)
       results.failedIds.push(...batch.map((entry) => entry.id))
       continue
     }

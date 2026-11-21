@@ -84,9 +84,12 @@ export const PersonalizePromptSection = () => {
     toast.success(t("personalize.reanalyze_all_started"))
   }
 
+  // Progress covers processed entries (scored + failed): a provider outage used
+  // to freeze the bar at the last `done` percent while every batch kept failing.
+  const reanalyzeProcessed = reanalyzeProgress.done + reanalyzeProgress.failed
   const reanalyzePercent =
     reanalyzeProgress.total > 0
-      ? Math.min(100, Math.round((reanalyzeProgress.done / reanalyzeProgress.total) * 100))
+      ? Math.min(100, Math.round((reanalyzeProcessed / reanalyzeProgress.total) * 100))
       : 0
 
   return (
@@ -161,6 +164,7 @@ export const PersonalizePromptSection = () => {
                 {reanalyzePercent}%
                 {reanalyzeProgress.failed > 0 &&
                   ` · ${t("personalize.reanalyze_failed", { count: reanalyzeProgress.failed })}`}
+                {reanalyzeProgress.lastError && ` · ${reanalyzeProgress.lastError}`}
               </span>
             </div>
           </div>

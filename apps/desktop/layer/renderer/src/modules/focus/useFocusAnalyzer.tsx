@@ -6,7 +6,12 @@ import { useCallback, useEffect, useRef } from "react"
 
 import { getAISettings } from "~/atoms/settings/ai"
 
-import { analyzeEntriesForFocus, explainFocusMatches, extractPlainText } from "./focus-analyzer"
+import {
+  analyzeEntriesForFocus,
+  describeFocusError,
+  explainFocusMatches,
+  extractPlainText,
+} from "./focus-analyzer"
 
 /** Number of most-recent unscored entries to backfill when the criteria change. */
 const FOCUS_RETRO_LIMIT = 100
@@ -32,6 +37,9 @@ export interface FocusReanalyzeProgress {
   running: boolean
   /** Entries the provider rejected (retried by the next run). */
   failed: number
+  /** Last failure reason (HTTP status / timeout) — shown next to the bar so a
+   *  stalled run never looks like a frozen progress bar. */
+  lastError?: string
 }
 
 /** Progress of the explicit full re-analysis — drives the settings progress bar. */
@@ -41,6 +49,9 @@ export const focusReanalyzeProgressAtom = atom<FocusReanalyzeProgress>({
   running: false,
   failed: 0,
 })
+
+/** Consecutive fully-failed batches before a full re-analysis aborts (3 × 50 = 150 entries). */
+const FULL_REANALYZE_MAX_CONSECUTIVE_FAILURES = 3
 
 /** The most recent entry ids still present in the entry store, newest first. */
 const getRecentEntryIds = (limit: number): string[] => {
@@ -294,71 +305,104 @@ export const useFocusAnalyzer = () => {
       setProgress({ total: rows.length, done: 0, running: true, failed: 0 })
       let done = 0
       let failed = 0
+      let lastError: string | undefined
+      // A dead provider must not burn through the whole library: after 3 fully
+      // failed batches in a row the run stops and reports the reason, instead of
+      // looking frozen while every batch waits out a 60s timeout ×3.
+      let consecutiveFailures = 0
       try {
         await focusActions.unmarkAnalyzed(allIds)
         focusActions.unmarkUnjudged(allIds)
 
         // Report at most ~100 progress updates: a large library means thousands
         // of small batches and every atom write re-renders the settings page.
+        // Failed entries advance the bar too — a run whose `done` stops growing
+        // (provider throttling / outage) used to look frozen at its last percent.
         const reportEvery = Math.max(FULL_REANALYZE_BATCH, Math.ceil(rows.length / 100))
-        let reportedDone = 0
+        let reportedProgress = 0
         for (let i = 0; i < rows.length; i += FULL_REANALYZE_BATCH) {
           const batch = rows.slice(i, i + FULL_REANALYZE_BATCH)
-          const contentless = batch.filter((row) => !row.title && !row.description)
-          if (contentless.length > 0) {
-            // Nothing for the AI to judge: mark them scored so they drop out of
-            // the queue, exactly like the incremental drain does.
-            const ids = contentless.map((row) => row.id)
-            await focusActions.persistAnalyzed(ids, [])
-            done += ids.length
+          let batchDone = 0
+          let batchFailed = 0
+          let batchError: string | undefined
+          try {
+            const contentless = batch.filter((row) => !row.title && !row.description)
+            if (contentless.length > 0) {
+              // Nothing for the AI to judge: mark them scored so they drop out of
+              // the queue, exactly like the incremental drain does.
+              const ids = contentless.map((row) => row.id)
+              await focusActions.persistAnalyzed(ids, [])
+              batchDone += ids.length
+            }
+
+            const candidates = batch
+              .filter((row) => Boolean(row.title || row.description))
+              .map((row) => ({
+                id: row.id,
+                feedId: row.feedId,
+                title: row.title,
+                description: row.description,
+              }))
+
+            if (candidates.length > 0) {
+              const result = await analyzeEntriesForFocus(candidates)
+              if (result.skipped) {
+                // No criteria / no usable provider: stop the run instead of
+                // burning through the library with nothing to score against.
+                setProgress({ total: rows.length, done, running: false, failed, lastError })
+                return
+              }
+              if (result.lastError) batchError = result.lastError
+              if (result.analyzedIds.length > 0) {
+                focusActions.markAnalyzedInSession(
+                  result.analyzedIds,
+                  result.matchedIds,
+                  result.matchedReasons,
+                  result.scores,
+                )
+                await focusActions.persistAnalyzed(
+                  result.analyzedIds,
+                  result.matchedIds,
+                  result.matchedReasons,
+                  result.scores,
+                )
+              }
+              batchDone += result.analyzedIds.length
+              batchFailed += result.failedIds.length
+              // Failed ids stay unscored (no DB write) so the next full run picks
+              // them up again; pushing them into the incremental drain would let
+              // the drain mark them "contentless" for entries not in the store.
+            }
+          } catch (error) {
+            // A single batch blowing up (local DB write, unexpected provider
+            // error) must not kill the whole run and leave the bar stuck.
+            console.error("[focus-analyzer] re-analysis batch failed", error)
+            batchError = describeFocusError(error)
+            batchFailed += Math.max(0, batch.length - batchDone)
           }
 
-          const candidates = batch
-            .filter((row) => Boolean(row.title || row.description))
-            .map((row) => ({
-              id: row.id,
-              feedId: row.feedId,
-              title: row.title,
-              description: row.description,
-            }))
+          done += batchDone
+          failed += batchFailed
+          if (batchError) lastError = batchError
+          const batchFullyFailed = batchFailed > 0 && batchDone === 0
+          consecutiveFailures = batchFullyFailed ? consecutiveFailures + 1 : 0
 
-          if (candidates.length > 0) {
-            const result = await analyzeEntriesForFocus(candidates)
-            if (result.skipped) {
-              // No criteria / no usable provider: stop the run instead of
-              // burning through the library with nothing to score against.
-              setProgress({ total: rows.length, done, running: false, failed })
-              return
-            }
-            if (result.analyzedIds.length > 0) {
-              focusActions.markAnalyzedInSession(
-                result.analyzedIds,
-                result.matchedIds,
-                result.matchedReasons,
-                result.scores,
-              )
-              await focusActions.persistAnalyzed(
-                result.analyzedIds,
-                result.matchedIds,
-                result.matchedReasons,
-                result.scores,
-              )
-            }
-            done += result.analyzedIds.length
-            failed += result.failedIds.length
-            // Failed ids stay unscored (no DB write) so the next full run picks
-            // them up again; pushing them into the incremental drain would let
-            // the drain mark them "contentless" for entries not in the store.
+          if (done + failed - reportedProgress >= reportEvery) {
+            reportedProgress = done + failed
+            setProgress({ total: rows.length, done, running: true, failed, lastError })
           }
 
-          if (done - reportedDone >= reportEvery) {
-            reportedDone = done
-            setProgress({ total: rows.length, done, running: true, failed })
+          if (consecutiveFailures >= FULL_REANALYZE_MAX_CONSECUTIVE_FAILURES) {
+            console.error(
+              `[focus-analyzer] re-analysis aborted after ${consecutiveFailures} failed batches:`,
+              lastError,
+            )
+            break
           }
         }
       } finally {
         fullRunningRef.current = false
-        setProgress({ total: rows.length, done, running: false, failed })
+        setProgress({ total: rows.length, done, running: false, failed, lastError })
         if (pendingRef.current.length > 0) void drain()
       }
     })()
