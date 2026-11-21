@@ -58,10 +58,21 @@ function normalizeRoute(route: string): string {
   return trimmed.startsWith("rsshub://") ? `/${trimmed.slice("rsshub://".length)}` : trimmed
 }
 
+/** Packaged resources directory name for the vendored RSSHub runtime. */
+const RUNTIME_DIR_NAME = "rsshub-runtime"
+
+/** Electron exposes `process.resourcesPath`; plain Node (tests) does not. */
+function bundledRuntimeDir(): string | null {
+  const resourcesPath = (process as NodeJS.Process & { resourcesPath?: string }).resourcesPath
+  return resourcesPath ? join(resourcesPath, RUNTIME_DIR_NAME) : null
+}
+
 function resolveDistDir(): string {
+  const bundled = bundledRuntimeDir()
   const candidates = [
     options.distDir,
     process.env.DITING_RSSHUB_DIST,
+    bundled ? join(bundled, "dist-lib") : "",
     join(homedir(), "rsshub-app", "dist-lib"),
   ]
 
@@ -78,9 +89,11 @@ function resolveDistDir(): string {
 }
 
 function resolveObscuraBinary(): string | null {
+  const bundled = bundledRuntimeDir()
   const candidates = [
     options.obscuraBinary,
     process.env.DITING_OBSCURA_BIN,
+    bundled ? join(bundled, "bin", "obscura") : "",
     join(homedir(), ".local", "bin", "obscura"),
     "/opt/homebrew/bin/obscura",
     "/usr/local/bin/obscura",

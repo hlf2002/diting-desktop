@@ -133,6 +133,17 @@ const keepModulePattern = [...keepModules]
   .join("|")
 const ignorePattern = new RegExp(`^/node_modules/(?!(?:${keepModulePattern})(?:/|$))`)
 
+// Vendored RSSHub engine (dist-lib + flattened deps + obscura). Produced by
+// `node scripts/prepare-rsshub-runtime.mjs`; git-ignored because it is ~330MB.
+const rsshubRuntimeDir = resolve(__dirname, "rsshub-runtime")
+const hasRsshubRuntime = fs.existsSync(rsshubRuntimeDir)
+if (!hasRsshubRuntime) {
+  console.warn(
+    "[forge] rsshub-runtime is missing — run `node scripts/prepare-rsshub-runtime.mjs` before packaging. " +
+      "Without it the client falls back to a user-installed RSSHub on 127.0.0.1:1200.",
+  )
+}
+
 const config: ForgeConfig = {
   packagerConfig: {
     name: isStaging ? "Folo Staging" : "Folo",
@@ -140,7 +151,10 @@ const config: ForgeConfig = {
     buildVersion: process.env.BUILD_VERSION || undefined,
     appBundleId: "cn.com.diting",
     icon: isStaging ? "resources/icon-staging" : "resources/icon",
-    extraResource: ["./resources/app-update.yml"],
+    extraResource: [
+      "./resources/app-update.yml",
+      ...(hasRsshubRuntime ? ["./rsshub-runtime"] : []),
+    ],
     protocols: [
       {
         name: "Folo",
