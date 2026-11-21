@@ -31,7 +31,10 @@ export interface FocusAnalysisResult {
 const BATCH_SIZE = 20
 const REQUEST_TIMEOUT_MS = 60_000
 const TITLE_LIMIT = 200
-const DESCRIPTION_LIMIT = 300
+// 300 字会把正文里的判定依据切掉（2026-11-21 实锤：36氪腾讯混元条 300 字 noul=0.62，
+// 2000 字 0.80，仅标题 0.66；阈值 0.8 下短截断直接漏判名单命中）。决策模型输入按
+// token 计费（约 $0.042/M），2000 字的额外成本可忽略，延迟仍是几十毫秒。
+const DESCRIPTION_LIMIT = 2000
 
 /** 服务端建立的主体档案（个人/机构/媒体，AI + 联网搜索）。 */
 export interface FocusProfile {
