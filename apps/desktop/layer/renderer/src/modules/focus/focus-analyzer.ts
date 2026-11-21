@@ -430,6 +430,12 @@ export const buildProviderUrl = (baseURL: string, path: string): string => {
   return `${base}/${tail}`
 }
 
+/** 决策模型单请求最多 16 个 questions —— 实测 17 条直接 400
+ *  `InternalError.Algo.ValidationError: questions: 17 exceeds the limit of 16`
+ *  （2026-11-21 实锤：BATCH_SIZE=20 的满批全 400，只有不满 20 条的尾巴批成功）。
+ *  这里在函数内部分块，调用方仍按 20/50 条批量，无需感知该限制。 */
+export const DECISION_MAX_QUESTIONS = 16
+
 /** 决策模型批量判定：走 `POST {baseURL}/systemone`，返回匹配的候选（id + 模板 reason）及全部候选评分。 */
 export const analyzeBatchWithDecision = async (
   provider: {
@@ -442,28 +448,41 @@ export const analyzeBatchWithDecision = async (
   batch: FocusCandidate[],
   profileSection: string,
 ): Promise<DecisionBatchResult> => {
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
-  try {
-    const response = await fetch(buildProviderUrl(provider.baseURL, "systemone"), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${provider.apiKey}`,
-        ...(provider.headers ?? {}),
-      },
-      body: JSON.stringify(buildDecisionRequest(criteria, batch, profileSection, provider.model)),
-      signal: controller.signal,
-    })
-    if (!response.ok) {
-      console.error("[focus-analyzer] decision request failed", response.status)
-      throw new Error(`decision_status_${response.status}`)
+  const matches: FocusMatchResult[] = []
+  const scores: Record<string, number> = {}
+  for (let i = 0; i < batch.length; i += DECISION_MAX_QUESTIONS) {
+    const chunk = batch.slice(i, i + DECISION_MAX_QUESTIONS)
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+    try {
+      const response = await fetch(buildProviderUrl(provider.baseURL, "systemone"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${provider.apiKey ?? ""}`,
+          ...(provider.headers ?? {}),
+        },
+        body: JSON.stringify(buildDecisionRequest(criteria, chunk, profileSection, provider.model)),
+        signal: controller.signal,
+      })
+      if (!response.ok) {
+        const detail = await response.text().catch(() => "")
+        console.error(
+          "[focus-analyzer] decision request failed",
+          response.status,
+          detail.slice(0, 200),
+        )
+        throw new Error(`decision_status_${response.status}`)
+      }
+      const data = (await response.json()) as { answers?: Record<string, DecisionAnswer> }
+      const chunkResult = parseDecisionAnswers(data.answers, chunk, criteria, profileSection)
+      matches.push(...chunkResult.matches)
+      Object.assign(scores, chunkResult.scores)
+    } finally {
+      clearTimeout(timeout)
     }
-    const data = (await response.json()) as { answers?: Record<string, DecisionAnswer> }
-    return parseDecisionAnswers(data.answers, batch, criteria, profileSection)
-  } finally {
-    clearTimeout(timeout)
   }
+  return { matches, scores }
 }
 
 /**
@@ -575,8 +594,11 @@ export const analyzeEntriesForFocus = async (
     skipped: false,
   }
 
-  for (let i = 0; i < candidates.length; i += BATCH_SIZE) {
-    const batch = candidates.slice(i, i + BATCH_SIZE)
+  // 决策模型一次只吃 16 个 questions，外层直接用 16 条一批（否则 20 条会被拆成
+  // 16+4 两个请求，尾巴批纯属浪费额度）；chat 模式仍用 BATCH_SIZE。
+  const batchSize = decisionMode ? DECISION_MAX_QUESTIONS : BATCH_SIZE
+  for (let i = 0; i < candidates.length; i += batchSize) {
+    const batch = candidates.slice(i, i + batchSize)
     const analyzedIds: string[] = []
     let matchedIds: string[] = []
     const matchedReasons: Record<string, string> = {}
@@ -725,8 +747,11 @@ export const explainFocusMatches = async (
   // 决策模型（System One）只做判断、不生成文本，走独立的 /systemone 协议。
   const decisionMode = isDecisionProvider(provider)
 
-  for (let i = 0; i < candidates.length; i += BATCH_SIZE) {
-    const batch = candidates.slice(i, i + BATCH_SIZE)
+  // 决策模型一次只吃 16 个 questions，外层直接用 16 条一批（否则 20 条会被拆成
+  // 16+4 两个请求，尾巴批纯属浪费额度）；chat 模式仍用 BATCH_SIZE。
+  const batchSize = decisionMode ? DECISION_MAX_QUESTIONS : BATCH_SIZE
+  for (let i = 0; i < candidates.length; i += batchSize) {
+    const batch = candidates.slice(i, i + batchSize)
     try {
       if (decisionMode) {
         // 复核：决策模型判匹配的补上模板 reason；判不匹配的不写 reason，

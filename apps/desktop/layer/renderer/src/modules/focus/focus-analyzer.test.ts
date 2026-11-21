@@ -2,6 +2,7 @@ import type { UserByokProviderConfig } from "@follow/shared/settings/interface"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import {
+  analyzeBatchWithDecision,
   buildDecisionReason,
   buildDecisionRequest,
   buildProfileSection,
@@ -483,5 +484,40 @@ describe("buildProviderUrl", () => {
     expect(buildProviderUrl("https://api.x.com/v1/Chat/completions", "chat/completions")).toBe(
       "https://api.x.com/v1/Chat/completions",
     )
+  })
+})
+
+describe("analyzeBatchWithDecision", () => {
+  it("splits a batch over the 16-question limit into multiple requests", async () => {
+    const calls: number[] = []
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_url: string, init: { body?: string }) => {
+        const body = JSON.parse(init.body ?? "{}") as { questions: Record<string, unknown> }
+        calls.push(Object.keys(body.questions).length)
+        return new Response(JSON.stringify({ answers: {} }), { status: 200 })
+      }),
+    )
+    try {
+      const batch = Array.from({ length: 30 }, (_, i) => ({
+        id: `1700000${String(100000 + i)}`,
+        title: `t${i}`,
+        description: "d",
+      }))
+      const result = await analyzeBatchWithDecision(
+        {
+          baseURL: "https://x.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+          model: "m",
+          apiKey: "k",
+        },
+        "criteria",
+        batch,
+        "",
+      )
+      expect(calls).toEqual([16, 14])
+      expect(Object.keys(result.scores)).toHaveLength(30)
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 })
