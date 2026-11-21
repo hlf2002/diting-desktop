@@ -297,6 +297,7 @@
   "personalize.reanalyze_done": "Re-analyzed {{done}} / {{total}} articles",
   "personalize.reanalyze_failed": "{{count}} failed",
   "personalize.reanalyze_progress": "Re-analyzing {{done}} / {{total}}",
+  "personalize.reanalyze_result": "{{done}} of {{total}} succeeded, {{failed}} failed",
   "personalize.saved": "Personalization saved successfully",
   "personalize.title": "Focus areas",
   "prompt_editor.over_limit": "Prompt exceeds {{max}} character limit",

@@ -297,6 +297,7 @@
   "personalize.reanalyze_done": "{{done}} / {{total}} 件を再評価しました",
   "personalize.reanalyze_failed": "{{count}} 件失敗",
   "personalize.reanalyze_progress": "{{done}} / {{total}} を再評価中",
+  "personalize.reanalyze_result": "{{total}} 件中 {{done}} 件成功、{{failed}} 件失敗",
   "personalize.saved": "パーソナライズが正常に保存されました",
   "personalize.title": "注目コンテンツ",
   "prompt_editor.over_limit": "プロンプトが {{max}} 文字の上限を超えています",

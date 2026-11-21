@@ -152,17 +152,27 @@ export const PersonalizePromptSection = () => {
               <span>
                 {reanalyzeProgress.running
                   ? t("personalize.reanalyze_progress", {
-                      done: reanalyzeProgress.done.toLocaleString(),
+                      done: reanalyzeProcessed.toLocaleString(),
                       total: reanalyzeProgress.total.toLocaleString(),
                     })
-                  : t("personalize.reanalyze_done", {
-                      done: reanalyzeProgress.done.toLocaleString(),
-                      total: reanalyzeProgress.total.toLocaleString(),
-                    })}
+                  : reanalyzeProgress.failed > 0
+                    ? // The bar counts processed entries, so the finished label must
+                      // show done vs failed instead of a bare done/total that looks
+                      // wrong next to a 100% bar.
+                      t("personalize.reanalyze_result", {
+                        done: reanalyzeProgress.done.toLocaleString(),
+                        failed: reanalyzeProgress.failed.toLocaleString(),
+                        total: reanalyzeProgress.total.toLocaleString(),
+                      })
+                    : t("personalize.reanalyze_done", {
+                        done: reanalyzeProgress.done.toLocaleString(),
+                        total: reanalyzeProgress.total.toLocaleString(),
+                      })}
               </span>
               <span>
                 {reanalyzePercent}%
-                {reanalyzeProgress.failed > 0 &&
+                {reanalyzeProgress.running &&
+                  reanalyzeProgress.failed > 0 &&
                   ` · ${t("personalize.reanalyze_failed", { count: reanalyzeProgress.failed })}`}
                 {reanalyzeProgress.lastError && ` · ${reanalyzeProgress.lastError}`}
               </span>

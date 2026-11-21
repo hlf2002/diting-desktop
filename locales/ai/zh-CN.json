@@ -297,6 +297,7 @@
   "personalize.reanalyze_done": "已重新分析 {{done}} / {{total}} 篇文章",
   "personalize.reanalyze_failed": "{{count}} 篇失败",
   "personalize.reanalyze_progress": "正在重新分析 {{done}} / {{total}}",
+  "personalize.reanalyze_result": "成功 {{done}} / 共 {{total}} 篇，失败 {{failed}} 篇",
   "personalize.saved": "个性化设置保存成功",
   "personalize.title": "重点关注的内容",
   "prompt_editor.over_limit": "提示词超出 {{max}} 个字符的限制",
