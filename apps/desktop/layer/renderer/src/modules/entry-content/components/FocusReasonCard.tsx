@@ -22,8 +22,10 @@ export function FocusReasonCard({ entryId }: { entryId: string }) {
 
   if (!isFocus || !reason) return null
 
+  // 决策数据与原因分开显示：评分行以句号收尾，再换行显示判断原因（否则两行
+  // 贴在一起，复制或朗读时都分不清是两段内容）。
   const scoreLine =
-    score != null ? `${t("entry_content.focus_score", { score: Math.round(score * 100) })}\n` : ""
+    score != null ? `${t("entry_content.focus_score", { score: Math.round(score * 100) })}。\n` : ""
   return (
     <AISummaryCardBase
       className="my-8"
