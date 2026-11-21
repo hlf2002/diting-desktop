@@ -81,10 +81,11 @@ export const useFocusAnalyzer = () => {
 
           const result = await analyzeEntriesForFocus(candidates)
           if (result.skipped) {
-            // Criteria or BYOK provider not ready yet: put the batch back and stop
-            // draining. A later enqueue (new entries) retries these too, so entries
-            // that arrived before the provider was configured are not lost.
-            pendingRef.current.unshift(...batch)
+            // Criteria or BYOK provider not ready yet: mark the batch as unjudged so the
+            // reader shows a "未判定" placeholder card pointing to AI settings. Do NOT put
+            // the batch back on pendingRef — we don't want to re-drain it repeatedly; the
+            // retro trigger (when the user saves criteria) will re-enqueue them.
+            focusActions.markUnjudged(unseen)
             break
           }
           if (result.failedIds && result.failedIds.length > 0) {
@@ -242,6 +243,8 @@ export const useFocusAnalyzer = () => {
       const recentIds = getRecentEntryIds(FOCUS_RETRO_LIMIT)
       if (recentIds.length === 0) return
       await focusActions.unmarkAnalyzed(recentIds)
+      // Also clear the unjudged flag so entries that were waiting for config get re-scored.
+      focusActions.unmarkUnjudged(recentIds)
       enqueue(recentIds)
     })()
   }, [enqueue, retroTrigger])
@@ -256,6 +259,7 @@ export const useFocusAnalyzer = () => {
       const allIds = [...useEntryStore.getState().entryIdSet]
       if (allIds.length === 0) return
       await focusActions.unmarkAnalyzed(allIds)
+      focusActions.unmarkUnjudged(allIds)
       enqueue(allIds)
     })()
   }, [enqueue, fullReanalyzeTrigger])

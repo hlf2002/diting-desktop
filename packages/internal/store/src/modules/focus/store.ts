@@ -8,6 +8,10 @@ export type FocusEntryId = string
 interface FocusState {
   focusEntryIds: Set<FocusEntryId>
   analyzedEntryIds: Set<FocusEntryId>
+  /** EntryIds waiting to be analyzed because focus criteria or BYOK provider is not yet configured.
+   *  These are not scored (not in analyzedEntryIds) — they show an "未判定" placeholder card
+   *  that links to AI settings until the user configures criteria/provider. */
+  unjudgedEntryIds: Set<FocusEntryId>
   /** entryId → why it matched the focus criteria (from the on-device AI). */
   focusReasons: Record<string, string>
   /** entryId → decision-model score (noul probability 0~1) at scoring time. */
@@ -17,6 +21,7 @@ interface FocusState {
 const defaultState: FocusState = {
   focusEntryIds: new Set(),
   analyzedEntryIds: new Set(),
+  unjudgedEntryIds: new Set(),
   focusReasons: {},
   focusScores: {},
 }
@@ -50,6 +55,29 @@ class FocusActions implements Hydratable, Resetable {
     set(defaultState)
   }
 
+  /** Mark entries as unjudged (waiting for criteria/provider config) — renders the placeholder card. */
+  markUnjudged(entryIds: FocusEntryId[]) {
+    if (entryIds.length === 0) return
+    set((state) => {
+      const next = new Set(state.unjudgedEntryIds)
+      for (const id of entryIds) next.add(id)
+      return { unjudgedEntryIds: next }
+    })
+  }
+
+  /**
+   * Clear the unjudged flag for entries (called when the user configures criteria/provider
+   * so we can re-analyze them; also called when they get actually scored).
+   */
+  unmarkUnjudged(entryIds: FocusEntryId[]) {
+    if (entryIds.length === 0) return
+    set((state) => {
+      const next = new Set(state.unjudgedEntryIds)
+      for (const id of entryIds) next.delete(id)
+      return { unjudgedEntryIds: next }
+    })
+  }
+
   /** Score results are applied in memory first, then persisted. */
   markAnalyzedInSession(
     entryIds: FocusEntryId[],
@@ -60,9 +88,13 @@ class FocusActions implements Hydratable, Resetable {
     set((state) => {
       const nextAnalyzed = new Set(state.analyzedEntryIds)
       const nextFocus = new Set(state.focusEntryIds)
+      const nextUnjudged = new Set(state.unjudgedEntryIds)
       const nextReasons = { ...state.focusReasons }
       const nextScores = { ...state.focusScores }
-      for (const id of entryIds) nextAnalyzed.add(id)
+      for (const id of entryIds) {
+        nextAnalyzed.add(id)
+        nextUnjudged.delete(id)
+      }
       for (const id of focusIds) nextFocus.add(id)
       for (const id of entryIds) {
         if (focusScores[id] != null) nextScores[id] = focusScores[id]
@@ -75,6 +107,7 @@ class FocusActions implements Hydratable, Resetable {
       return {
         analyzedEntryIds: nextAnalyzed,
         focusEntryIds: nextFocus,
+        unjudgedEntryIds: nextUnjudged,
         focusReasons: nextReasons,
         focusScores: nextScores,
       }
@@ -116,17 +149,20 @@ class FocusActions implements Hydratable, Resetable {
     set((state) => {
       const nextAnalyzed = new Set(state.analyzedEntryIds)
       const nextFocus = new Set(state.focusEntryIds)
+      const nextUnjudged = new Set(state.unjudgedEntryIds)
       const nextReasons = { ...state.focusReasons }
       const nextScores = { ...state.focusScores }
       for (const id of entryIds) {
         nextAnalyzed.delete(id)
         nextFocus.delete(id)
+        nextUnjudged.delete(id)
         delete nextReasons[id]
         delete nextScores[id]
       }
       return {
         analyzedEntryIds: nextAnalyzed,
         focusEntryIds: nextFocus,
+        unjudgedEntryIds: nextUnjudged,
         focusReasons: nextReasons,
         focusScores: nextScores,
       }

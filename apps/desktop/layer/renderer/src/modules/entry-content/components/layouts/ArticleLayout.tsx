@@ -30,6 +30,7 @@ import { EntryAttachments } from "../EntryAttachments"
 import { EntryTitle } from "../EntryTitle"
 import { FocusNotMatchedCard } from "../FocusNotMatchedCard"
 import { FocusReasonCard } from "../FocusReasonCard"
+import { FocusUnjudgedCard } from "../FocusUnjudgedCard"
 import { getArticleRendererContent } from "./content-selection"
 import { MediaTranscript, TranscriptToggle, useTranscription } from "./shared"
 import { ArticleAudioPlayer } from "./shared/AudioPlayer"
@@ -108,6 +109,8 @@ export const ArticleLayout: React.FC<EntryLayoutProps> = ({
             )}
             {/* 未进入重点关注的判定结果卡片，放在正文末尾（正文渲染完之后、附件之前）。 */}
             <FocusNotMatchedCard entryId={entryId} />
+            {/* 未判定占位卡片（未配置判定标准/模型时）：点击跳转 AI 设置。 */}
+            <FocusUnjudgedCard entryId={entryId} />
           </ErrorBoundary>
         </div>
       </WrappedElementProvider>
