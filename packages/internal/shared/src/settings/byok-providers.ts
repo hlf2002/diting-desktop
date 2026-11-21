@@ -57,7 +57,7 @@ export const BYOK_PROVIDERS: ByokProviderMeta[] = [
     defaultModel: "decision-model-preview",
     group: "cn",
     protocol: "decision",
-    hint: "决策模型（System One）：只返回概率/评分，不生成文本，用于重点关注判定；正式环境可把 baseURL 换成 {业务空间ID}.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+    hint: "决策模型（System One）：只返回概率/评分，不生成文本，用于重点关注判定；baseURL 只填到 /compatible-mode/v1（不要带 /systemone，客户端会自己拼接）；正式环境把 {业务空间ID} 换成自己的业务空间",
   },
   {
     value: "zai",

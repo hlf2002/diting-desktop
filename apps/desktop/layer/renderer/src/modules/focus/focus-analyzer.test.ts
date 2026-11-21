@@ -5,6 +5,7 @@ import {
   buildDecisionReason,
   buildDecisionRequest,
   buildProfileSection,
+  buildProviderUrl,
   describeFocusError,
   enrichCandidateFeedIds,
   extractFocusResults,
@@ -453,5 +454,34 @@ describe("describeFocusError", () => {
 
   it("falls back to the raw message", () => {
     expect(describeFocusError(new Error("boom"))).toBe("boom")
+  })
+})
+
+describe("buildProviderUrl", () => {
+  it("appends the endpoint to a plain baseURL", () => {
+    expect(
+      buildProviderUrl("https://x.cn-beijing.maas.aliyuncs.com/compatible-mode/v1", "systemone"),
+    ).toBe("https://x.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/systemone")
+  })
+
+  it("does not duplicate an endpoint the user pasted into baseURL", () => {
+    expect(
+      buildProviderUrl(
+        "https://x.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/systemone",
+        "systemone",
+      ),
+    ).toBe("https://x.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/systemone")
+  })
+
+  it("trims trailing slashes before joining", () => {
+    expect(buildProviderUrl("https://api.deepseek.com/v1///", "chat/completions")).toBe(
+      "https://api.deepseek.com/v1/chat/completions",
+    )
+  })
+
+  it("tolerates a pasted chat endpoint and mixed case", () => {
+    expect(buildProviderUrl("https://api.x.com/v1/Chat/completions", "chat/completions")).toBe(
+      "https://api.x.com/v1/Chat/completions",
+    )
   })
 })

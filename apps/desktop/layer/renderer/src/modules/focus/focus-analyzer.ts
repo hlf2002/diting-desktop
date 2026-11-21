@@ -413,6 +413,23 @@ export const buildDecisionRequest = (
   return { model, state, questions }
 }
 
+/**
+ * Join a BYOK baseURL with an endpoint path.
+ *
+ * Users paste the full endpoint into the baseURL field (e.g.
+ * `https://…/compatible-mode/v1/systemone`). Appending `/systemone` again
+ * produced `…/systemone/systemone`, which the provider rejects with
+ * `400 invalid_parameter_error url error` — every batch then failed and the
+ * whole re-analysis scored 0 entries (2026-11-21 实锤). Strip a trailing
+ * duplicate of the path instead of blindly appending it.
+ */
+export const buildProviderUrl = (baseURL: string, path: string): string => {
+  const base = baseURL.trim().replace(/\/+$/, "")
+  const tail = path.replace(/^\/+/, "")
+  if (base.toLowerCase().endsWith(`/${tail.toLowerCase()}`)) return base
+  return `${base}/${tail}`
+}
+
 /** 决策模型批量判定：走 `POST {baseURL}/systemone`，返回匹配的候选（id + 模板 reason）及全部候选评分。 */
 export const analyzeBatchWithDecision = async (
   provider: {
@@ -428,7 +445,7 @@ export const analyzeBatchWithDecision = async (
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
   try {
-    const response = await fetch(`${provider.baseURL}/systemone`, {
+    const response = await fetch(buildProviderUrl(provider.baseURL, "systemone"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -584,7 +601,7 @@ export const analyzeEntriesForFocus = async (
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
         try {
-          const response = await fetch(`${provider.baseURL}/chat/completions`, {
+          const response = await fetch(buildProviderUrl(provider.baseURL, "chat/completions"), {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -727,7 +744,7 @@ export const explainFocusMatches = async (
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
         try {
-          const response = await fetch(`${provider.baseURL}/chat/completions`, {
+          const response = await fetch(buildProviderUrl(provider.baseURL, "chat/completions"), {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
