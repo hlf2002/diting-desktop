@@ -6,6 +6,10 @@
 #   bash scripts/release-mac.sh --skip-build    # 复用 out/ 下已有 .app，只公证+打包上传
 #   bash scripts/release-mac.sh --no-upload     # 只产出产物，不发 release
 #   bash scripts/release-mac.sh --skip-notarize # 不公证（仅签名，Gatekeeper 会拦首次打开）
+#   bash scripts/release-mac.sh --skip-qiniu     # 不上传七牛（默认每次都传）
+#
+# 七牛：产物传 res-7373 的 diting/ 下，key 固定不带版本号
+#      （diting/diting-mac-arm64.dmg / .zip），每次发版覆盖同名对象。
 #
 # 前置条件（缺一不可）：
 #   1. 钥匙串里有 "Developer ID Application: Shooter Technology (Zhuhai) Co., Ltd (FY4X5PTS6Q)"
@@ -28,11 +32,13 @@ APP_PATH="out/${APP_BUNDLE}-darwin-arm64/${APP_BUNDLE}.app"
 SKIP_BUILD=0
 UPLOAD=1
 NOTARIZE=1
+QINIU=1
 for arg in "$@"; do
   case "$arg" in
     --skip-build) SKIP_BUILD=1 ;;
     --no-upload) UPLOAD=0 ;;
     --skip-notarize) NOTARIZE=0 ;;
+    --skip-qiniu) QINIU=0 ;;
     *) echo "未知参数: $arg"; exit 1 ;;
   esac
 done
@@ -158,6 +164,24 @@ if [ "$UPLOAD" = 1 ]; then
   gh release view "$TAG" -R "$REPO" --json url,assets -q '.url, (.assets[].name)'
 else
   echo "== 已跳过上传（--no-upload）"
+fi
+
+# 7) 上传七牛云（固定 key，不带版本号；每次发版覆盖同名对象）
+if [ "$QINIU" = 1 ]; then
+  QINIU_BUCKET="${QINIU_BUCKET:-res-7373}"
+  QINIU_PREFIX="${QINIU_PREFIX:-diting}"
+  # 优先用装了 qiniu SDK 的解释器（走分片续传，几百 MB 更稳）；没有则系统 python3（流式表单）
+  QINIU_PY="${QINIU_PY:-$HOME/.venvs/qiniu/bin/python}"
+  [ -x "$QINIU_PY" ] || QINIU_PY="$(command -v python3)"
+  echo "== 上传七牛 $QINIU_BUCKET:${QINIU_PREFIX}/diting-mac-arm64.{dmg,zip}（$QINIU_PY）"
+  for pair in "$DMG:diting-mac-arm64.dmg" "$ZIP:diting-mac-arm64.zip"; do
+    src="${pair%%:*}"
+    key="${QINIU_PREFIX}/${pair##*:}"
+    "$QINIU_PY" scripts/upload-qiniu.py "$src" "$key" --bucket "$QINIU_BUCKET"
+  done
+  echo "== 七牛地址：https://res.7373.com.cn/${QINIU_PREFIX}/diting-mac-arm64.dmg"
+else
+  echo "== 已跳过七牛上传（--skip-qiniu）"
 fi
 
 echo "== 完成"
