@@ -2,14 +2,17 @@
 # 谛听 macOS 发布脚本：构建 → 签名校验 → zip → dmg → GitHub Release
 #
 # 用法：
-#   bash scripts/release-mac.sh                 # 全量构建 + 签名 + 打包 + 上传
-#   bash scripts/release-mac.sh --skip-build    # 复用 out/ 下已有 .app，只打包上传
+#   bash scripts/release-mac.sh                 # 全量构建 + 签名 + 公证 + 打包 + 上传
+#   bash scripts/release-mac.sh --skip-build    # 复用 out/ 下已有 .app，只公证+打包上传
 #   bash scripts/release-mac.sh --no-upload     # 只产出产物，不发 release
+#   bash scripts/release-mac.sh --skip-notarize # 不公证（仅签名，Gatekeeper 会拦首次打开）
 #
 # 前置条件（缺一不可）：
 #   1. 钥匙串里有 "Developer ID Application: Shooter Technology (Zhuhai) Co., Ltd (FY4X5PTS6Q)"
 #      且屏幕已解锁（锁屏状态下 codesign 取私钥会报 errSecInternalComponent）
 #   2. gh CLI 已登录（hlf2002）
+#   3. 公证凭据：APPLE_ID / APPLE_PASSWORD(App 专用密码) / APPLE_TEAM_ID
+#      默认从 ~/.config/diting/notarize.env 读（chmod 600，不进仓库）
 set -euo pipefail
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -24,10 +27,12 @@ APP_BUNDLE="diting"    # .app 文件名与可执行名（ASCII，避免编码坑
 APP_PATH="out/${APP_BUNDLE}-darwin-arm64/${APP_BUNDLE}.app"
 SKIP_BUILD=0
 UPLOAD=1
+NOTARIZE=1
 for arg in "$@"; do
   case "$arg" in
     --skip-build) SKIP_BUILD=1 ;;
     --no-upload) UPLOAD=0 ;;
+    --skip-notarize) NOTARIZE=0 ;;
     *) echo "未知参数: $arg"; exit 1 ;;
   esac
 done
@@ -43,7 +48,9 @@ fi
 # 2) 构建（electron-vite build + electron-forge make；dmg 交给本脚本，forge 只出 zip）
 if [ "$SKIP_BUILD" = 0 ]; then
   echo "== 构建中（签名身份：$IDENTITY）"
-  OSX_SIGN_IDENTITY="$IDENTITY" pnpm run build:electron
+  # 构建阶段的 forge 公证没有意义（本脚本随后会显式重签，旧票失效），一律屏蔽
+  env -u APPLE_ID -u APPLE_PASSWORD -u APPLE_TEAM_ID \
+    OSX_SIGN_IDENTITY="$IDENTITY" pnpm run build:electron
 fi
 
 if [ ! -d "$APP_PATH" ]; then
@@ -68,6 +75,55 @@ echo "$SIGN_INFO" | grep -E "Authority=|TeamIdentifier=|flags=" | head -5
 if ! echo "$SIGN_INFO" | grep -qF "Developer ID Application: Shooter Technology"; then
   echo "FATAL: .app 仍是 ad-hoc 签名（未打上 Developer ID 证书），拒绝发布"
   exit 2
+fi
+
+# 3.5) 公证（notarytool）：签名完成后必须做，否则 Gatekeeper 报 source=Unnotarized Developer ID
+if [ "$NOTARIZE" = 1 ]; then
+  # 凭据优先取已 export 的环境变量，否则读 ~/.config/diting/notarize.env（不进仓库）
+  if [ -z "${APPLE_ID:-}" ] || [ -z "${APPLE_PASSWORD:-}" ] || [ -z "${APPLE_TEAM_ID:-}" ]; then
+    if [ -f "$HOME/.config/diting/notarize.env" ]; then
+      set -a
+      source "$HOME/.config/diting/notarize.env"
+      set +a
+    fi
+  fi
+  if [ -z "${APPLE_ID:-}" ] || [ -z "${APPLE_PASSWORD:-}" ] || [ -z "${APPLE_TEAM_ID:-}" ]; then
+    echo "FATAL: 缺少 APPLE_ID / APPLE_PASSWORD / APPLE_TEAM_ID，无法公证（急用可加 --skip-notarize）"
+    exit 3
+  fi
+
+  SUBMIT_ZIP="out/make/.diting-notarize-submit.zip"
+  NOTARY_LOG="out/make/.diting-notarize.log"
+  rm -f "$SUBMIT_ZIP"
+  echo "== 公证：打包待提交 zip（$(du -h "$APP_PATH" | cut -f1) 的 .app）"
+  ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$SUBMIT_ZIP"
+  # 上传 200MB+ 常见 1-5 分钟；--wait 等 Apple 出结果，日志留在 out/make 便于失败取证
+  if ! xcrun notarytool submit "$SUBMIT_ZIP" \
+    --apple-id "$APPLE_ID" --password "$APPLE_PASSWORD" --team-id "$APPLE_TEAM_ID" \
+    --wait 2>&1 | tee "$NOTARY_LOG"; then
+    echo "FATAL: notarytool 提交失败，日志见 $NOTARY_LOG"
+    exit 4
+  fi
+  rm -f "$SUBMIT_ZIP"
+  if ! grep -q "status: Accepted" "$NOTARY_LOG"; then
+    echo "FATAL: 公证被拒（status 非 Accepted），日志见 $NOTARY_LOG"
+    exit 4
+  fi
+
+  # 票贴在 .app 包内，重打包时 ticket 随包分发，离线首启也不再被拦
+  echo "== 公证：贴票到 $APP_PATH"
+  xcrun stapler staple "$APP_PATH"
+  xcrun stapler validate "$APP_PATH"
+
+  echo "== Gatekeeper 实测（必须 accepted / source=Notarized Developer ID）"
+  SPCTL_OUT="$(spctl -a -vvv -t exec "$APP_PATH" 2>&1 || true)"
+  echo "$SPCTL_OUT"
+  if ! echo "$SPCTL_OUT" | grep -q "source=Notarized Developer ID"; then
+    echo "FATAL: spctl 未显示 Notarized Developer ID，公证未生效，拒绝发布"
+    exit 5
+  fi
+else
+  echo "== 已跳过公证（--skip-notarize）：首次打开会被 Gatekeeper 拦，需右键「打开」"
 fi
 
 # 4) zip（ditto 保留符号链接与扩展属性）
@@ -96,7 +152,7 @@ if [ "$UPLOAD" = 1 ]; then
     gh release create "$TAG" -R "$REPO" \
       --title "谛听 $VERSION (macOS)" \
       --notes "谛听 $VERSION for macOS（Apple Silicon，需 macOS 13+）。
-已使用 Developer ID 签名；如需通过 Gatekeeper，首次打开请在 Finder 中右键「打开」。"
+已使用 Developer ID 签名并通过 Apple 公证（notarized），首次打开无需右键放行。"
   fi
   gh release upload "$TAG" "$ZIP" "$DMG" -R "$REPO" --clobber
   gh release view "$TAG" -R "$REPO" --json url,assets -q '.url, (.assets[].name)'

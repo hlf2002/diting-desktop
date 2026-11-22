@@ -183,10 +183,10 @@ const config: ForgeConfig = {
     },
     osxSign: {
       // Only sign binaries/executables inside the vendored RSSHub runtime: codesign runs once per
-      // file, and signing thousands of .js chunks there dominates packaging time.
+      // file, and signing thousands of .js chunks there dominates packaging time. Nested Mach-O
+      // binaries under bin/ (obscura, esbuild) must be signed, or notarization fails validation.
       ignore: (filePath: string) =>
-        filePath.includes("rsshub-runtime") &&
-        !/(?:\.node|\.dylib)$|\/bin\/obscura$/.test(filePath),
+        filePath.includes("rsshub-runtime") && !/(?:\.node|\.dylib)$|\/bin\/[^/]+$/.test(filePath),
       // Apple's timestamp server is unreachable from this network and codesign blocks on it per
       // file, which is what made local packaging hang for minutes. Local builds therefore sign
       // ad-hoc (`identity: "-"`), which skips the timestamp service; release builds pass a real

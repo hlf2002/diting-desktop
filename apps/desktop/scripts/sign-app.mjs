@@ -14,9 +14,10 @@ await sign({
   identityValidation: true,
   hardenedRuntime: true,
   entitlements: "build/entitlements.mac.plist",
-  // 只签 rsshub-runtime 里的原生二进制，避免逐文件签名把打包时间拉满
+  // 只签 rsshub-runtime 里的原生二进制（Mach-O），避免逐文件签名把打包时间拉满。
+  // 必须包含 bin/ 下的可执行文件（obscura、esbuild）：漏签任何一个都会被公证判 Invalid。
   ignore: (filePath) =>
-    filePath.includes("rsshub-runtime") && !/(?:\.node|\.dylib)$|\/bin\/obscura$/.test(filePath),
+    filePath.includes("rsshub-runtime") && !/(?:\.node|\.dylib)$|\/bin\/[^/]+$/.test(filePath),
 })
 
 console.log("[sign] done")
