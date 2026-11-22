@@ -145,7 +145,7 @@ if (!hasRsshubRuntime) {
 
 const config: ForgeConfig = {
   packagerConfig: {
-    name: isStaging ? "Folo Staging" : "Folo",
+    name: isStaging ? "谛听 Staging" : "谛听",
     appCategoryType: "public.app-category.news",
     buildVersion: process.env.BUILD_VERSION || undefined,
     appBundleId: "cn.com.diting",
@@ -156,11 +156,11 @@ const config: ForgeConfig = {
     ],
     protocols: [
       {
-        name: "Folo",
+        name: "谛听",
         schemes: ["diting", "cn.com.diting"],
       },
       {
-        name: "Folo",
+        name: "谛听",
         schemes: ["diting", "cn.com.diting"],
       },
     ],
@@ -177,6 +177,7 @@ const config: ForgeConfig = {
     prune: false,
     extendInfo: {
       ITSAppUsesNonExemptEncryption: false,
+      CFBundleDisplayName: isStaging ? "谛听 Staging" : "谛听",
     },
     osxSign: {
       // Only sign binaries/executables inside the vendored RSSHub runtime: codesign runs once per
@@ -219,37 +220,44 @@ const config: ForgeConfig = {
   rebuildConfig: {},
   makers: [
     new MakerZIP({}, ["darwin"]),
-    new MakerDMG(
-      {
-        overwrite: true,
-        background: "static/dmg-background.png",
-        icon: "static/dmg-icon.icns",
-        iconSize: 160,
-        additionalDMGOptions: {
-          window: {
-            size: {
-              width: 660,
-              height: 400,
+    // appdmg 依赖的 macos-alias 原生模块在 Node 26 下编译失败（3 个 C++ 错误），
+    // 因此默认不走 MakerDMG，dmg 由 scripts/release-mac.sh 用 hdiutil 生成；
+    // 需要 forge 出 dmg 时设 DITING_FORGE_DMG=1。
+    ...(process.env.DITING_FORGE_DMG === "1"
+      ? [
+          new MakerDMG(
+            {
+              overwrite: true,
+              background: "static/dmg-background.png",
+              icon: "static/dmg-icon.icns",
+              iconSize: 160,
+              additionalDMGOptions: {
+                window: {
+                  size: {
+                    width: 660,
+                    height: 400,
+                  },
+                },
+              },
+              contents: (opts) => [
+                {
+                  x: 180,
+                  y: 170,
+                  type: "file",
+                  path: (opts as any).appPath,
+                },
+                {
+                  x: 480,
+                  y: 170,
+                  type: "link",
+                  path: "/Applications",
+                },
+              ],
             },
-          },
-        },
-        contents: (opts) => [
-          {
-            x: 180,
-            y: 170,
-            type: "file",
-            path: (opts as any).appPath,
-          },
-          {
-            x: 480,
-            y: 170,
-            type: "link",
-            path: "/Applications",
-          },
-        ],
-      },
-      ["darwin", "mas"],
-    ),
+            ["darwin", "mas"],
+          ),
+        ]
+      : []),
     new ResolvedMakerAppImage({
       config: {
         icons: [
@@ -266,7 +274,7 @@ const config: ForgeConfig = {
           name: isStaging ? "diting-staging" : "diting",
           productName: isStaging ? "谛听 Staging" : "谛听",
           // must match the executable emitted by electron-packager (packagerConfig.name)
-          bin: isStaging ? "Folo Staging" : "Folo",
+          bin: isStaging ? "谛听 Staging" : "谛听",
           genericName: "RSS Reader",
           description: "Follow everything in one place",
           maintainer: "Folo Team",
@@ -330,8 +338,8 @@ const config: ForgeConfig = {
       name: "@electron-forge/publisher-github",
       config: {
         repository: {
-          owner: "RSSNext",
-          name: "diting",
+          owner: "hlf2002",
+          name: "diting-desktop",
         },
         draft: true,
       },
