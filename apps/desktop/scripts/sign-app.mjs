@@ -3,7 +3,7 @@ import { sign } from "@electron/osx-sign"
 const identity =
   process.env.OSX_SIGN_IDENTITY ??
   "Developer ID Application: Shooter Technology (Zhuhai) Co., Ltd (FY4X5PTS6Q)"
-const appPath = process.argv[2] ?? "out/谛听-darwin-arm64/谛听.app"
+const appPath = process.argv[2] ?? "out/diting-darwin-arm64/diting.app"
 
 console.log("[sign] identity:", identity)
 console.log("[sign] app:", appPath)

@@ -145,7 +145,9 @@ if (!hasRsshubRuntime) {
 
 const config: ForgeConfig = {
   packagerConfig: {
-    name: isStaging ? "谛听 Staging" : "谛听",
+    // .app 名与可执行名用 ASCII（diting），Finder 显示名靠 CFBundleDisplayName = 谛听；
+    // 中文 .app 名会让命令行、脚本、CI 处理路径时频繁踩编码坑。
+    name: isStaging ? "diting-staging" : "diting",
     appCategoryType: "public.app-category.news",
     buildVersion: process.env.BUILD_VERSION || undefined,
     appBundleId: "cn.com.diting",
@@ -274,7 +276,7 @@ const config: ForgeConfig = {
           name: isStaging ? "diting-staging" : "diting",
           productName: isStaging ? "谛听 Staging" : "谛听",
           // must match the executable emitted by electron-packager (packagerConfig.name)
-          bin: isStaging ? "谛听 Staging" : "谛听",
+          bin: isStaging ? "diting-staging" : "diting",
           genericName: "RSS Reader",
           description: "Follow everything in one place",
           maintainer: "Folo Team",

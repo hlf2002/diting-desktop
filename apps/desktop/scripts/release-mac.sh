@@ -19,8 +19,9 @@ VERSION="$(node -p "require('./package.json').version")"
 IDENTITY="${OSX_SIGN_IDENTITY:-Developer ID Application: Shooter Technology (Zhuhai) Co., Ltd (FY4X5PTS6Q)}"
 REPO="${REPO:-hlf2002/diting-desktop}"
 TAG="${TAG:-v$VERSION}"
-APP_NAME="谛听"
-APP_PATH="out/${APP_NAME}-darwin-arm64/${APP_NAME}.app"
+APP_NAME="谛听"        # dmg 卷名 / Finder 显示名
+APP_BUNDLE="diting"    # .app 文件名与可执行名（ASCII，避免编码坑）
+APP_PATH="out/${APP_BUNDLE}-darwin-arm64/${APP_BUNDLE}.app"
 SKIP_BUILD=0
 UPLOAD=1
 for arg in "$@"; do
@@ -50,6 +51,11 @@ if [ ! -d "$APP_PATH" ]; then
   exit 1
 fi
 
+# 2.4) Finder / Dock 显示名：electron-packager 会用 name（diting）覆盖 CFBundleDisplayName，
+#      必须在签名前改回中文名，否则用户看到的是 diting
+/usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName ${APP_NAME}" "$APP_PATH/Contents/Info.plist"
+echo "== CFBundleDisplayName → ${APP_NAME}"
+
 # 2.5) 显式重签：forge 内部的签名受环境影响可能降级成 ad-hoc，这里统一用 Developer ID 重签一次
 echo "== 重签 $APP_PATH"
 OSX_SIGN_IDENTITY="$IDENTITY" node scripts/sign-app.mjs "$APP_PATH"
@@ -66,7 +72,7 @@ fi
 
 # 4) zip（ditto 保留符号链接与扩展属性）
 mkdir -p out/make
-ZIP="out/make/${APP_NAME}-${VERSION}-darwin-arm64.zip"
+ZIP="out/make/${APP_BUNDLE}-${VERSION}-darwin-arm64.zip"
 echo "== 打包 zip → $ZIP"
 rm -f "$ZIP"
 ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP"
@@ -74,9 +80,9 @@ ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP"
 # 5) dmg（hdiutil；forge 的 MakerDMG 依赖的 macos-alias 在 Node 26 编译不过）
 DMG_ROOT="$(mktemp -d)"
 trap 'rm -rf "$DMG_ROOT"' EXIT
-DMG="out/make/${APP_NAME}-${VERSION}-darwin-arm64.dmg"
+DMG="out/make/${APP_BUNDLE}-${VERSION}-darwin-arm64.dmg"
 echo "== 打包 dmg → $DMG"
-ditto "$APP_PATH" "$DMG_ROOT/${APP_NAME}.app"
+ditto "$APP_PATH" "$DMG_ROOT/${APP_BUNDLE}.app"
 ln -s /Applications "$DMG_ROOT/Applications"
 rm -f "$DMG"
 hdiutil create -volname "$APP_NAME" -srcfolder "$DMG_ROOT" -ov -format UDZO "$DMG" >/dev/null
