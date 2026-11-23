@@ -11,6 +11,7 @@ import { toast } from "sonner"
 
 import { useAppIsReady } from "./atoms/app"
 import { useUISettingKey } from "./atoms/settings/ui"
+import { useHourlyRefresh } from "./hooks/common/useHourlyRefresh"
 import { removeAppSkeleton } from "./lib/app"
 import { takeAuthRedirectError } from "./lib/auth-redirect-error"
 import { ipcServices } from "./lib/client"
@@ -37,8 +38,14 @@ function App() {
 
       <AppLayer />
       <FocusAnalyzerMount />
+      <HourlyRefreshMount />
     </RootProviders>
   )
+}
+
+const HourlyRefreshMount = () => {
+  useHourlyRefresh()
+  return null
 }
 
 const FocusAnalyzerMount = () => {
